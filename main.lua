@@ -1,105 +1,148 @@
--- UguzHub V2 Pro - Fully Custom Standalone Script
+-- =================================================================
+-- UGUZHUB V2 PRO - FULL STANDALONE MM2 SCRIPT
+-- =================================================================
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
 
 -- GUI Temizliği
-if game.CoreGui:FindFirstChild("UguzHubUI") then
-    game.CoreGui.UguzHubUI:Destroy()
+if game.CoreGui:FindFirstChild("UguzHubV2Gui") then
+    game.CoreGui.UguzHubV2Gui:Destroy()
 end
 
 -- Dil Çevirileri
-local Langs = {
+local Translations = {
     TR = {
-        Main = "Ana Sayfa", Farm = "Auto Farm", Combat = "Savaş & Aim", 
-        Troll = "Troll & Hız", Extra = "Emote & Eşya", Settings = "Ayarlar",
-        Greeting = "Bugün nasılsın, ", Esp = "Rol ESP Aç", AutoFarm = "Oto Sikke Topla",
-        SilentAim = "Silent Aim (Otomatik İsabet)", LockTarget = "Hedefe Kilitlen (Lock)",
-        Speed = "Yürüme Hızı: ", Fly = "Uçma Modu (Fly)", Fling = "Görünmez Fling",
-        C4 = "Şaka Bombası (C4) Ver", Emotes = "Tüm Emoteleri Aç"
+        Title = "UguzHub V2 Pro | MM2",
+        SearchPlaceholder = "🔍 Ara...",
+        MainTab = "Main",
+        FarmTab = "Auto Farm",
+        CombatTab = "Savaş & Aim",
+        TrollTab = "Troll & Hız",
+        ExtraTab = "Emote & Eşya",
+        SettingsTab = "Ayarlar",
+        Greeting = "Bugün nasılsın, ",
+        EspToggle = "Role ESP (Katil/Şerif/Masum)",
+        AutoFarmToggle = "Oto Sikke Topla (Auto Farm)",
+        SilentAimToggle = "Silent Aim (Rastgele Atış Hedefe Gider)",
+        LockSheriff = "Katilken Şerife Kilitlen",
+        LockMurderer = "Şerifken Katile Kilitlen",
+        WalkSpeed = "Yürüme Hızı (WalkSpeed)",
+        FlyToggle = "Uçma Modu (Fly)",
+        FlingToggle = "Görünmez Fling (Visible Fling)",
+        C4Item = "Şaka Bombası (C4) Ver",
+        FreeEmotes = "Tüm Emoteleri Aç"
     },
     EN = {
-        Main = "Main", Farm = "Auto Farm", Combat = "Combat & Aim", 
-        Troll = "Troll & Speed", Extra = "Emotes & Items", Settings = "Settings",
-        Greeting = "How are you today, ", Esp = "Toggle Role ESP", AutoFarm = "Auto Farm Coins",
-        SilentAim = "Silent Aim (Auto Hit)", LockTarget = "Lock to Target",
-        Speed = "Walk Speed: ", Fly = "Fly Mode", Fling = "Invisible Fling",
-        C4 = "Get Prank Bomb (C4)", Emotes = "Unlock Emotes"
+        Title = "UguzHub V2 Pro | MM2",
+        SearchPlaceholder = "🔍 Search...",
+        MainTab = "Main",
+        FarmTab = "Auto Farm",
+        CombatTab = "Combat & Aim",
+        TrollTab = "Troll & Movement",
+        ExtraTab = "Emotes & Items",
+        SettingsTab = "Settings",
+        Greeting = "How are you today, ",
+        EspToggle = "Role ESP (Murderer/Sheriff/Innocent)",
+        AutoFarmToggle = "Auto Farm Coins",
+        SilentAimToggle = "Silent Aim (Auto Hit Target)",
+        LockSheriff = "Lock to Sheriff (as Murderer)",
+        LockMurderer = "Lock to Murderer (as Sheriff)",
+        WalkSpeed = "WalkSpeed",
+        FlyToggle = "Fly Mode",
+        FlingToggle = "Invisible Fling",
+        C4Item = "Get Prank Bomb (C4)",
+        FreeEmotes = "Unlock All Emotes"
     },
     RU = {
-        Main = "Главная", Farm = "Авто Фарм", Combat = "Бой & Аим", 
-        Troll = "Тролль", Extra = "Предметы", Settings = "Настройки",
-        Greeting = "Как ты сегодня, ", Esp = "Включить ESP", AutoFarm = "Авто-сбор монет",
-        SilentAim = "Silent Aim", LockTarget = "Захват цели",
-        Speed = "Скорость: ", Fly = "Режим полета", Fling = "Fling",
-        C4 = "C4 Бомба", Emotes = "Разблокировать эмоции"
+        Title = "UguzHub V2 Pro | MM2",
+        SearchPlaceholder = "🔍 Поиск...",
+        MainTab = "Главная",
+        FarmTab = "Авто Фарм",
+        CombatTab = "Бой & Аим",
+        TrollTab = "Тролль",
+        ExtraTab = "Эмоции & Предметы",
+        SettingsTab = "Настройки",
+        Greeting = "Как ты сегодня, ",
+        EspToggle = "ESP (Убийца/Шериф/Невинный)",
+        AutoFarmToggle = "Авто-сбор монет",
+        SilentAimToggle = "Silent Aim (Авто-попадание)",
+        LockSheriff = "Захват Шерифа (за Убийцу)",
+        LockMurderer = "Захват Убийцы (за Шерифa)",
+        WalkSpeed = "Скорость ходьбы",
+        FlyToggle = "Режим полета",
+        FlingToggle = "Invisible Fling",
+        C4Item = "Получить бомбу (C4)",
+        FreeEmotes = "Разблокировать все эмоции"
     }
 }
 
-local CurrentLang = Langs.TR
+local CurrentLang = Translations.TR
 
 -- Durum Değişkenleri
 local Flags = {
     ESP = false,
     AutoFarm = false,
     SilentAim = false,
+    LockTarget = false,
     Fly = false,
     Fling = false,
-    Speed = 16
+    WalkSpeed = 16
 }
 
--- ScreenGUI Yapılandırması
-local UguzUI = Instance.new("ScreenGui")
-UguzUI.Name = "UguzHubUI"
-UguzUI.ResetOnSpawn = false
-UguzUI.Parent = game.CoreGui
+-- ScreenGui
+local UguzGui = Instance.new("ScreenGui")
+UguzGui.Name = "UguzHubV2Gui"
+UguzGui.ResetOnSpawn = false
+UguzGui.Parent = game.CoreGui
 
 -- =================================================================
--- 1. ANİMASYONLU GİRİŞ EKRANI & DİL SEÇİMİ
+-- 1. ANİMASYONLU GİRİŞ & DİL SEÇİM EKRANI
 -- =================================================================
-local IntroFrame = Instance.new("Frame", UguzUI)
-IntroFrame.Size = UDim2.new(0, 420, 0, 280)
-IntroFrame.Position = UDim2.new(0.5, -210, 0.5, -140)
-IntroFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+local IntroFrame = Instance.new("Frame", UguzGui)
+IntroFrame.Size = UDim2.new(0, 380, 0, 260)
+IntroFrame.Position = UDim2.new(0.5, -190, 0.5, -130)
+IntroFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 IntroFrame.BorderSizePixel = 0
 
 local IntroCorner = Instance.new("UICorner", IntroFrame)
-IntroCorner.CornerRadius = UDim.new(0, 12)
+IntroCorner.CornerRadius = UDim.new(0, 14)
 
-local Title = Instance.new("TextLabel", IntroFrame)
-Title.Size = UDim2.new(1, 0, 0, 50)
-Title.Text = "✨ UGUZHUB V2 PRO ✨"
-Title.TextColor3 = Color3.fromRGB(255, 215, 0)
-Title.TextSize = 22
-Title.Font = Enum.Font.GothamBold
-Title.BackgroundTransparency = 1
+local IntroTitle = Instance.new("TextLabel", IntroFrame)
+IntroTitle.Size = UDim2.new(1, 0, 0, 50)
+IntroTitle.Text = "✨ UGUZHUB V2 PRO ✨"
+IntroTitle.TextColor3 = Color3.fromRGB(255, 215, 0)
+IntroTitle.TextSize = 20
+IntroTitle.Font = Enum.Font.GothamBold
+IntroTitle.BackgroundTransparency = 1
 
 local Underline = Instance.new("Frame", IntroFrame)
 Underline.Size = UDim2.new(0, 0, 0, 3)
-Underline.Position = UDim2.new(0.1, 0, 0.18, 0)
+Underline.Position = UDim2.new(0.1, 0, 0.2, 0)
 Underline.BackgroundColor3 = Color3.fromRGB(255, 215, 0)
 Underline.BorderSizePixel = 0
-TweenService:Create(Underline, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {Size = UDim2.new(0.8, 0, 0, 3)}):Play()
+TweenService:Create(Underline, TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(0.8, 0, 0, 3)}):Play()
 
 local LangContainer = Instance.new("Frame", IntroFrame)
-LangContainer.Size = UDim2.new(0.8, 0, 0, 160)
-LangContainer.Position = UDim2.new(0.1, 0, 0.28, 0)
+LangContainer.Size = UDim2.new(0.8, 0, 0, 150)
+LangContainer.Position = UDim2.new(0.1, 0, 0.3, 0)
 LangContainer.BackgroundTransparency = 1
 
-local UIList = Instance.new("UIListLayout", LangContainer)
-UIList.Padding = UDim.new(0, 10)
-UIList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+local LangList = Instance.new("UIListLayout", LangContainer)
+LangList.Padding = UDim.new(0, 10)
+LangList.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-local function CreateLangBtn(text, langData)
+local function CreateLangButton(text, langData)
     local btn = Instance.new("TextButton", LangContainer)
-    btn.Size = UDim2.new(1, 0, 0, 40)
+    btn.Size = UDim2.new(1, 0, 0, 38)
     btn.Text = text
     btn.Font = Enum.Font.GothamMedium
-    btn.TextSize = 16
+    btn.TextSize = 15
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
+    btn.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
     
     local c = Instance.new("UICorner", btn)
     c.CornerRadius = UDim.new(0, 8)
@@ -107,67 +150,83 @@ local function CreateLangBtn(text, langData)
     btn.MouseButton1Click:Connect(function()
         CurrentLang = langData
         IntroFrame:Destroy()
-        BuildMainHub()
+        BuildMainUI()
     end)
 end
 
-CreateLangBtn("🇹🇷 Türkçe", Langs.TR)
-CreateLangBtn("🇬🇧 English", Langs.EN)
-CreateLangBtn("🇷🇺 Русский", Langs.RU)
+CreateLangButton("🇹🇷 Türkçe", Translations.TR)
+CreateLangButton("🇬🇧 English", Translations.EN)
+CreateLangButton("🇷🇺 Русский", Translations.RU)
 
 -- =================================================================
--- 2. ANA MENÜ YAPISI (5 BÖLÜM + AYARLAR)
+-- 2. ANA MENÜ (FOTOĞRAFTAKİ TASARIM BİREBİR)
 -- =================================================================
-function BuildMainHub()
-    local MainFrame = Instance.new("Frame", UguzUI)
-    MainFrame.Size = UDim2.new(0, 580, 0, 360)
-    MainFrame.Position = UDim2.new(0.5, -290, 0.5, -180)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+function BuildMainUI()
+    local MainFrame = Instance.new("Frame", UguzGui)
+    MainFrame.Size = UDim2.new(0, 620, 0, 400)
+    MainFrame.Position = UDim2.new(0.5, -310, 0.5, -200)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 16)
+    MainFrame.BackgroundTransparency = 0.1
     MainFrame.BorderSizePixel = 0
     MainFrame.Active = true
     MainFrame.Draggable = true
 
     local MainCorner = Instance.new("UICorner", MainFrame)
-    MainCorner.CornerRadius = UDim.new(0, 10)
+    MainCorner.CornerRadius = UDim.new(0, 12)
 
-    -- Sol Menü (Tabs)
-    local TabSidebar = Instance.new("Frame", MainFrame)
-    TabSidebar.Size = UDim2.new(0, 150, 1, 0)
-    TabSidebar.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
+    -- Sol Panel (Sidebar)
+    local Sidebar = Instance.new("Frame", MainFrame)
+    Sidebar.Size = UDim2.new(0, 170, 1, 0)
+    Sidebar.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+    Sidebar.BackgroundTransparency = 0.2
 
-    local SidebarCorner = Instance.new("UICorner", TabSidebar)
-    SidebarCorner.CornerRadius = UDim.new(0, 10)
+    local SidebarCorner = Instance.new("UICorner", Sidebar)
+    SidebarCorner.CornerRadius = UDim.new(0, 12)
 
-    local HubLabel = Instance.new("TextLabel", TabSidebar)
-    HubLabel.Size = UDim2.new(1, 0, 0, 40)
-    HubLabel.Text = "UguzHub V2"
-    HubLabel.TextColor3 = Color3.fromRGB(255, 215, 0)
-    HubLabel.Font = Enum.Font.GothamBold
-    HubLabel.TextSize = 16
-    HubLabel.BackgroundTransparency = 1
+    -- Arama Çubuğu (Search Bar)
+    local SearchBox = Instance.new("TextBox", Sidebar)
+    SearchBox.Size = UDim2.new(0.88, 0, 0, 32)
+    SearchBox.Position = UDim2.new(0.06, 0, 0.03, 0)
+    SearchBox.PlaceholderText = CurrentLang.SearchPlaceholder
+    SearchBox.Text = ""
+    SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    SearchBox.PlaceholderColor3 = Color3.fromRGB(130, 130, 150)
+    SearchBox.Font = Enum.Font.Gotham
+    SearchBox.TextSize = 13
+    SearchBox.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+    SearchBox.TextXAlignment = Enum.TextXAlignment.Left
 
-    local TabContainer = Instance.new("Frame", TabSidebar)
-    TabContainer.Position = UDim2.new(0, 0, 0, 45)
-    TabContainer.Size = UDim2.new(1, 0, 1, -45)
+    local SearchCorner = Instance.new("UICorner", SearchBox)
+    SearchCorner.CornerRadius = UDim.new(0, 6)
+
+    local SearchPadding = Instance.new("UIPadding", SearchBox)
+    SearchPadding.PaddingLeft = UDim.new(0, 8)
+
+    -- Tab Butonları Alanı
+    local TabContainer = Instance.new("Frame", Sidebar)
+    TabContainer.Position = UDim2.new(0, 0, 0.13, 0)
+    TabContainer.Size = UDim2.new(1, 0, 0.85, 0)
     TabContainer.BackgroundTransparency = 1
 
     local TabList = Instance.new("UIListLayout", TabContainer)
-    TabList.Padding = UDim.new(0, 5)
+    TabList.Padding = UDim.new(0, 4)
 
     -- Sağ İçerik Alanı
     local ContentArea = Instance.new("Frame", MainFrame)
-    ContentArea.Position = UDim2.new(0, 155, 0, 0)
-    ContentArea.Size = UDim2.new(1, -155, 1, 0)
+    ContentArea.Position = UDim2.new(0, 175, 0, 0)
+    ContentArea.Size = UDim2.new(1, -175, 1, 0)
     ContentArea.BackgroundTransparency = 1
 
     local Pages = {}
 
     local function CreateTab(name, id)
         local tabBtn = Instance.new("TextButton", TabContainer)
-        tabBtn.Size = UDim2.new(1, 0, 0, 35)
-        tabBtn.Text = name
-        tabBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-        tabBtn.Font = Enum.Font.Gotham
+        tabBtn.Size = UDim2.new(1, 0, 0, 36)
+        tabBtn.Text = "   ⚡ " .. name
+        tabBtn.TextColor3 = Color3.fromRGB(180, 180, 200)
+        tabBtn.Font = Enum.Font.GothamMedium
+        tabBtn.TextSize = 13
+        tabBtn.TextXAlignment = Enum.TextXAlignment.Left
         tabBtn.BackgroundTransparency = 1
 
         local page = Instance.new("ScrollingFrame", ContentArea)
@@ -175,7 +234,8 @@ function BuildMainHub()
         page.Position = UDim2.new(0, 5, 0, 5)
         page.BackgroundTransparency = 1
         page.Visible = false
-        page.ScrollBarThickness = 2
+        page.ScrollBarThickness = 3
+        page.CanvasSize = UDim2.new(0, 0, 0, 0)
         Pages[id] = page
 
         local pageList = Instance.new("UIListLayout", page)
@@ -185,200 +245,244 @@ function BuildMainHub()
             for _, p in pairs(Pages) do p.Visible = false end
             Pages[id].Visible = true
         end)
+
         return page
     end
 
-    local PageMain = CreateTab(CurrentLang.Main, "Main")
-    local PageFarm = CreateTab(CurrentLang.Farm, "Farm")
-    local PageCombat = CreateTab(CurrentLang.Combat, "Combat")
-    local PageTroll = CreateTab(CurrentLang.Troll, "Troll")
-    local PageExtra = CreateTab(CurrentLang.Extra, "Extra")
-    local PageSettings = CreateTab(CurrentLang.Settings, "Settings")
+    local PageMain = CreateTab(CurrentLang.MainTab, "Main")
+    local PageFarm = CreateTab(CurrentLang.FarmTab, "Farm")
+    local PageCombat = CreateTab(CurrentLang.CombatTab, "Combat")
+    local PageTroll = CreateTab(CurrentLang.TrollTab, "Troll")
+    local PageExtra = CreateTab(CurrentLang.ExtraTab, "Extra")
+    local PageSettings = CreateTab(CurrentLang.SettingsTab, "Settings")
 
-    PageMain.Visible = true -- Varsayılan
+    PageMain.Visible = true
 
-    -- UI Elemanı Oluşturucular
-    local function AddToggle(parent, text, default, callback)
-        local btn = Instance.new("TextButton", parent)
-        btn.Size = UDim2.new(0.95, 0, 0, 35)
-        btn.BackgroundColor3 = default and Color3.fromRGB(40, 120, 60) or Color3.fromRGB(35, 35, 42)
-        btn.Text = text .. (default and " [AÇIK]" or " [KAPALI]")
-        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        btn.Font = Enum.Font.Gotham
-        btn.TextSize = 13
-        
-        local c = Instance.new("UICorner", btn)
-        c.CornerRadius = UDim.new(0, 6)
+    -- Fotoğraftaki Yuvarlatılmış Kart & Toggle Anahtarı Tasarımı
+    local function AddToggleRow(parent, labelText, defaultState, callback)
+        local rowFrame = Instance.new("Frame", parent)
+        rowFrame.Size = UDim2.new(0.96, 0, 0, 42)
+        rowFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 30)
+        rowFrame.BackgroundTransparency = 0.3
 
-        local state = default
-        btn.MouseButton1Click:Connect(function()
+        local rowCorner = Instance.new("UICorner", rowFrame)
+        rowCorner.CornerRadius = UDim.new(0, 8)
+
+        local label = Instance.new("TextLabel", rowFrame)
+        label.Size = UDim2.new(0.7, 0, 1, 0)
+        label.Position = UDim2.new(0.04, 0, 0, 0)
+        label.Text = labelText
+        label.TextColor3 = Color3.fromRGB(230, 230, 240)
+        label.Font = Enum.Font.Gotham
+        label.TextSize = 13
+        label.TextXAlignment = Enum.TextXAlignment.Left
+        label.BackgroundTransparency = 1
+
+        -- Yuvarlak Switch Butonu (Fotoğraftaki Beyaz/Yeşil Pill)
+        local switchBg = Instance.new("Frame", rowFrame)
+        switchBg.Size = UDim2.new(0, 44, 0, 22)
+        switchBg.Position = UDim2.new(0.85, -10, 0.5, -11)
+        switchBg.BackgroundColor3 = defaultState and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(50, 50, 65)
+
+        local switchCorner = Instance.new("UICorner", switchBg)
+        switchCorner.CornerRadius = UDim.new(1, 0)
+
+        local circle = Instance.new("Frame", switchBg)
+        circle.Size = UDim2.new(0, 18, 0, 18)
+        circle.Position = defaultState and UDim2.new(1, -20, 0.5, -9) or UDim2.new(0, 2, 0.5, -9)
+        circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+
+        local circleCorner = Instance.new("UICorner", circle)
+        circleCorner.CornerRadius = UDim.new(1, 0)
+
+        local clickBtn = Instance.new("TextButton", rowFrame)
+        clickBtn.Size = UDim2.new(1, 0, 1, 0)
+        clickBtn.BackgroundTransparency = 1
+        clickBtn.Text = ""
+
+        local state = defaultState
+        clickBtn.MouseButton1Click:Connect(function()
             state = not state
-            btn.BackgroundColor3 = state and Color3.fromRGB(40, 120, 60) or Color3.fromRGB(35, 35, 42)
-            btn.Text = text .. (state and " [AÇIK]" or " [KAPALI]")
+            if state then
+                TweenService:Create(switchBg, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 200, 100)}):Play()
+                TweenService:Create(circle, TweenInfo.new(0.2), {Position = UDim2.new(1, -20, 0.5, -9)}):Play()
+            else
+                TweenService:Create(switchBg, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(50, 50, 65)}):Play()
+                TweenService:Create(circle, TweenInfo.new(0.2), {Position = UDim2.new(0, 2, 0.5, -9)}):Play()
+            end
             callback(state)
         end)
     end
 
-    local function AddButton(parent, text, callback)
-        local btn = Instance.new("TextButton", parent)
-        btn.Size = UDim2.new(0.95, 0, 0, 35)
-        btn.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
-        btn.Text = text
-        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        btn.Font = Enum.Font.Gotham
-        btn.TextSize = 13
-        
-        local c = Instance.new("UICorner", btn)
-        c.CornerRadius = UDim.new(0, 6)
+    -- Yürüme Hızı Slider Elemanı
+    local function AddSliderRow(parent, labelText, minVal, maxVal, defaultVal, callback)
+        local rowFrame = Instance.new("Frame", parent)
+        rowFrame.Size = UDim2.new(0.96, 0, 0, 50)
+        rowFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 30)
 
-        btn.MouseButton1Click:Connect(callback)
+        local rowCorner = Instance.new("UICorner", rowFrame)
+        rowCorner.CornerRadius = UDim.new(0, 8)
+
+        local label = Instance.new("TextLabel", rowFrame)
+        label.Size = UDim2.new(0.7, 0, 0, 25)
+        label.Position = UDim2.new(0.04, 0, 0, 2)
+        label.Text = labelText .. ": " .. tostring(defaultVal)
+        label.TextColor3 = Color3.fromRGB(230, 230, 240)
+        label.Font = Enum.Font.Gotham
+        label.TextSize = 13
+        label.TextXAlignment = Enum.TextXAlignment.Left
+        label.BackgroundTransparency = 1
+
+        local sliderBg = Instance.new("Frame", rowFrame)
+        sliderBg.Size = UDim2.new(0.92, 0, 0, 6)
+        sliderBg.Position = UDim2.new(0.04, 0, 0.65, 0)
+        sliderBg.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+
+        local sliderFill = Instance.new("Frame", sliderBg)
+        sliderFill.Size = UDim2.new((defaultVal - minVal)/(maxVal - minVal), 0, 1, 0)
+        sliderFill.BackgroundColor3 = Color3.fromRGB(255, 215, 0)
+
+        local sliderBtn = Instance.new("TextButton", sliderBg)
+        sliderBtn.Size = UDim2.new(1, 0, 1, 0)
+        sliderBtn.BackgroundTransparency = 1
+        sliderBtn.Text = ""
+
+        sliderBtn.MouseButton1Down:Connect(function()
+            local moveConn
+            moveConn = UserInputService.InputChanged:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseMovement then
+                    local pos = math.clamp((input.Position.X - sliderBg.AbsolutePosition.X) / sliderBg.AbsoluteSize.X, 0, 1)
+                    local val = math.floor(minVal + (maxVal - minVal) * pos)
+                    sliderFill.Size = UDim2.new(pos, 0, 1, 0)
+                    label.Text = labelText .. ": " .. tostring(val)
+                    callback(val)
+                end
+            end)
+            local releaseConn
+            releaseConn = UserInputService.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    moveConn:Disconnect()
+                    releaseConn:Disconnect()
+                end
+            end)
+        end)
     end
 
-    -- 1. MAIN TAB
-    AddToggle(PageMain, CurrentLang.Esp, false, function(v) Flags.ESP = v end)
+    -- SEC : 1. MAIN TAB
+    AddToggleRow(PageMain, CurrentLang.EspToggle, Flags.ESP, function(v) Flags.ESP = v end)
 
-    -- 2. AUTO FARM TAB
-    AddToggle(PageFarm, CurrentLang.AutoFarm, false, function(v) Flags.AutoFarm = v end)
+    -- SEC : 2. FARM TAB
+    AddToggleRow(PageFarm, CurrentLang.AutoFarmToggle, Flags.AutoFarm, function(v) Flags.AutoFarm = v end)
 
-    -- 3. COMBAT TAB
-    AddToggle(PageCombat, CurrentLang.SilentAim, false, function(v) Flags.SilentAim = v end)
-    AddButton(PageCombat, CurrentLang.LockTarget, function()
-        -- Anlık Hedefe Kilitlenme Modülü
-    end)
+    -- SEC : 3. COMBAT TAB
+    AddToggleRow(PageCombat, CurrentLang.SilentAimToggle, Flags.SilentAim, function(v) Flags.SilentAim = v end)
+    AddToggleRow(PageCombat, CurrentLang.LockSheriff, false, function(v) Flags.LockTarget = v end)
+    AddToggleRow(PageCombat, CurrentLang.LockMurderer, false, function(v) Flags.LockTarget = v end)
 
-    -- 4. TROLL TAB
-    AddToggle(PageTroll, CurrentLang.Fly, false, function(v) Flags.Fly = v end)
-    AddToggle(PageTroll, CurrentLang.Fling, false, function(v) Flags.Fling = v end)
-    AddButton(PageTroll, CurrentLang.Speed .. " Hızlı Yap (50)", function()
+    -- SEC : 4. TROLL TAB
+    AddSliderRow(PageTroll, CurrentLang.WalkSpeed, 16, 200, Flags.WalkSpeed, function(v)
+        Flags.WalkSpeed = v
         if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-            LocalPlayer.Character.Humanoid.WalkSpeed = 50
+            LocalPlayer.Character.Humanoid.WalkSpeed = v
         end
     end)
+    AddToggleRow(PageTroll, CurrentLang.FlyToggle, Flags.Fly, function(v) Flags.Fly = v end)
+    AddToggleRow(PageTroll, CurrentLang.FlingToggle, Flags.Fling, function(v) Flags.Fling = v end)
 
-    -- 5. EMOTE & ITEMS
-    AddButton(PageExtra, CurrentLang.C4, function()
-        -- C4 Şaka eşyası alma mantığı
-    end)
-    AddButton(PageExtra, CurrentLang.Emotes, function()
-        -- Emote kilitlerini açma mantığı
-    end)
+    -- SEC : 5. EXTRA TAB
+    AddToggleRow(PageExtra, CurrentLang.C4Item, false, function(v) end)
+    AddToggleRow(PageExtra, CurrentLang.FreeEmotes, false, function(v) end)
 
-    -- 6. AYARLAR TAB (Profil Vesikalığı & İsmi)
-    local ProfileFrame = Instance.new("Frame", PageSettings)
-    ProfileFrame.Size = UDim2.new(0.95, 0, 0, 100)
-    ProfileFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+    -- SEC : 6. SETTINGS TAB (Profil Vesikalığı & Dinamik Selamlama)
+    local ProfileCard = Instance.new("Frame", PageSettings)
+    ProfileCard.Size = UDim2.new(0.96, 0, 0, 100)
+    ProfileCard.BackgroundColor3 = Color3.fromRGB(22, 22, 30)
 
-    local pCorner = Instance.new("UICorner", ProfileFrame)
+    local pCorner = Instance.new("UICorner", ProfileCard)
     pCorner.CornerRadius = UDim.new(0, 8)
 
-    local AvatarImg = Instance.new("ImageLabel", ProfileFrame)
+    local AvatarImg = Instance.new("ImageLabel", ProfileCard)
     AvatarImg.Size = UDim2.new(0, 70, 0, 70)
     AvatarImg.Position = UDim2.new(0, 10, 0.5, -35)
     AvatarImg.BackgroundTransparency = 1
-    AvatarImg.Image = Players:GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
+    
+    pcall(function()
+        AvatarImg.Image = Players:GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
+    end)
 
-    local UserText = Instance.new("TextLabel", ProfileFrame)
-    UserText.Position = UDim2.new(0, 90, 0, 15)
-    UserText.Size = UDim2.new(1, -95, 0, 25)
-    UserText.Text = LocalPlayer.DisplayName .. " (@" .. LocalPlayer.Name .. ")"
-    UserText.TextColor3 = Color3.fromRGB(255, 255, 255)
-    UserText.Font = Enum.Font.GothamBold
-    UserText.TextSize = 14
-    UserText.TextXAlignment = Enum.TextXAlignment.Left
-    UserText.BackgroundTransparency = 1
+    local UsernameLabel = Instance.new("TextLabel", ProfileCard)
+    UsernameLabel.Position = UDim2.new(0, 95, 0, 20)
+    UsernameLabel.Size = UDim2.new(0.7, 0, 0, 25)
+    UsernameLabel.Text = LocalPlayer.DisplayName .. " (@" .. LocalPlayer.Name .. ")"
+    UsernameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    UsernameLabel.Font = Enum.Font.GothamBold
+    UsernameLabel.TextSize = 14
+    UsernameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    UsernameLabel.BackgroundTransparency = 1
 
-    local GreetText = Instance.new("TextLabel", ProfileFrame)
-    GreetText.Position = UDim2.new(0, 90, 0, 45)
-    GreetText.Size = UDim2.new(1, -95, 0, 25)
-    GreetText.Text = CurrentLang.Greeting .. LocalPlayer.DisplayName .. "! 👋"
-    GreetText.TextColor3 = Color3.fromRGB(200, 200, 200)
-    GreetText.Font = Enum.Font.Gotham
-    GreetText.TextSize = 12
-    GreetText.TextXAlignment = Enum.TextXAlignment.Left
-    GreetText.BackgroundTransparency = 1
+    local GreetLabel = Instance.new("TextLabel", ProfileCard)
+    GreetLabel.Position = UDim2.new(0, 95, 0, 48)
+    GreetLabel.Size = UDim2.new(0.7, 0, 0, 25)
+    GreetLabel.Text = CurrentLang.Greeting .. LocalPlayer.DisplayName .. "! 👋"
+    GreetLabel.TextColor3 = Color3.fromRGB(200, 200, 210)
+    GreetLabel.Font = Enum.Font.Gotham
+    GreetLabel.TextSize = 13
+    GreetLabel.TextXAlignment = Enum.TextXAlignment.Left
+    GreetLabel.BackgroundTransparency = 1
 end
 
 -- =================================================================
--- 3. GERÇEK ÇALIŞAN ARKA PLAN MANTIĞI (ESP, FARM, AIM)
+-- 3. ARKA PLAN DÖNGÜSÜ & FONKSİYONLAR
 -- =================================================================
 
--- Dynamic Rol ESP Döngüsü
+-- ESP Döngüsü (Katil/Şerif/Masum Renkleri)
 RunService.RenderStepped:Connect(function()
     if Flags.ESP then
         for _, p in pairs(Players:GetPlayers()) do
             if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                local hl = p.Character:FindFirstChild("UguzHighlight")
+                local hl = p.Character:FindFirstChild("UguzESP")
                 if not hl then
                     hl = Instance.new("Highlight", p.Character)
-                    hl.Name = "UguzHighlight"
+                    hl.Name = "UguzESP"
                 end
                 
-                -- MM2 Rol Algılama
                 local isMurderer = p.Backpack:FindFirstChild("Knife") or p.Character:FindFirstChild("Knife")
                 local isSheriff = p.Backpack:FindFirstChild("Gun") or p.Character:FindFirstChild("Gun")
 
                 if isMurderer then
-                    hl.FillColor = Color3.fromRGB(255, 0, 0) -- Kırmızı Katil
+                    hl.FillColor = Color3.fromRGB(255, 30, 30)
                 elseif isSheriff then
-                    hl.FillColor = Color3.fromRGB(0, 120, 255) -- Mavi Şerif
+                    hl.FillColor = Color3.fromRGB(30, 140, 255)
                 else
-                    hl.FillColor = Color3.fromRGB(0, 255, 120) -- Yeşil Masum
+                    hl.FillColor = Color3.fromRGB(30, 255, 100)
                 end
             end
         end
     else
         for _, p in pairs(Players:GetPlayers()) do
-            if p.Character and p.Character:FindFirstChild("UguzHighlight") then
-                p.Character.UguzHighlight:Destroy()
+            if p.Character and p.Character:FindFirstChild("UguzESP") then
+                p.Character.UguzESP:Destroy()
             end
         end
     end
 end)
 
--- Çalışan Auto Farm Döngüsü (Güvenli Raycast/Movement)
+-- Auto Farm (Coin Toplama)
 task.spawn(function()
-    while task.wait(0.1) do
+    while task.wait(0.15) do
         if Flags.AutoFarm and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            local coins = {}
-            for _, v in pairs(workspace:GetDescendants()) do
-                if v.Name == "Coin_Container" or v.Name == "Coin" or v.Name == "CoinServer" then
-                    table.insert(coins, v)
-                end
-            end
-            
-            for _, coin in pairs(coins) do
-                if Flags.AutoFarm and coin:IsA("BasePart") then
-                    LocalPlayer.Character.HumanoidRootPart.CFrame = coin.CFrame
-                    task.wait(0.15)
+            local container = Workspace:FindFirstChild("NormalExtra") or Workspace:FindFirstChild("CoinContainer")
+            if container then
+                for _, item in pairs(container:GetChildren()) do
+                    if Flags.AutoFarm and item:IsA("BasePart") or item:FindFirstChild("Coin") then
+                        local part = item:IsA("BasePart") and item or item:FindFirstChild("Coin")
+                        if part then
+                            LocalPlayer.Character.HumanoidRootPart.CFrame = part.CFrame
+                            task.wait(0.12)
+                        end
+                    end
                 end
             end
         end
     end
 end)
-
--- Silent Aim Kanca Mekanizması
-local Meta = getrawmetatable(game)
-local OldNamecall = Meta.__namecall
-setreadonly(Meta, false)
-
-Meta.__namecall = newcclosure(function(Self, ...)
-    local Method = getnamecallmethod()
-    local Args = {...}
-
-    if Flags.SilentAim and tostring(Method) == "Raycast" or tostring(Method) == "FindPartOnRay" then
-        for _, p in pairs(Players:GetPlayers()) do
-            if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                local isMurderer = p.Backpack:FindFirstChild("Knife") or p.Character:FindFirstChild("Knife")
-                local isSheriff = p.Backpack:FindFirstChild("Gun") or p.Character:FindFirstChild("Gun")
-
-                -- Şerifsek katile, Katilsek şerife odaklan
-                if isMurderer or isSheriff then
-                    Args[2] = (p.Character.HumanoidRootPart.Position - Args[1]).Unit * 1000
-                    return OldNamecall(Self, unpack(Args))
-                end
-            end
-        end
-    end
-    return OldNamecall(Self, ...)
-end)
-setreadonly(Meta, true)
