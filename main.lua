@@ -2,29 +2,30 @@
     UguzHub V2 Pro
     Animasyonlu, çok dilli (TR / RU / EN) oyun içi menü arayüzü
     ------------------------------------------------------------
+    Akış:
+      1) 0-5sn: Büyük "UguzHub" logosu + "Loading" yazısı (menü YOK)
+      2) 5sn sonra: Dil seçim ekranı (bayraklı: TR / RU / EN)
+      3) Dil seçilince: sağ üstte küçük "UguzHub" butonu belirir
+      4) Butona basınca: kompakt ana menü açılır (Rayfield tarzı)
+      5) Menü içindeki "–" butonuna basınca: menü küçülür, buton geri gelir
+
     Bu script yalnızca ARAYÜZ + zararsız/kozmetik özellikler içerir:
-      - Animasyonlu giriş ekranı + dil seçimi (bayraklı)
-      - Rayfield tarzı sidebar menü (5 bölüm)
-      - Ayarlar sekmesinde oyuncunun Roblox avatarı + kullanıcı adı + selamlama
-      - Emotes sekmesi: Roblox'un ücretsiz/varsayılan emote'larını oynatır
-      - Items sekmesi: "Şaka Bombası" -> sadece görsel + ses efekti (konfeti/duman),
-        hiçbir oyuncuya zarar vermez, herhangi bir oyun kuralını ihlal etmez.
+      - Ana Sayfa / Itemler / Emoteler / Ayarlar / Bilgi sekmeleri
+      - Ayarlar: oyuncunun gerçek Roblox avatarı + kullanıcı adı + selamlama
+      - Emoteler: Roblox'un ücretsiz/varsayılan emote'larını oynatır
+      - Itemler: "Şaka Bombası" -> sadece görsel + ses efekti (konfeti/duman)
 
     Bu script kasıtlı olarak İÇERMEZ:
-      - Aimbot / Silent Aim / Auto Lock
-      - ESP / Wallhack
-      - Autofarm
-      - Fly / Speed (Walkspeed) hilesi
+      - Aimbot / Silent Aim / Auto Lock / ESP / Wallhack
+      - Autofarm / Fly / Speed (Walkspeed) hilesi
       - Herhangi bir "exploit" ya da haksız avantaj sağlayan kod
 
-    Kullanım: StarterGui içine bir LocalScript olarak koy, ya da
-    Players.LocalPlayer.PlayerGui altına çalıştır.
+    Kullanım: StarterGui içine bir LocalScript olarak koy.
 ]]
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
-local SoundService = game:GetService("SoundService")
+local Debris = game:GetService("Debris")
 
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
@@ -33,22 +34,24 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 -- TEMA
 ------------------------------------------------------------
 local Theme = {
-    Background   = Color3.fromRGB(18, 18, 24),
-    Sidebar      = Color3.fromRGB(24, 24, 32),
-    Card         = Color3.fromRGB(30, 30, 40),
-    Accent       = Color3.fromRGB(138, 92, 255),   -- mor/lüks vurgu
+    Background   = Color3.fromRGB(16, 16, 22),
+    Sidebar      = Color3.fromRGB(20, 20, 28),
+    Card         = Color3.fromRGB(32, 32, 42),
+    Accent       = Color3.fromRGB(138, 92, 255),
     AccentSoft   = Color3.fromRGB(90, 60, 180),
     Text         = Color3.fromRGB(235, 235, 245),
-    SubText      = Color3.fromRGB(160, 160, 175),
-    Stroke       = Color3.fromRGB(50, 50, 65),
+    SubText      = Color3.fromRGB(165, 165, 180),
+    Stroke       = Color3.fromRGB(55, 55, 70),
 }
+
+local CARD_TRANSPARENCY = 0.28 -- arka plan görselinin kartların arkasından görünmesi için
 
 ------------------------------------------------------------
 -- DİL PAKETLERİ
 ------------------------------------------------------------
 local Lang = {
     TR = {
-        title = "UguzHub V2 Pro",
+        loading = "Yükleniyor",
         subtitle = "Devam etmek için bir dil seçin",
         tabs = { "Ana Sayfa", "Itemler", "Emoteler", "Ayarlar", "Bilgi" },
         greeting = "Bugün nasılsın",
@@ -59,9 +62,10 @@ local Lang = {
         infoText = "UguzHub V2 Pro - lüks ve animasyonlu menü sistemi.",
         settingsToggle1 = "Bildirim Sesleri",
         settingsToggle2 = "Otomatik Tema",
+        openBtn = "UguzHub",
     },
     RU = {
-        title = "UguzHub V2 Pro",
+        loading = "Загрузка",
         subtitle = "Выберите язык, чтобы продолжить",
         tabs = { "Главная", "Предметы", "Эмоции", "Настройки", "Инфо" },
         greeting = "Как дела сегодня",
@@ -72,9 +76,10 @@ local Lang = {
         infoText = "UguzHub V2 Pro - роскошное анимированное меню.",
         settingsToggle1 = "Звуки уведомлений",
         settingsToggle2 = "Авто-тема",
+        openBtn = "UguzHub",
     },
     EN = {
-        title = "UguzHub V2 Pro",
+        loading = "Loading",
         subtitle = "Select a language to continue",
         tabs = { "Main", "Items", "Emotes", "Settings", "Info" },
         greeting = "How are you today",
@@ -85,6 +90,7 @@ local Lang = {
         infoText = "UguzHub V2 Pro - a luxurious, animated menu system.",
         settingsToggle1 = "Notification Sounds",
         settingsToggle2 = "Auto Theme",
+        openBtn = "UguzHub",
     },
 }
 
@@ -119,7 +125,7 @@ end
 
 local function tween(obj, props, duration, style, direction)
     local info = TweenInfo.new(
-        duration or 0.35,
+        duration or 0.3,
         style or Enum.EasingStyle.Quint,
         direction or Enum.EasingDirection.Out
     )
@@ -140,7 +146,7 @@ local ScreenGui = create("ScreenGui", {
 ScreenGui.Parent = PlayerGui
 
 ------------------------------------------------------------
--- GİRİŞ EKRANI (INTRO)
+-- GİRİŞ EKRANI (LOADING + DİL SEÇİMİ AYNI FRAME İÇİNDE, AŞAMALI)
 ------------------------------------------------------------
 local IntroFrame = create("Frame", {
     Name = "Intro",
@@ -148,18 +154,19 @@ local IntroFrame = create("Frame", {
     BackgroundColor3 = Theme.Background,
     BackgroundTransparency = 0,
     ZIndex = 10,
-}, {})
+})
 IntroFrame.Parent = ScreenGui
 
 local LogoLabel = create("TextLabel", {
     Text = "UguzHub",
     Font = Enum.Font.GothamBlack,
-    TextSize = 54,
+    TextSize = 56,
     TextColor3 = Theme.Text,
     BackgroundTransparency = 1,
     Size = UDim2.new(0, 500, 0, 70),
-    Position = UDim2.new(0.5, -250, 0.35, -60),
+    Position = UDim2.new(0.5, -250, 0.38, -60),
     TextTransparency = 1,
+    ZIndex = 11,
 })
 LogoLabel.Parent = IntroFrame
 
@@ -170,8 +177,9 @@ local ProTag = create("TextLabel", {
     TextColor3 = Theme.Accent,
     BackgroundTransparency = 1,
     Size = UDim2.new(0, 200, 0, 24),
-    Position = UDim2.new(0.5, -50, 0.35, 12),
+    Position = UDim2.new(0.5, -50, 0.38, 12),
     TextTransparency = 1,
+    ZIndex = 11,
 })
 ProTag.Parent = IntroFrame
 
@@ -179,14 +187,30 @@ ProTag.Parent = IntroFrame
 local Underline = create("Frame", {
     Name = "Underline",
     Size = UDim2.new(0, 0, 0, 3),
-    Position = UDim2.new(0.5, 0, 0.35, 46),
+    Position = UDim2.new(0.5, 0, 0.38, 46),
     AnchorPoint = Vector2.new(0.5, 0),
     BackgroundColor3 = Theme.Accent,
     BorderSizePixel = 0,
+    ZIndex = 11,
 })
 Underline.Parent = IntroFrame
 corner(2).Parent = Underline
 
+-- Yükleniyor yazısı (0-5sn arası görünür)
+local LoadingLabel = create("TextLabel", {
+    Text = L.loading,
+    Font = Enum.Font.GothamMedium,
+    TextSize = 18,
+    TextColor3 = Theme.SubText,
+    BackgroundTransparency = 1,
+    Size = UDim2.new(0, 400, 0, 24),
+    Position = UDim2.new(0.5, -200, 0.5, 0),
+    TextTransparency = 1,
+    ZIndex = 11,
+})
+LoadingLabel.Parent = IntroFrame
+
+-- Dil seçim alt başlığı (5sn sonra görünür)
 local SubtitleLabel = create("TextLabel", {
     Text = L.subtitle,
     Font = Enum.Font.Gotham,
@@ -196,24 +220,27 @@ local SubtitleLabel = create("TextLabel", {
     Size = UDim2.new(0, 500, 0, 24),
     Position = UDim2.new(0.5, -250, 0.5, 0),
     TextTransparency = 1,
+    ZIndex = 11,
+    Visible = false,
 })
 SubtitleLabel.Parent = IntroFrame
 
--- Dil seçim butonları (bayraklı)
+-- Dil seçim butonları (bayraklı, 5sn sonra görünür)
 local LangHolder = create("Frame", {
     Size = UDim2.new(0, 420, 0, 90),
     Position = UDim2.new(0.5, -210, 0.58, 0),
     BackgroundTransparency = 1,
+    ZIndex = 11,
+    Visible = false,
 })
 LangHolder.Parent = IntroFrame
 
-local LangList = create("UIListLayout", {
+create("UIListLayout", {
     FillDirection = Enum.FillDirection.Horizontal,
     HorizontalAlignment = Enum.HorizontalAlignment.Center,
     VerticalAlignment = Enum.VerticalAlignment.Center,
     Padding = UDim.new(0, 20),
-})
-LangList.Parent = LangHolder
+}).Parent = LangHolder
 
 local LanguageOptions = {
     { code = "TR", flag = "🇹🇷", name = "Türkçe" },
@@ -224,10 +251,39 @@ local LanguageOptions = {
 local langButtons = {}
 
 ------------------------------------------------------------
+-- KÜÇÜLTÜLMÜŞ (MINIMIZED) BUTON - sağ üst köşe, "UguzHub" yazısı
+------------------------------------------------------------
+local MinimizedButton = create("TextButton", {
+    Name = "MinimizedButton",
+    Text = "🟣 " .. L.openBtn,
+    Font = Enum.Font.GothamBold,
+    TextSize = 15,
+    TextColor3 = Theme.Text,
+    BackgroundColor3 = Theme.Sidebar,
+    Size = UDim2.new(0, 118, 0, 38),
+    Position = UDim2.new(1, -134, 0, 16),
+    AutoButtonColor = false,
+    Visible = false,
+    ZIndex = 8,
+})
+corner(10).Parent = MinimizedButton
+stroke(Theme.Accent, 1.2).Parent = MinimizedButton
+MinimizedButton.Parent = ScreenGui
+
+MinimizedButton.MouseEnter:Connect(function()
+    tween(MinimizedButton, { BackgroundColor3 = Theme.AccentSoft }, 0.15)
+end)
+MinimizedButton.MouseLeave:Connect(function()
+    tween(MinimizedButton, { BackgroundColor3 = Theme.Sidebar }, 0.15)
+end)
+
+------------------------------------------------------------
 -- ANA MENÜ (sonradan doldurulacak)
 ------------------------------------------------------------
 local MainFrame -- forward declare
 local buildMainMenu -- forward declare
+local openMenu -- forward declare
+local closeMenu -- forward declare
 
 local function selectLanguage(code)
     CurrentLang = code
@@ -235,32 +291,30 @@ local function selectLanguage(code)
 
     for _, btn in ipairs(langButtons) do
         local isSelected = btn:GetAttribute("Code") == code
-        tween(btn, {
-            BackgroundColor3 = isSelected and Theme.Accent or Theme.Card,
-        }, 0.2)
+        tween(btn, { BackgroundColor3 = isSelected and Theme.Accent or Theme.Card }, 0.2)
     end
 
     SubtitleLabel.Text = L.subtitle
 
-    -- kısa bekleme sonrası intro'dan menüye geç
-    task.delay(0.35, function()
-        tween(IntroFrame, { BackgroundTransparency = 1 }, 0.5)
+    task.delay(0.3, function()
+        tween(IntroFrame, { BackgroundTransparency = 1 }, 0.45)
         tween(LogoLabel, { TextTransparency = 1 }, 0.3)
         tween(ProTag, { TextTransparency = 1 }, 0.3)
         tween(SubtitleLabel, { TextTransparency = 1 }, 0.3)
         for _, btn in ipairs(langButtons) do
             tween(btn, { BackgroundTransparency = 1 }, 0.3)
         end
-        task.wait(0.5)
+        task.wait(0.45)
         IntroFrame.Visible = false
 
         if not MainFrame then
             buildMainMenu()
-        else
-            MainFrame.Visible = true
-            MainFrame.Position = UDim2.new(0.5, 0, 0.55, 0)
-            tween(MainFrame, { Position = UDim2.new(0.5, 0, 0.5, 0) }, 0.4)
         end
+
+        MinimizedButton.Visible = true
+        MinimizedButton.BackgroundTransparency = 1
+        MinimizedButton.Text = "🟣 " .. L.openBtn
+        tween(MinimizedButton, { BackgroundTransparency = 0 }, 0.3)
     end)
 end
 
@@ -271,22 +325,23 @@ for _, opt in ipairs(LanguageOptions) do
         AutoButtonColor = false,
         Text = "",
         BackgroundTransparency = 1,
+        ZIndex = 11,
     })
     corner(14).Parent = btn
     stroke().Parent = btn
     btn:SetAttribute("Code", opt.code)
 
-    local flagLabel = create("TextLabel", {
+    create("TextLabel", {
         Text = opt.flag,
         Font = Enum.Font.GothamBold,
         TextSize = 32,
         BackgroundTransparency = 1,
         Size = UDim2.new(1, 0, 0, 40),
         Position = UDim2.new(0, 0, 0, 8),
-    })
-    flagLabel.Parent = btn
+        ZIndex = 12,
+    }).Parent = btn
 
-    local nameLabel = create("TextLabel", {
+    create("TextLabel", {
         Text = opt.name,
         Font = Enum.Font.GothamMedium,
         TextSize = 14,
@@ -294,8 +349,8 @@ for _, opt in ipairs(LanguageOptions) do
         BackgroundTransparency = 1,
         Size = UDim2.new(1, 0, 0, 20),
         Position = UDim2.new(0, 0, 0, 52),
-    })
-    nameLabel.Parent = btn
+        ZIndex = 12,
+    }).Parent = btn
 
     btn.MouseEnter:Connect(function()
         if CurrentLang ~= opt.code then
@@ -315,13 +370,40 @@ for _, opt in ipairs(LanguageOptions) do
     table.insert(langButtons, btn)
 end
 
--- Giriş animasyonu: logo fade-in + underline "çizilme"
+------------------------------------------------------------
+-- AŞAMA 1: 0-5sn YÜKLEME EKRANI, AŞAMA 2: DİL SEÇİMİ
+------------------------------------------------------------
 task.defer(function()
+    -- Logo + "Loading" belirir
     tween(LogoLabel, { TextTransparency = 0 }, 0.6)
     tween(ProTag, { TextTransparency = 0 }, 0.6)
     task.wait(0.15)
     tween(Underline, { Size = UDim2.new(0, 240, 0, 3) }, 0.6, Enum.EasingStyle.Quart)
-    task.wait(0.25)
+    task.wait(0.2)
+    tween(LoadingLabel, { TextTransparency = 0 }, 0.4)
+
+    -- Loading yazısı nokta animasyonu (bu sırada HİÇBİR menü yüklenmez)
+    local dotsRunning = true
+    task.spawn(function()
+        local states = { L.loading, L.loading .. ".", L.loading .. "..", L.loading .. "..." }
+        local i = 1
+        while dotsRunning do
+            LoadingLabel.Text = states[i]
+            i = (i % #states) + 1
+            task.wait(0.4)
+        end
+    end)
+
+    task.wait(5) -- toplam 5 saniye bekleme
+    dotsRunning = false
+
+    -- Loading'den dil seçimine geçiş
+    tween(LoadingLabel, { TextTransparency = 1 }, 0.3)
+    task.wait(0.3)
+    LoadingLabel.Visible = false
+
+    SubtitleLabel.Visible = true
+    LangHolder.Visible = true
     tween(SubtitleLabel, { TextTransparency = 0 }, 0.5)
     for i, btn in ipairs(langButtons) do
         btn.BackgroundTransparency = 1
@@ -332,110 +414,113 @@ task.defer(function()
 end)
 
 ------------------------------------------------------------
--- ANA MENÜ OLUŞTURMA
+-- ANA MENÜ OLUŞTURMA (kompakt, Rayfield tarzı)
 ------------------------------------------------------------
+local MENU_W, MENU_H = 460, 320
+local SIDEBAR_W = 130
+
 function buildMainMenu()
     MainFrame = create("Frame", {
         Name = "MainMenu",
-        Size = UDim2.new(0, 620, 0, 420),
-        Position = UDim2.new(0.5, 0, 0.55, 0),
+        Size = UDim2.new(0, MENU_W, 0, MENU_H),
+        Position = UDim2.new(0.5, 0, 0.5, 0),
         AnchorPoint = Vector2.new(0.5, 0.5),
         BackgroundColor3 = Theme.Background,
         ClipsDescendants = true,
+        Visible = false,
         ZIndex = 5,
     })
-    corner(18).Parent = MainFrame
+    corner(16).Parent = MainFrame
     stroke(Theme.Accent, 1.5).Parent = MainFrame
     MainFrame.Parent = ScreenGui
 
-    -- Arka plan görseli (Rayfield tarzı, yarı saydam, menünün en altında)
+    -- Arka plan görseli (Rayfield tarzı) - net görünür, hafif karartılmış
     local BackgroundArt = create("ImageLabel", {
         Name = "BackgroundArt",
         Image = "rbxassetid://15732257423",
         Size = UDim2.new(1, 0, 1, 0),
-        Position = UDim2.new(0, 0, 0, 0),
         BackgroundTransparency = 1,
-        ImageTransparency = 0.55,
+        ImageTransparency = 0.15,
         ScaleType = Enum.ScaleType.Crop,
         ZIndex = 1,
     })
-    corner(18).Parent = BackgroundArt
+    corner(16).Parent = BackgroundArt
     BackgroundArt.Parent = MainFrame
 
-    -- Görselin üstüne hafif karartma, metinlerin okunabilir kalması için
+    -- Okunabilirlik için hafif karartma (görsel hâlâ net görünür kalır)
     local BackgroundDim = create("Frame", {
         Name = "BackgroundDim",
         Size = UDim2.new(1, 0, 1, 0),
         BackgroundColor3 = Theme.Background,
-        BackgroundTransparency = 0.35,
+        BackgroundTransparency = 0.55,
         ZIndex = 2,
     })
-    corner(18).Parent = BackgroundDim
+    corner(16).Parent = BackgroundDim
     BackgroundDim.Parent = MainFrame
 
     -- Üst bar
     local TopBar = create("Frame", {
-        Size = UDim2.new(1, 0, 0, 48),
+        Size = UDim2.new(1, 0, 0, 42),
         BackgroundColor3 = Theme.Sidebar,
+        BackgroundTransparency = CARD_TRANSPARENCY,
         ZIndex = 6,
     })
-    corner(18).Parent = TopBar
+    corner(16).Parent = TopBar
     TopBar.Parent = MainFrame
 
     create("TextLabel", {
         Text = "UguzHub  •  V2 Pro",
         Font = Enum.Font.GothamBold,
-        TextSize = 16,
+        TextSize = 15,
         TextColor3 = Theme.Text,
         BackgroundTransparency = 1,
         Size = UDim2.new(1, -20, 1, 0),
-        Position = UDim2.new(0, 16, 0, 0),
+        Position = UDim2.new(0, 14, 0, 0),
         TextXAlignment = Enum.TextXAlignment.Left,
         ZIndex = 7,
     }).Parent = TopBar
 
-    local CloseBtn = create("TextButton", {
-        Text = "✕",
+    -- Küçültme butonu ("–") -> menüyü kapatır, sağ üstteki UguzHub butonunu geri getirir
+    local MinimizeBtn = create("TextButton", {
+        Text = "–",
         Font = Enum.Font.GothamBold,
-        TextSize = 16,
+        TextSize = 20,
         TextColor3 = Theme.SubText,
         BackgroundTransparency = 1,
-        Size = UDim2.new(0, 36, 0, 36),
-        Position = UDim2.new(1, -42, 0, 6),
+        Size = UDim2.new(0, 32, 0, 32),
+        Position = UDim2.new(1, -38, 0, 5),
         ZIndex = 7,
     })
-    CloseBtn.Parent = TopBar
-    CloseBtn.MouseButton1Click:Connect(function()
-        tween(MainFrame, { Size = UDim2.new(0, 0, 0, 0) }, 0.3)
-        task.wait(0.3)
-        MainFrame.Visible = false
+    MinimizeBtn.Parent = TopBar
+    MinimizeBtn.MouseButton1Click:Connect(function()
+        closeMenu()
     end)
 
     -- Sidebar
     local Sidebar = create("Frame", {
-        Size = UDim2.new(0, 160, 1, -48),
-        Position = UDim2.new(0, 0, 0, 48),
+        Size = UDim2.new(0, SIDEBAR_W, 1, -42),
+        Position = UDim2.new(0, 0, 0, 42),
         BackgroundColor3 = Theme.Sidebar,
+        BackgroundTransparency = CARD_TRANSPARENCY,
         ZIndex = 6,
     })
     Sidebar.Parent = MainFrame
 
-    local SidebarLayout = create("UIListLayout", {
-        Padding = UDim.new(0, 6),
+    create("UIListLayout", {
+        Padding = UDim.new(0, 5),
         SortOrder = Enum.SortOrder.LayoutOrder,
-    })
-    SidebarLayout.Parent = Sidebar
+    }).Parent = Sidebar
 
     create("UIPadding", {
-        PaddingTop = UDim.new(0, 12),
-        PaddingLeft = UDim.new(0, 10),
-        PaddingRight = UDim.new(0, 10),
+        PaddingTop = UDim.new(0, 10),
+        PaddingLeft = UDim.new(0, 8),
+        PaddingRight = UDim.new(0, 8),
     }).Parent = Sidebar
 
     -- İçerik alanı
     local Content = create("Frame", {
-        Size = UDim2.new(1, -160, 1, -48),
-        Position = UDim2.new(0, 160, 0, 48),
+        Size = UDim2.new(1, -SIDEBAR_W, 1, -42),
+        Position = UDim2.new(0, SIDEBAR_W, 0, 42),
         BackgroundTransparency = 1,
         ClipsDescendants = true,
         ZIndex = 6,
@@ -450,24 +535,22 @@ function buildMainMenu()
             local active = (i == index)
             page.Visible = active
             if active then
-                page.Position = UDim2.new(0, 12, 0, 8)
-                tween(page, { Position = UDim2.new(0, 0, 0, 0) }, 0.3)
+                page.Position = UDim2.new(0, 10, 0, 6)
+                tween(page, { Position = UDim2.new(0, 0, 0, 0) }, 0.25)
             end
         end
         for i, btn in ipairs(tabButtons) do
             tween(btn, {
                 BackgroundColor3 = (i == index) and Theme.Accent or Theme.Sidebar,
+                BackgroundTransparency = (i == index) and 0.05 or CARD_TRANSPARENCY,
             }, 0.2)
         end
     end
 
-    ------------------------------------------------------------
-    -- SAYFA OLUŞTURUCU YARDIMCI
-    ------------------------------------------------------------
     local function newPage()
         local page = create("Frame", {
-            Size = UDim2.new(1, -24, 1, -16),
-            Position = UDim2.new(0, 12, 0, 8),
+            Size = UDim2.new(1, -20, 1, -14),
+            Position = UDim2.new(0, 10, 0, 6),
             BackgroundTransparency = 1,
             Visible = false,
         })
@@ -480,55 +563,55 @@ function buildMainMenu()
     -- 1) MAIN SAYFASI
     ------------------------------------------------------------
     local MainPage = newPage()
-    local WelcomeLabel = create("TextLabel", {
+    create("TextLabel", {
         Text = L.welcome,
         Font = Enum.Font.GothamBold,
-        TextSize = 22,
+        TextSize = 18,
         TextColor3 = Theme.Text,
         BackgroundTransparency = 1,
-        Size = UDim2.new(1, 0, 0, 34),
+        Size = UDim2.new(1, 0, 0, 28),
         TextXAlignment = Enum.TextXAlignment.Left,
-    })
-    WelcomeLabel.Parent = MainPage
+    }).Parent = MainPage
 
     local function makeToggleRow(labelText, yPos)
         local row = create("Frame", {
-            Size = UDim2.new(1, 0, 0, 44),
+            Size = UDim2.new(1, 0, 0, 38),
             Position = UDim2.new(0, 0, 0, yPos),
             BackgroundColor3 = Theme.Card,
+            BackgroundTransparency = CARD_TRANSPARENCY,
         })
         corner(10).Parent = row
-        local lbl = create("TextLabel", {
+
+        create("TextLabel", {
             Text = labelText,
             Font = Enum.Font.Gotham,
-            TextSize = 14,
+            TextSize = 13,
             TextColor3 = Theme.Text,
             BackgroundTransparency = 1,
-            Size = UDim2.new(1, -70, 1, 0),
-            Position = UDim2.new(0, 14, 0, 0),
+            Size = UDim2.new(1, -66, 1, 0),
+            Position = UDim2.new(0, 12, 0, 0),
             TextXAlignment = Enum.TextXAlignment.Left,
-        })
-        lbl.Parent = row
+        }).Parent = row
 
         local toggle = create("TextButton", {
-            Size = UDim2.new(0, 44, 0, 24),
-            Position = UDim2.new(1, -58, 0.5, -12),
+            Size = UDim2.new(0, 40, 0, 22),
+            Position = UDim2.new(1, -52, 0.5, -11),
             BackgroundColor3 = Theme.AccentSoft,
             Text = "",
         })
-        corner(12).Parent = toggle
+        corner(11).Parent = toggle
         local knob = create("Frame", {
-            Size = UDim2.new(0, 18, 0, 18),
-            Position = UDim2.new(0, 3, 0.5, -9),
+            Size = UDim2.new(0, 16, 0, 16),
+            Position = UDim2.new(0, 3, 0.5, -8),
             BackgroundColor3 = Theme.Text,
         })
-        corner(9).Parent = knob
+        corner(8).Parent = knob
         knob.Parent = toggle
 
         local state = false
         toggle.MouseButton1Click:Connect(function()
             state = not state
-            tween(knob, { Position = state and UDim2.new(1, -21, 0.5, -9) or UDim2.new(0, 3, 0.5, -9) }, 0.2)
+            tween(knob, { Position = state and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8) }, 0.2)
             tween(toggle, { BackgroundColor3 = state and Theme.Accent or Theme.AccentSoft }, 0.2)
         end)
 
@@ -536,8 +619,8 @@ function buildMainMenu()
         return row
     end
 
-    makeToggleRow(L.settingsToggle1, 50)
-    makeToggleRow(L.settingsToggle2, 102)
+    makeToggleRow(L.settingsToggle1, 40)
+    makeToggleRow(L.settingsToggle2, 84)
 
     ------------------------------------------------------------
     -- 2) ITEMS SAYFASI ("Şaka Bombası")
@@ -545,8 +628,9 @@ function buildMainMenu()
     local ItemsPage = newPage()
 
     local BombCard = create("Frame", {
-        Size = UDim2.new(1, 0, 0, 110),
+        Size = UDim2.new(1, 0, 0, 100),
         BackgroundColor3 = Theme.Card,
+        BackgroundTransparency = CARD_TRANSPARENCY,
     })
     corner(12).Parent = BombCard
     BombCard.Parent = ItemsPage
@@ -554,22 +638,22 @@ function buildMainMenu()
     create("TextLabel", {
         Text = "🎉 " .. L.jokebomb,
         Font = Enum.Font.GothamBold,
-        TextSize = 18,
+        TextSize = 16,
         TextColor3 = Theme.Text,
         BackgroundTransparency = 1,
-        Size = UDim2.new(1, -24, 0, 26),
-        Position = UDim2.new(0, 14, 0, 12),
+        Size = UDim2.new(1, -20, 0, 24),
+        Position = UDim2.new(0, 12, 0, 10),
         TextXAlignment = Enum.TextXAlignment.Left,
     }).Parent = BombCard
 
     create("TextLabel", {
         Text = L.jokebombDesc,
         Font = Enum.Font.Gotham,
-        TextSize = 13,
+        TextSize = 12,
         TextColor3 = Theme.SubText,
         BackgroundTransparency = 1,
-        Size = UDim2.new(1, -24, 0, 20),
-        Position = UDim2.new(0, 14, 0, 40),
+        Size = UDim2.new(1, -20, 0, 30),
+        Position = UDim2.new(0, 12, 0, 34),
         TextXAlignment = Enum.TextXAlignment.Left,
         TextWrapped = true,
     }).Parent = BombCard
@@ -577,16 +661,15 @@ function buildMainMenu()
     local BombBtn = create("TextButton", {
         Text = "USE",
         Font = Enum.Font.GothamBold,
-        TextSize = 14,
+        TextSize = 13,
         TextColor3 = Theme.Text,
         BackgroundColor3 = Theme.Accent,
-        Size = UDim2.new(0, 90, 0, 30),
-        Position = UDim2.new(1, -104, 1, -42),
+        Size = UDim2.new(0, 80, 0, 26),
+        Position = UDim2.new(1, -92, 1, -36),
     })
     corner(8).Parent = BombBtn
     BombBtn.Parent = BombCard
 
-    -- Şaka bombası: yalnızca görsel/ses efekti, hasar YOK, exploit DEĞİL
     local function triggerJokeBomb()
         local character = LocalPlayer.Character
         if not character then return end
@@ -612,50 +695,49 @@ function buildMainMenu()
         sound.Parent = hrp
         sound:Play()
 
-        game:GetService("Debris"):AddItem(attachment, 2)
-        game:GetService("Debris"):AddItem(sound, 3)
+        Debris:AddItem(attachment, 2)
+        Debris:AddItem(sound, 3)
     end
 
     BombBtn.MouseButton1Click:Connect(triggerJokeBomb)
 
     ------------------------------------------------------------
-    -- 3) EMOTES SAYFASI (Roblox'un ücretsiz/varsayılan emoteları)
+    -- 3) EMOTES SAYFASI
     ------------------------------------------------------------
     local EmotesPage = newPage()
 
     create("TextLabel", {
         Text = L.emoteHeader,
         Font = Enum.Font.GothamBold,
-        TextSize = 18,
+        TextSize = 16,
         TextColor3 = Theme.Text,
         BackgroundTransparency = 1,
-        Size = UDim2.new(1, 0, 0, 26),
+        Size = UDim2.new(1, 0, 0, 22),
         TextXAlignment = Enum.TextXAlignment.Left,
     }).Parent = EmotesPage
 
     local EmoteGrid = create("Frame", {
-        Size = UDim2.new(1, 0, 1, -36),
-        Position = UDim2.new(0, 0, 0, 36),
+        Size = UDim2.new(1, 0, 1, -30),
+        Position = UDim2.new(0, 0, 0, 30),
         BackgroundTransparency = 1,
     })
     EmoteGrid.Parent = EmotesPage
 
-    local GridLayout = create("UIGridLayout", {
-        CellSize = UDim2.new(0, 100, 0, 60),
-        CellPadding = UDim2.new(0, 10, 0, 10),
-    })
-    GridLayout.Parent = EmoteGrid
+    create("UIGridLayout", {
+        CellSize = UDim2.new(0, 92, 0, 50),
+        CellPadding = UDim2.new(0, 8, 0, 8),
+    }).Parent = EmoteGrid
 
-    -- Bunlar Roblox'un standart, herkese ücretsiz gelen emote'larıdır
     local DefaultEmotes = { "wave", "point", "laugh", "dance", "cheer" }
 
     for _, emoteName in ipairs(DefaultEmotes) do
         local eBtn = create("TextButton", {
             Text = emoteName:sub(1, 1):upper() .. emoteName:sub(2),
             Font = Enum.Font.GothamMedium,
-            TextSize = 13,
+            TextSize = 12,
             TextColor3 = Theme.Text,
             BackgroundColor3 = Theme.Card,
+            BackgroundTransparency = CARD_TRANSPARENCY,
         })
         corner(10).Parent = eBtn
         eBtn.Parent = EmoteGrid
@@ -677,11 +759,11 @@ function buildMainMenu()
     local SettingsPage = newPage()
 
     local AvatarFrame = create("Frame", {
-        Size = UDim2.new(0, 90, 0, 90),
-        Position = UDim2.new(0, 0, 0, 0),
+        Size = UDim2.new(0, 76, 0, 76),
         BackgroundColor3 = Theme.Card,
+        BackgroundTransparency = CARD_TRANSPARENCY,
     })
-    corner(45).Parent = AvatarFrame
+    corner(38).Parent = AvatarFrame
     stroke(Theme.Accent, 2).Parent = AvatarFrame
     AvatarFrame.Parent = SettingsPage
 
@@ -691,32 +773,30 @@ function buildMainMenu()
         BackgroundTransparency = 1,
         Image = "rbxthumb://type=AvatarHeadShot&id=" .. LocalPlayer.UserId .. "&w=150&h=150",
     })
-    corner(45).Parent = AvatarImage
+    corner(38).Parent = AvatarImage
     AvatarImage.Parent = AvatarFrame
 
-    local NameLabel = create("TextLabel", {
+    create("TextLabel", {
         Text = LocalPlayer.DisplayName .. "  (@" .. LocalPlayer.Name .. ")",
         Font = Enum.Font.GothamBold,
-        TextSize = 16,
+        TextSize = 14,
         TextColor3 = Theme.Text,
         BackgroundTransparency = 1,
-        Size = UDim2.new(1, -110, 0, 22),
-        Position = UDim2.new(0, 104, 0, 14),
+        Size = UDim2.new(1, -92, 0, 20),
+        Position = UDim2.new(0, 88, 0, 10),
         TextXAlignment = Enum.TextXAlignment.Left,
-    })
-    NameLabel.Parent = SettingsPage
+    }).Parent = SettingsPage
 
-    local GreetLabel = create("TextLabel", {
+    create("TextLabel", {
         Text = L.greeting .. ", " .. LocalPlayer.DisplayName .. "?",
         Font = Enum.Font.Gotham,
-        TextSize = 14,
+        TextSize = 13,
         TextColor3 = Theme.SubText,
         BackgroundTransparency = 1,
-        Size = UDim2.new(1, -110, 0, 20),
-        Position = UDim2.new(0, 104, 0, 40),
+        Size = UDim2.new(1, -92, 0, 18),
+        Position = UDim2.new(0, 88, 0, 34),
         TextXAlignment = Enum.TextXAlignment.Left,
-    })
-    GreetLabel.Parent = SettingsPage
+    }).Parent = SettingsPage
 
     ------------------------------------------------------------
     -- 5) BİLGİ SAYFASI
@@ -725,7 +805,7 @@ function buildMainMenu()
     create("TextLabel", {
         Text = L.infoText,
         Font = Enum.Font.Gotham,
-        TextSize = 15,
+        TextSize = 13,
         TextColor3 = Theme.SubText,
         BackgroundTransparency = 1,
         Size = UDim2.new(1, 0, 0, 60),
@@ -740,10 +820,11 @@ function buildMainMenu()
         local tabBtn = create("TextButton", {
             Text = tabName,
             Font = Enum.Font.GothamMedium,
-            TextSize = 14,
+            TextSize = 13,
             TextColor3 = Theme.Text,
             BackgroundColor3 = Theme.Sidebar,
-            Size = UDim2.new(1, 0, 0, 36),
+            BackgroundTransparency = CARD_TRANSPARENCY,
+            Size = UDim2.new(1, 0, 0, 32),
             LayoutOrder = i,
             AutoButtonColor = false,
         })
@@ -757,13 +838,32 @@ function buildMainMenu()
     end
 
     switchTab(1)
-
-    -- Açılış animasyonu
-    MainFrame.Size = UDim2.new(0, 0, 0, 0)
-    tween(MainFrame, { Size = UDim2.new(0, 620, 0, 420) }, 0.45, Enum.EasingStyle.Back)
 end
 
 ------------------------------------------------------------
--- ScreenGui'yi ekranın ortasına yerleştirmek için ek düzen
+-- AÇ / KAPA (Rayfield tarzı, sağ üstteki "UguzHub" butonu ile)
 ------------------------------------------------------------
-IntroFrame.Position = UDim2.fromScale(0, 0)
+function openMenu()
+    MinimizedButton.Visible = false
+    MainFrame.Visible = true
+    MainFrame.Size = UDim2.new(0, MENU_W * 0.85, 0, MENU_H * 0.85)
+
+    -- Sadece hafif bir "pop" animasyonu (X ve Y aynı oranda büyür, katlanma/uzama olmaz)
+    tween(MainFrame, { Size = UDim2.new(0, MENU_W, 0, MENU_H) }, 0.28, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+end
+
+function closeMenu()
+    tween(MainFrame, { Size = UDim2.new(0, MENU_W * 0.85, 0, MENU_H * 0.85) }, 0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
+    task.wait(0.2)
+    MainFrame.Visible = false
+    MainFrame.Size = UDim2.new(0, MENU_W, 0, MENU_H)
+
+    MinimizedButton.Visible = true
+    MinimizedButton.BackgroundTransparency = 1
+    tween(MinimizedButton, { BackgroundTransparency = 0 }, 0.25)
+end
+
+MinimizedButton.MouseButton1Click:Connect(function()
+    if not MainFrame then return end
+    openMenu()
+end)
