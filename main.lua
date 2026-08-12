@@ -1,5 +1,5 @@
 -- =================================================================
--- UGUZHUB V2 PRO | INDEPENDENT BACKGROUND LAYER FIX
+-- UGUZHUB V2 PRO | DEFINITIVE BACKGROUND FIX
 -- =================================================================
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
@@ -16,7 +16,7 @@ local Translations = {
 }
 
 if CoreGui:FindFirstChild("UguzIntroGui") then CoreGui.UguzIntroGui:Destroy() end
-if CoreGui:FindFirstChild("UguzMenuBackgroundGui") then CoreGui.UguzMenuBackgroundGui:Destroy() end
+if CoreGui:FindFirstChild("UguzGlobalBg") then CoreGui.UguzGlobalBg:Destroy() end
 
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "UguzIntroGui"
@@ -78,6 +78,26 @@ local function InitializeHub(langKey)
     local L = Translations[langKey]
     ScreenGui:Destroy()
 
+    -- MENÜ ARKASINDAKİ RESMİ SIFIRDAN OLUŞTUR
+    local GlobalBg = Instance.new("ScreenGui")
+    GlobalBg.Name = "UguzGlobalBg"
+    GlobalBg.DisplayOrder = -999 -- En arkada durur
+    GlobalBg.ResetOnSpawn = false
+    GlobalBg.Parent = CoreGui
+
+    local BgImage = Instance.new("ImageLabel")
+    BgImage.Size = UDim2.new(1, 0, 1, 0)
+    BgImage.BackgroundTransparency = 1
+    BgImage.Image = MENU_BG_ID
+    BgImage.ScaleType = Enum.ScaleType.Crop
+    BgImage.Parent = GlobalBg
+
+    local Overlay = Instance.new("Frame")
+    Overlay.Size = UDim2.new(1, 0, 1, 0)
+    Overlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    Overlay.BackgroundTransparency = 0.5 -- Arka plan resminin görünürlüğü
+    Overlay.Parent = BgImage
+
     local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
     local Window = Rayfield:CreateWindow({
@@ -96,52 +116,16 @@ local function InitializeHub(langKey)
     SettingsTab:CreateLabel("👤 " .. LocalPlayer.Name)
     SettingsTab:CreateLabel("✨ " .. L.Greeting .. LocalPlayer.DisplayName .. "!")
 
-    -- BAĞIMSIZ ARKA PLAN KATMANI OLUŞTURMA (Rayfield'ın Çerçevesine Tam Oturur)
+    -- RAYFIELD ŞEFFAFLIK AYARI
     task.spawn(function()
         task.wait(0.5)
         pcall(function()
             local rayGui = CoreGui:FindFirstChild("Rayfield") or CoreGui:FindFirstChild("RayfieldGui")
             if rayGui then
-                local mainFrame = rayGui:FindFirstChild("Main", true) or rayGui:FindFirstChild("MainFrame", true)
-                if mainFrame then
-                    -- Rayfield'ın kendi siyah panellerini transparan yap
-                    mainFrame.BackgroundTransparency = 0.8
-                    for _, child in pairs(mainFrame:GetChildren()) do
-                        if child:IsA("Frame") and child.Name ~= "TopBar" then
-                            child.BackgroundTransparency = 0.8
-                        end
+                for _, v in pairs(rayGui:GetDescendants()) do
+                    if v:IsA("Frame") and v.Name == "Main" then
+                        v.BackgroundTransparency = 0.35 -- Rayfield menüsünü transparan yaparak arkadaki resmi gösterir
                     end
-
-                    -- Rayfield penceresinin arkasına bağımsız resim GUI'si oluştur
-                    local MenuBgGui = Instance.new("ScreenGui")
-                    MenuBgGui.Name = "UguzMenuBackgroundGui"
-                    MenuBgGui.DisplayOrder = rayGui.DisplayOrder - 1 -- Tam olarak Rayfield'ın arkasında kalır
-                    MenuBgGui.ResetOnSpawn = false
-                    MenuBgGui.Parent = CoreGui
-
-                    local bgImage = Instance.new("ImageLabel")
-                    bgImage.Name = "UguzMenuBG"
-                    bgImage.Size = mainFrame.Size
-                    bgImage.Position = mainFrame.AbsolutePosition
-                    bgImage.Position = UDim2.new(0, mainFrame.AbsolutePosition.X, 0, mainFrame.AbsolutePosition.Y)
-                    bgImage.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
-                    bgImage.ImageTransparency = 0.1
-                    bgImage.ScaleType = Enum.ScaleType.Crop
-                    bgImage.Image = MENU_BG_ID
-                    bgImage.Parent = MenuBgGui
-
-                    local bgCorner = Instance.new("UICorner")
-                    bgCorner.CornerRadius = UDim.new(0, 10)
-                    bgCorner.Parent = bgImage
-
-                    -- Menü sürüklendiğinde/hareket ettiğinde resim de menüyü takip eder
-                    mainFrame:GetPropertyChangedSignal("AbsolutePosition"):Connect(function()
-                        bgImage.Position = UDim2.new(0, mainFrame.AbsolutePosition.X, 0, mainFrame.AbsolutePosition.Y)
-                    end)
-                    
-                    mainFrame:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-                        bgImage.Size = UDim2.new(0, mainFrame.AbsoluteSize.X, 0, mainFrame.AbsoluteSize.Y)
-                    end)
                 end
             end
         end)
