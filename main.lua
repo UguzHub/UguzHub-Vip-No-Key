@@ -1,15 +1,12 @@
 -- =================================================================
--- UGUZHUB V2 PRO | DARK EDITION
+-- UGUZHUB V2 PRO | RAYFIELD IMAGE FIX
 -- =================================================================
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local LocalPlayer = Players.LocalPlayer
 
--- Koyu Tema Giriş Arka Planı
 local INTRO_BG_ID = "rbxassetid://15732257423" 
-
--- Menü Arka Plan Resmi
 local MENU_BG_ID = "rbxassetid://10830725683"
 
 local Translations = {
@@ -27,26 +24,25 @@ ScreenGui.Name = "UguzIntroGui"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = CoreGui
 
--- Arka Plan Resmi Ve Koyu Karartma Katmanı
 local BackgroundImage = Instance.new("ImageLabel")
 BackgroundImage.Size = UDim2.new(1, 0, 1, 0)
 BackgroundImage.BackgroundColor3 = Color3.fromRGB(5, 5, 8)
 BackgroundImage.Image = INTRO_BG_ID
-BackgroundImage.ImageTransparency = 0.25 -- Karanlık hissi artırmak için resim karartıldı
+BackgroundImage.ImageTransparency = 0.25
 BackgroundImage.ScaleType = Enum.ScaleType.Crop
 BackgroundImage.Parent = ScreenGui
 
 local DarkOverlay = Instance.new("Frame")
 DarkOverlay.Size = UDim2.new(1, 0, 1, 0)
 DarkOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-DarkOverlay.BackgroundTransparency = 0.4 -- Ekstra karartma
+DarkOverlay.BackgroundTransparency = 0.4
 DarkOverlay.Parent = BackgroundImage
 
 local MainContainer = Instance.new("Frame")
 MainContainer.Size = UDim2.new(0, 450, 0, 320)
 MainContainer.Position = UDim2.new(0.5, 0, 0.5, 0)
 MainContainer.AnchorPoint = Vector2.new(0.5, 0.5)
-MainContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 16) -- Mat Koyu Siyah
+MainContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 16)
 MainContainer.BorderSizePixel = 0
 MainContainer.Parent = ScreenGui
 
@@ -101,26 +97,34 @@ local function InitializeHub(langKey)
     SettingsTab:CreateLabel("👤 " .. LocalPlayer.Name)
     SettingsTab:CreateLabel("✨ " .. L.Greeting .. LocalPlayer.DisplayName .. "!")
 
-    -- Menü Açıldığında Koyu Temalı 10830725683 Resmini Arka Plana Koyar
+    -- RAYFIELD ARAYÜZÜNE RESMİ ZORLA ENJEKTE ETMENİN GÜVENLİ YOLU
     task.spawn(function()
-        task.wait(0.6)
+        task.wait(1)
         pcall(function()
             local rayGui = CoreGui:FindFirstChild("Rayfield") or CoreGui:FindFirstChild("RayfieldGui")
             if rayGui then
-                local mainFrame = rayGui:FindFirstChild("Main", true)
-                if mainFrame then
-                    mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20) -- Menü içi koyulaştırıldı
-                    
-                    local bgImage = Instance.new("ImageLabel")
-                    bgImage.Name = "UguzMenuBG"
-                    bgImage.Size = UDim2.new(1, 0, 1, 0)
-                    bgImage.Position = UDim2.new(0, 0, 0, 0)
-                    bgImage.BackgroundTransparency = 1
-                    bgImage.ImageTransparency = 0.55 -- Koyu görünmesi için şeffaflık dengelendi
-                    bgImage.ScaleType = Enum.ScaleType.Crop
-                    bgImage.ZIndex = 0
-                    bgImage.Image = MENU_BG_ID
-                    bgImage.Parent = mainFrame
+                -- Rayfield ana çerçevesini tarayıp arka planını şeffaflaştırma
+                for _, obj in pairs(rayGui:GetDescendants()) do
+                    if obj:IsA("Frame") and (obj.Name == "Main" or obj.Name == "MainFrame") then
+                        obj.BackgroundTransparency = 0.3 -- İçeriklerin okunabilmesi için transparanlık ayarı
+                        
+                        -- Eski resim varsa kaldır
+                        if obj:FindFirstChild("UguzMenuBG") then
+                            obj.UguzMenuBG:Destroy()
+                        end
+
+                        local bgImage = Instance.new("ImageLabel")
+                        bgImage.Name = "UguzMenuBG"
+                        bgImage.Size = UDim2.new(1, 0, 1, 0)
+                        bgImage.Position = UDim2.new(0, 0, 0, 0)
+                        bgImage.BackgroundTransparency = 1
+                        bgImage.ImageTransparency = 0.2 -- Görsel netliği artırıldı
+                        bgImage.ScaleType = Enum.ScaleType.Crop
+                        bgImage.ZIndex = 0
+                        bgImage.Image = MENU_BG_ID
+                        bgImage.Parent = obj
+                        break
+                    end
                 end
             end
         end)
@@ -130,7 +134,7 @@ end
 local function CreateLangButton(text, langKey)
     local Btn = Instance.new("TextButton")
     Btn.Size = UDim2.new(1, 0, 0, 42)
-    Btn.BackgroundColor3 = Color3.fromRGB(22, 22, 30) -- Koyu Buton Rengi
+    Btn.BackgroundColor3 = Color3.fromRGB(22, 22, 30)
     Btn.Text = text
     Btn.TextColor3 = Color3.fromRGB(220, 220, 230)
     Btn.TextSize = 15
