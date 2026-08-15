@@ -1,4 +1,4 @@
--- [[ UguzHub V2 Pro - Updated with Delta Warning & 14-Day Kick ]] --
+-- [[ UguzHub V2 Pro - Fully Fixed & Updated ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -12,7 +12,7 @@ local LocalPlayer = Players.LocalPlayer
 -- 0) 14 GÜNLÜK HESAP YAŞ KONTROLÜ (KICK)
 ------------------------------------------------------------
 if LocalPlayer.AccountAge < 14 then
-    LocalPlayer:Kick("Your account is less than 30 days old.")
+    LocalPlayer:Kick("Your account is less than 14 days old.")
     return
 end
 
@@ -328,7 +328,7 @@ local WarningFrame = create("Frame", {
     Size = UDim2.fromScale(1, 1),
     Position = UDim2.fromScale(0, 0),
     BackgroundColor3 = Theme.Background,
-    BackgroundTransparency = 0.35, -- Saydam ekran
+    BackgroundTransparency = 0.35,
     Visible = false,
     ZIndex = 20,
 })
@@ -384,6 +384,14 @@ corner(10).Parent = ContinueBtn
 stroke(Theme.Stroke, 1).Parent = ContinueBtn
 ContinueBtn.Parent = WarningBox
 
+------------------------------------------------------------
+-- TANIMLAMALAR (FORWARD DECLARATIONS)
+------------------------------------------------------------
+local MainFrame
+local buildMainMenu
+local openMenu
+local closeMenu
+
 local function showDeltaWarning()
     WarnText.Text = L.deltaWarn
     WarningFrame.Visible = true
@@ -421,7 +429,6 @@ end
 ------------------------------------------------------------
 -- DİL KARTLARI DÖNGÜSÜ
 ------------------------------------------------------------
-local MainFrame, buildMainMenu, openMenu, closeMenu
 local langCards = {}
 
 local function selectLanguage(code)
@@ -440,7 +447,6 @@ local function selectLanguage(code)
         task.wait(0.4)
         IntroFrame.Visible = false
 
-        -- Uyarı ekranını başlat
         showDeltaWarning()
     end)
 end
@@ -549,33 +555,216 @@ function buildMainMenu()
 
     local TopBar = create("Frame", {
         Size = UDim2.new(1, 0, 0, 36),
+        BackgroundC
+                    BackgroundColor3 = Theme.Sidebar,
+        BackgroundTransparency = CARD_TRANSPARENCY,
+        ZIndex = 6,
+        Active = true,
+    })
+    corner(RADIUS).Parent = TopBar
+    TopBar.Parent = MainFrame
+
+    create("TextLabel", {
+        Text = "UguzHub  •  V2 Pro",
+        Font = Enum.Font.GothamBold,
+        TextSize = 13,
+        TextColor3 = Theme.Text,
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, -56, 1, 0),
+        Position = UDim2.new(0, 12, 0, 0),
+        TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 7,
+    }).Parent = TopBar
+
+    local MinimizeBtn = create("TextButton", {
+        Text = "–",
+        Font = Enum.Font.GothamBold,
+        TextSize = 18,
+        TextColor3 = Theme.SubText,
+        BackgroundTransparency = 1,
+        Size = UDim2.new(0, 32, 0, 32),
+        Position = UDim2.new(1, -34, 0, 2),
+        ZIndex = 7,
+    })
+    MinimizeBtn.Parent = TopBar
+    MinimizeBtn.MouseButton1Click:Connect(function() closeMenu() end)
+
+    do
+        local dragging, dragInput, dragStart, startPos
+        TopBar.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                dragging = true
+                dragStart = input.Position
+                startPos = MainFrame.Position
+                input.Changed:Connect(function()
+                    if input.UserInputState == Enum.UserInputState.End then dragging = false end
+                end)
+            end
+        end)
+        TopBar.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then dragInput = input end
+        end)
+        UserInputService.InputChanged:Connect(function(input)
+            if input == dragInput and dragging then
+                local delta = input.Position - dragStart
+                MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            end
+        end)
+    end
+
+    local Sidebar = create("Frame", {
+        Size = UDim2.new(0, 110, 1, -42),
+        Position = UDim2.new(0, 6, 0, 40),
         BackgroundColor3 = Theme.Sidebar,
         BackgroundTransparency = CARD_TRANSPARENCY,
         ZIndex = 6,
-        Active
-                -- 5. Ayarlar Tab
+    })
+    corner(10).Parent = Sidebar
+    Sidebar.Parent = MainFrame
+
+    local TabContainer = create("Frame", {
+        Size = UDim2.new(1, -128, 1, -42),
+        Position = UDim2.new(0, 122, 0, 40),
+        BackgroundTransparency = 1,
+        ZIndex = 6,
+    })
+    TabContainer.Parent = MainFrame
+
+    local TabList = create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 4) })
+    TabList.Parent = Sidebar
+
+    local pages = {}
+    local tabBtns = {}
+
+    local function addTab(name, icon)
+        local btn = create("TextButton", {
+            Size = UDim2.new(1, 0, 0, 30),
+            BackgroundColor3 = Theme.Card,
+            BackgroundTransparency = 0.5,
+            Font = Enum.Font.GothamMedium,
+            Text = icon .. " " .. name,
+            TextColor3 = Theme.SubText,
+            TextSize = 11,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            ZIndex = 7,
+        })
+        corner(8).Parent = btn
+        btn.Parent = Sidebar
+
+        local page = create("ScrollingFrame", {
+            Size = UDim2.new(1, 0, 1, 0),
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            ScrollBarThickness = 2,
+            Visible = false,
+            ZIndex = 7,
+        })
+        page.Parent = TabContainer
+
+        create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 6) }).Parent = page
+
+        pages[name] = page
+        tabBtns[name] = btn
+
+        btn.MouseButton1Click:Connect(function()
+            for _, p in pairs(pages) do p.Visible = false end
+            for _, b in pairs(tabBtns) do
+                b.BackgroundColor3 = Theme.Card
+                b.TextColor3 = Theme.SubText
+            end
+            page.Visible = true
+            btn.BackgroundColor3 = Theme.Accent
+            btn.TextColor3 = Theme.Text
+        end)
+
+        return page
+    end
+
+    local function createToggle(parent, labelText, flag)
+        local frame = create("Frame", { Size = UDim2.new(1, -6, 0, 30), BackgroundColor3 = Theme.Card, BackgroundTransparency = CARD_TRANSPARENCY })
+        corner(8).Parent = frame
+        frame.Parent = parent
+
+        create("TextLabel", { Text = labelText, Font = Enum.Font.Gotham, TextColor3 = Theme.Text, TextSize = 10, BackgroundTransparency = 1, Size = UDim2.new(0.7, 0, 1, 0), Position = UDim2.new(0, 8, 0, 0), TextXAlignment = Enum.TextXAlignment.Left }).Parent = frame
+
+        local switch = create("Frame", { Size = UDim2.new(0, 28, 0, 14), Position = UDim2.new(1, -34, 0.5, -7), BackgroundColor3 = Color3.fromRGB(40, 40, 45) })
+        corner(10).Parent = switch
+        switch.Parent = frame
+
+        local dot = create("Frame", { Size = UDim2.new(0, 10, 0, 10), Position = UDim2.new(0, 2, 0.5, -5), BackgroundColor3 = Color3.fromRGB(200, 200, 200) })
+        corner(10).Parent = dot
+        dot.Parent = switch
+
+        local btn = create("TextButton", { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, Text = "" })
+        btn.Parent = frame
+
+        btn.MouseButton1Click:Connect(function()
+            Flags[flag] = not Flags[flag]
+            if Flags[flag] then
+                switch.BackgroundColor3 = Theme.Accent
+                dot.Position = UDim2.new(1, -12, 0.5, -5)
+                dot.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            else
+                switch.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+                dot.Position = UDim2.new(0, 2, 0.5, -5)
+                dot.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+            end
+        end)
+    end
+
+    local function createButton(parent, labelText, callback)
+        local btn = create("TextButton", { Size = UDim2.new(1, -6, 0, 30), BackgroundColor3 = Theme.Card, Font = Enum.Font.GothamBold, Text = labelText, TextColor3 = Theme.Text, TextSize = 10 })
+        corner(8).Parent = btn
+        stroke(Theme.Accent, 1).Parent = btn
+        btn.Parent = parent
+        btn.MouseButton1Click:Connect(function() if callback then callback() end end)
+    end
+
+    local ESPTab = addTab("ESP", "👁")
+    local AimbotTab = addTab("Aimbot", "🎯")
+    local PlayersTab = addTab("Players", "👤")
+    local TeleportTab = addTab("Teleport", "🌀")
+    local SettingsTab = addTab("Ayarlar", "⚙")
+
+    createToggle(ESPTab, "ESP All", "ESPAll")
+    createToggle(ESPTab, "ESP Gun", "ESPGun")
+    createToggle(ESPTab, "Auto Grab Gun", "AutoGrabGun")
+    createButton(ESPTab, "TP Grab Gun", function()
+        local gunDrop = Workspace:FindFirstChild("GunDrop") or Workspace:FindFirstChild("Gun")
+        local myHrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if gunDrop and myHrp then
+            local oldCFrame = myHrp.CFrame
+            myHrp.CFrame = gunDrop.CFrame
+            task.wait(0.15)
+            if firetouchinterest then firetouchinterest(myHrp, gunDrop, 0); firetouchinterest(myHrp, gunDrop, 1) end
+            task.wait(0.1)
+            myHrp.CFrame = oldCFrame
+        end
+    end)
+
+    createToggle(AimbotTab, "Aimbot Enable", "AimbotEnabled")
+    createToggle(PlayersTab, "Auto Kill Murderer", "AutoKillMurderer")
+    createToggle(PlayersTab, "Auto Fling Murderer", "AutoFlingMurderer")
+    createToggle(PlayersTab, "Auto Fling Sheriff", "AutoFlingSheriff")
+    createToggle(PlayersTab, "Auto Fling All", "AutoFlingAll")
+
+    createButton(TeleportTab, "TP to Lobby", function()
+        local myHrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if not myHrp then return end
+        local lobby = Workspace:FindFirstChild("Lobby")
+        if lobby then
+            local spawnPart = lobby:FindFirstChild("Spawns") or lobby:FindFirstChildWhichIsA("BasePart", true)
+            if spawnPart then myHrp.CFrame = spawnPart.CFrame + Vector3.new(0, 3, 0) end
+        end
+    end)
+
     create("TextLabel", { Text = L.sectionTitle, Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = Theme.SubText, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 18), TextXAlignment = Enum.TextXAlignment.Left }).Parent = SettingsTab
-
-    local AvatarFrame = create("Frame", { Size = UDim2.new(0, 50, 0, 50), Position = UDim2.new(0, 0, 0, 26), BackgroundColor3 = Theme.Card, BackgroundTransparency = CARD_TRANSPARENCY })
-    corner(25).Parent = AvatarFrame
-    stroke(Theme.Accent, 2).Parent = AvatarFrame
-    AvatarFrame.Parent = SettingsTab
-
-    local AvatarImage = create("ImageLabel", { Size = UDim2.new(1, -4, 1, -4), Position = UDim2.new(0, 2, 0, 2), BackgroundTransparency = 1, Image = "rbxthumb://type=AvatarHeadShot&id=" .. LocalPlayer.UserId .. "&w=150&h=150" })
-    corner(25).Parent = AvatarImage
-    AvatarImage.Parent = AvatarFrame
-
-    create("TextLabel", { Text = LocalPlayer.DisplayName .. " (@" .. LocalPlayer.Name .. ")", Font = Enum.Font.GothamBold, TextSize = 12, TextColor3 = Theme.Text, BackgroundTransparency = 1, Size = UDim2.new(1, -60, 0, 18), Position = UDim2.new(0, 60, 0, 28), TextXAlignment = Enum.TextXAlignment.Left }).Parent = SettingsTab
-    create("TextLabel", { Text = L.greeting .. ", " .. LocalPlayer.DisplayName .. "?", Font = Enum.Font.Gotham, TextSize = 11, TextColor3 = Theme.SubText, BackgroundTransparency = 1, Size = UDim2.new(1, -60, 0, 16), Position = UDim2.new(0, 60, 0, 46), TextXAlignment = Enum.TextXAlignment.Left }).Parent = SettingsTab
 
     pages["ESP"].Visible = true
     tabBtns["ESP"].BackgroundColor3 = Theme.Accent
     tabBtns["ESP"].TextColor3 = Theme.Text
 end
 
-------------------------------------------------------------
--- MENÜ AÇ / KAPA
-------------------------------------------------------------
 function openMenu()
     MinimizedButton.Visible = false
     MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -589,69 +778,24 @@ function closeMenu()
     task.wait(0.2)
     MainFrame.Visible = false
     MainFrame.Size = UDim2.new(0, MENU_W, 0, MENU_H)
-
     MinimizedButton.Visible = true
-    MinimizedButton.BackgroundTransparency = 1
-    tween(MinimizedButton, { BackgroundTransparency = 0 }, 0.25)
 end
 
-MinimizedButton.MouseButton1Click:Connect(function()
-    if not MainFrame then return end
-    openMenu()
-end)
+MinimizedButton.MouseButton1Click:Connect(function() if MainFrame then openMenu() end end)
 
-------------------------------------------------------------
--- ARKA PLAN RENDER DÖNGÜSÜ (ESP & AIMBOT)
-------------------------------------------------------------
 RunService.RenderStepped:Connect(function()
     if Flags.ESPAll then
         for _, p in pairs(Players:GetPlayers()) do
             if p ~= LocalPlayer and p.Character then
-                local role = getRole(p)
                 local hl = p.Character:FindFirstChild("UguzHighlight") or Instance.new("Highlight")
                 hl.Name = "UguzHighlight"
-                hl.FillColor = RoleColors[role]
-                hl.OutlineColor = Color3.fromRGB(255, 255, 255)
-                hl.FillTransparency = 0.4
+                hl.FillColor = RoleColors[getRole(p)]
                 hl.Parent = p.Character
             end
         end
     else
         for _, p in pairs(Players:GetPlayers()) do
-            if p.Character and p.Character:FindFirstChild("UguzHighlight") then
-                p.Character.UguzHighlight:Destroy()
-            end
-        end
-    end
-
-    local gunDrop = Workspace:FindFirstChild("GunDrop") or Workspace:FindFirstChild("Gun")
-    if gunDrop then
-        if Flags.ESPGun then
-            local hl = gunDrop:FindFirstChild("GunHighlight") or Instance.new("Highlight")
-            hl.Name = "GunHighlight"
-            hl.FillColor = RoleColors.Gun
-            hl.OutlineColor = Color3.fromRGB(255, 255, 255)
-            hl.Parent = gunDrop
-        elseif gunDrop:FindFirstChild("GunHighlight") then
-            gunDrop.GunHighlight:Destroy()
-        end
-
-        if Flags.AutoGrabGun and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            if firetouchinterest then
-                firetouchinterest(LocalPlayer.Character.HumanoidRootPart, gunDrop, 0)
-                firetouchinterest(LocalPlayer.Character.HumanoidRootPart, gunDrop, 1)
-            else
-                LocalPlayer.Character.HumanoidRootPart.CFrame = gunDrop.CFrame
-            end
-        end
-    end
-
-    if Flags.AimbotEnabled or (Flags.AutoKillMurderer and getRole(LocalPlayer) == "Sheriff") then
-        for _, p in pairs(Players:GetPlayers()) do
-            if p ~= LocalPlayer and getRole(p) == "Murderer" and p.Character and p.Character:FindFirstChild("Head") then
-                Camera.CFrame = CFrame.new(Camera.CFrame.Position, p.Character.Head.Position)
-            end
+            if p.Character and p.Character:FindFirstChild("UguzHighlight") then p.Character.UguzHighlight:Destroy() end
         end
     end
 end)
-        
