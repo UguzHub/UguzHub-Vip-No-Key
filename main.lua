@@ -1,3 +1,7 @@
+--[[
+    UguzHub V2 Pro - Siyah Ekran / Çizgi Sorunu Düzeltilmiş Kararlı Sürüm
+]]
+
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
@@ -8,10 +12,14 @@ local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
 
+-- Önceki GUI'yi temizle
 if CoreGui:FindFirstChild("UguzHubV2Pro") then 
     CoreGui.UguzHubV2Pro:Destroy() 
 end
 
+------------------------------------------------------------
+-- ÖZELLİK BAYRAKLARI
+------------------------------------------------------------
 local Flags = {
     SpeedWalk = false,
     SpeedValue = 24,
@@ -37,6 +45,9 @@ local Flags = {
     Fullbright = false
 }
 
+------------------------------------------------------------
+-- TEMA
+------------------------------------------------------------
 local Theme = {
     Background = Color3.fromRGB(18, 16, 26),
     Sidebar    = Color3.fromRGB(24, 21, 35),
@@ -50,25 +61,32 @@ local Theme = {
 
 local RADIUS = 14
 
+------------------------------------------------------------
+-- DİL PAKETLERİ (4 Dil: TR, EN, RU, DE)
+------------------------------------------------------------
 local Lang = {}
+
 Lang.TR = {
     loading = "Yükleniyor",
     subtitle = "Dilinizi seçin",
     openBtn = "UguzHub",
     notice = "Sizlere daha iyi bir deneyim sunmak amacıyla lütfen delta ayarlarindaki tüm izinleri Kapattığınıza emin olun.",
 }
+
 Lang.EN = {
     loading = "Loading",
     subtitle = "Select your language",
     openBtn = "UguzHub",
     notice = "To provide you with a better experience, please make sure to turn off all permissions in the delta settings.",
 }
+
 Lang.RU = {
     loading = "Загрузка",
     subtitle = "Выберите язык",
     openBtn = "UguzHub",
     notice = "Чтобы обеспечить вам лучший опыт, пожалуйста, убедитесь, что отключили все разрешения в настройках delta.",
 }
+
 Lang.DE = {
     loading = "Wird geladen",
     subtitle = "Wähle deine Sprache",
@@ -86,6 +104,9 @@ local LanguageOptions = {
 local CurrentLang = "EN"
 local L = Lang[CurrentLang]
 
+------------------------------------------------------------
+-- OYUN ROLLERİ VE DÖNGÜLER (MM2)
+------------------------------------------------------------
 local function getRole(plr)
     if not plr or not plr.Character then return "Innocent" end
     local char = plr.Character
@@ -262,6 +283,9 @@ UserInputService.JumpRequest:Connect(function()
     end
 end)
 
+------------------------------------------------------------
+-- YARDIMCI FONKSİYONLAR
+------------------------------------------------------------
 local function create(class, props, children)
     local inst = Instance.new(class)
     for prop, value in pairs(props or {}) do
@@ -285,6 +309,20 @@ local function stroke(color, thickness)
     })
 end
 
+local function tween(obj, props, duration, style, direction)
+    local info = TweenInfo.new(
+        duration or 0.3,
+        style or Enum.EasingStyle.Quint,
+        direction or Enum.EasingDirection.Out
+    )
+    local t = TweenService:Create(obj, info, props)
+    t:Play()
+    return t
+end
+
+------------------------------------------------------------
+-- ANA GUI
+------------------------------------------------------------
 local ScreenGui = create("ScreenGui", {
     Name = "UguzHubV2Pro",
     ResetOnSpawn = false,
@@ -293,6 +331,10 @@ local ScreenGui = create("ScreenGui", {
     IgnoreGuiInset = true,
 })
 ScreenGui.Parent = CoreGui
+
+------------------------------------------------------------
+-- GİRİŞ EKRANI (Yükleme + 4'lü Dil Seçimi)
+------------------------------------------------------------
 local IntroFrame = create("Frame", {
     Name = "Intro",
     Size = UDim2.new(1, 0, 1, 0),
@@ -395,6 +437,9 @@ create("UIGridLayout", {
     SortOrder = Enum.SortOrder.LayoutOrder,
 }).Parent = LangHolder
 
+------------------------------------------------------------
+-- UYARI EKRANI (Delta Ayarları Geri Sayımı)
+------------------------------------------------------------
 local NoticeFrame = create("Frame", {
     Name = "Notice",
     Size = UDim2.new(1, 0, 1, 0),
@@ -421,6 +466,9 @@ local NoticeLabel = create("TextLabel", {
 })
 NoticeLabel.Parent = NoticeFrame
 
+------------------------------------------------------------
+-- MİNİMİZE BUTONU
+------------------------------------------------------------
 local MinimizedButton = create("TextButton", {
     Name = "MinimizedButton",
     Text = "🟣 " .. L.openBtn,
@@ -438,6 +486,9 @@ corner(12).Parent = MinimizedButton
 stroke(Color3.fromRGB(255, 255, 255), 1).Parent = MinimizedButton
 MinimizedButton.Parent = ScreenGui
 
+------------------------------------------------------------
+-- MENÜ KONTROLÜ
+------------------------------------------------------------
 local MainFrame
 local buildMainMenu
 local openMenu
@@ -448,8 +499,8 @@ local function showNoticeThenMenu()
     local countdown = 7
     NoticeLabel.Text = L.notice .. "\n\n(" .. countdown .. ")"
     NoticeFrame.Visible = true
-    TweenService:Create(NoticeFrame, TweenInfo.new(0.4), { BackgroundTransparency = 0.05 }):Play()
-    TweenService:Create(NoticeLabel, TweenInfo.new(0.5), { TextTransparency = 0 }):Play()
+    tween(NoticeFrame, { BackgroundTransparency = 0.05 }, 0.4)
+    tween(NoticeLabel, { TextTransparency = 0 }, 0.5)
 
     task.spawn(function()
         while countdown > 0 do
@@ -460,8 +511,8 @@ local function showNoticeThenMenu()
     end)
 
     task.delay(7, function()
-        TweenService:Create(NoticeFrame, TweenInfo.new(0.5), { BackgroundTransparency = 1 }):Play()
-        TweenService:Create(NoticeLabel, TweenInfo.new(0.4), { TextTransparency = 1 }):Play()
+        tween(NoticeFrame, { BackgroundTransparency = 1 }, 0.5)
+        tween(NoticeLabel, { TextTransparency = 1 }, 0.4)
         task.wait(0.5)
         NoticeFrame.Visible = false
 
@@ -478,16 +529,16 @@ local function selectLanguage(code)
 
     for _, card in ipairs(langCards) do
         local isSelected = card:GetAttribute("Code") == code
-        TweenService:Create(card, TweenInfo.new(0.2), { BackgroundColor3 = isSelected and Theme.Accent or Theme.Card }):Play()
+        tween(card, { BackgroundColor3 = isSelected and Theme.Accent or Theme.Card }, 0.2)
     end
 
     task.delay(0.25, function()
-        TweenService:Create(IntroFrame, TweenInfo.new(0.4), { BackgroundTransparency = 1 }):Play()
+        tween(IntroFrame, { BackgroundTransparency = 1 }, 0.4)
         for _, obj in ipairs({ LogoLabel, ProTag, SubtitleLabel }) do
-            TweenService:Create(obj, TweenInfo.new(0.3), { TextTransparency = 1 }):Play()
+            tween(obj, { TextTransparency = 1 }, 0.3)
         end
         for _, card in ipairs(langCards) do
-            TweenService:Create(card, TweenInfo.new(0.25), { BackgroundTransparency = 1 }):Play()
+            tween(card, { BackgroundTransparency = 1 }, 0.25)
         end
         task.wait(0.4)
         IntroFrame.Visible = false
@@ -535,12 +586,12 @@ for i, opt in ipairs(LanguageOptions) do
 
     card.MouseEnter:Connect(function()
         if CurrentLang ~= opt.code then
-            TweenService:Create(card, TweenInfo.new(0.15), { BackgroundColor3 = Theme.AccentSoft }):Play()
+            tween(card, { BackgroundColor3 = Theme.AccentSoft }, 0.15)
         end
     end)
     card.MouseLeave:Connect(function()
         if CurrentLang ~= opt.code then
-            TweenService:Create(card, TweenInfo.new(0.15), { BackgroundColor3 = Theme.Card }):Play()
+            tween(card, { BackgroundColor3 = Theme.Card }, 0.15)
         end
     end)
     card.MouseButton1Click:Connect(function()
@@ -551,13 +602,16 @@ for i, opt in ipairs(LanguageOptions) do
     table.insert(langCards, card)
 end
 
+------------------------------------------------------------
+-- GİRİŞ AKIŞI
+------------------------------------------------------------
 task.defer(function()
-    TweenService:Create(LogoLabel, TweenInfo.new(0.6), { TextTransparency = 0 }):Play()
-    TweenService:Create(ProTag, TweenInfo.new(0.6), { TextTransparency = 0 }):Play()
+    tween(LogoLabel, { TextTransparency = 0 }, 0.6)
+    tween(ProTag, { TextTransparency = 0 }, 0.6)
     task.wait(0.15)
-    TweenService:Create(Underline, TweenInfo.new(0.6, Enum.EasingStyle.Quart), { Size = UDim2.new(0, 220, 0, 3) }):Play()
+    tween(Underline, { Size = UDim2.new(0, 220, 0, 3) }, 0.6, Enum.EasingStyle.Quart)
     task.wait(0.2)
-    TweenService:Create(LoadingLabel, TweenInfo.new(0.4), { TextTransparency = 0 }):Play()
+    tween(LoadingLabel, { TextTransparency = 0 }, 0.4)
 
     local dotsRunning = true
     task.spawn(function()
@@ -573,21 +627,24 @@ task.defer(function()
     task.wait(5)
     dotsRunning = false
 
-    TweenService:Create(LoadingLabel, TweenInfo.new(0.3), { TextTransparency = 1 }):Play()
+    tween(LoadingLabel, { TextTransparency = 1 }, 0.3)
     task.wait(0.3)
     LoadingLabel.Visible = false
 
     SubtitleLabel.Visible = true
     LangHolder.Visible = true
-    TweenService:Create(SubtitleLabel, TweenInfo.new(0.4), { TextTransparency = 0 }):Play()
+    tween(SubtitleLabel, { TextTransparency = 0 }, 0.4)
     for i, card in ipairs(langCards) do
         card.BackgroundTransparency = 1
         task.delay(0.03 * i, function()
-            TweenService:Create(card, TweenInfo.new(0.3), { BackgroundTransparency = 0 }):Play()
+            tween(card, { BackgroundTransparency = 0 }, 0.3)
         end)
     end
 end)
 
+------------------------------------------------------------
+-- ANA MENÜ (Görseldeki Sekmelere Göre Tasarlandı)
+------------------------------------------------------------
 local MENU_W, MENU_H = 520, 330
 
 function buildMainMenu()
@@ -615,7 +672,7 @@ function buildMainMenu()
     })
 
     create("TextLabel", {
-        Text = "  Murder Mystery 2 | UguzHub",
+        Text = "  Murder Mystery 2 | UguzHub V2 Pro",
         Size = UDim2.new(1, -40, 1, 0),
         TextColor3 = Theme.Text,
         Font = Enum.Font.GothamBold,
@@ -727,7 +784,7 @@ function buildMainMenu()
             Font = Enum.Font.Gotham,
             TextSize = 11,
             TextXAlignment = Enum.TextXAlignment.Left,
-                BackgroundTransparency = 1,
+            BackgroundTransparency = 1,
             Parent = frame,
             ZIndex = 7,
         })
@@ -759,11 +816,13 @@ function buildMainMenu()
         end)
     end
 
+    -- Görseldeki 4 Ana Sekme Oluşturuluyor
     local MainTab   = addTab("Main", "Main")
     local VisualTab = addTab("Visual", "Visual")
     local CombatTab = addTab("Combat", "Combat")
-    local TeleTab   = addTab("Teleport", "Teleport")
+    local TeleTab   = addTab("Optimization", "Optimization") -- Görseldeki Optimization sekmesi
 
+    -- Profil Kartı
     local ProfileCard = create("Frame", {
         Size = UDim2.new(1, -4, 0, 85),
         BackgroundColor3 = Theme.Card,
@@ -812,6 +871,7 @@ function buildMainMenu()
         ZIndex = 7,
     })
 
+    -- Discord Kopyalama Kartı
     local DiscordCard = create("TextButton", {
         Size = UDim2.new(1, -4, 0, 38),
         BackgroundColor3 = Theme.Card,
@@ -855,6 +915,7 @@ function buildMainMenu()
         end)
     end)
 
+    -- Main Sekmesi Özellikleri
     createToggle(MainTab, "Auto Farm (Coin Topla)", "AutoFarm")
 
     local ModeBtn = create("TextButton", {
@@ -903,16 +964,19 @@ function buildMainMenu()
     createToggle(MainTab, "Infinite Jump (Sınırsız Zıpla)", "InfiniteJump")
     createToggle(MainTab, "Noclip (Duvardan Geç)", "Noclip")
 
+    -- Visual Sekmesi Özellikleri
     createToggle(VisualTab, "Player ESP (Tümü)", "ESPAll")
     createToggle(VisualTab, "Murderer ESP (Katil)", "ESPMurderer")
     createToggle(VisualTab, "Sheriff ESP (Şerif)", "ESPSheriff")
     createToggle(VisualTab, "Innocent ESP (Masum)", "ESPInnocent")
 
+    -- Combat Sekmesi Özellikleri
     createToggle(CombatTab, "Aimbot (Katile Kilitlen)", "AimbotEnabled")
     createToggle(CombatTab, "Auto Shoot (Otomatik Ateş)", "AutoShoot")
     createToggle(CombatTab, "KillAura (Yakındakini Kes)", "KillAura")
     createToggle(CombatTab, "Auto Grab Gun (Silahı Al)", "AutoGrabGun")
 
+    -- Optimization Sekmesi Özellikleri
     createToggle(TeleTab, "Fullbright (Aydınlık)", "Fullbright")
 
     local function createTPButton(name, cf)
@@ -944,6 +1008,7 @@ function buildMainMenu()
     tabBtns["Main"].BackgroundColor3 = Theme.Card
     tabBtns["Main"].TextColor3 = Theme.Accent
 
+    -- Sürüklenebilirlik (Drag)
     local dragging, dragStart, startPos
     Header.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -969,23 +1034,22 @@ function openMenu()
     MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     MainFrame.Visible = true
     MainFrame.Size = UDim2.new(0, MENU_W * 0.85, 0, MENU_H * 0.85)
-    TweenService:Create(MainFrame, TweenInfo.new(0.28, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), { Size = UDim2.new(0, MENU_W, 0, MENU_H) }):Play()
+    tween(MainFrame, { Size = UDim2.new(0, MENU_W, 0, MENU_H) }, 0.28, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
 end
 
 function closeMenu()
-    TweenService:Create(MainFrame, TweenInfo.new(0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.In), { Size = UDim2.new(0, MENU_W * 0.85, 0, MENU_H * 0.85) }):Play()
+    tween(MainFrame, { Size = UDim2.new(0, MENU_W * 0.85, 0, MENU_H * 0.85) }, 0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
     task.wait(0.2)
     MainFrame.Visible = false
     MainFrame.Size = UDim2.new(0, MENU_W, 0, MENU_H)
 
     MinimizedButton.Visible = true
     MinimizedButton.BackgroundTransparency = 1
-    TweenService:Create(MinimizedButton, TweenInfo.new(0.25), { BackgroundTransparency = 0 }):Play()
+    tween(MinimizedButton, { BackgroundTransparency = 0 }, 0.25)
 end
 
 MinimizedButton.MouseButton1Click:Connect(function()
     if not MainFrame then return end
     openMenu()
 end)
-
-
+    
