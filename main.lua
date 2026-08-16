@@ -1,5 +1,5 @@
 --[[
-    UguzHub V2 Pro - Full Sürüm (Intro, 4 Dil, Delta Uyarısı, Auto Farm, Kill All)
+    UguzHub V2 Pro - Siyah Ekran / Çizgi Sorunu Düzeltilmiş Kararlı Sürüm
 ]]
 
 local Players = game:GetService("Players")
@@ -39,7 +39,7 @@ local Flags = {
     AutoGrabGun = false,
     
     AutoFarm = false,
-    FarmMode = "Teleport", -- "Teleport" veya "Tween"
+    FarmMode = "Teleport",
     KillAllActive = false,
     
     Fullbright = false
@@ -337,8 +337,8 @@ ScreenGui.Parent = CoreGui
 ------------------------------------------------------------
 local IntroFrame = create("Frame", {
     Name = "Intro",
-    Size = UDim2.fromScale(1, 1),
-    Position = UDim2.fromScale(0, 0),
+    Size = UDim2.new(1, 0, 1, 0),
+    Position = UDim2.new(0, 0, 0, 0),
     BorderSizePixel = 0,
     BackgroundColor3 = Theme.Background,
     BackgroundTransparency = 0,
@@ -442,8 +442,8 @@ create("UIGridLayout", {
 ------------------------------------------------------------
 local NoticeFrame = create("Frame", {
     Name = "Notice",
-    Size = UDim2.fromScale(1, 1),
-    Position = UDim2.fromScale(0, 0),
+    Size = UDim2.new(1, 0, 1, 0),
+    Position = UDim2.new(0, 0, 0, 0),
     BackgroundColor3 = Theme.Background,
     BackgroundTransparency = 1,
     Visible = false,
@@ -488,6 +488,162 @@ MinimizedButton.Parent = ScreenGui
 
 ------------------------------------------------------------
 -- MENÜ KONTROLÜ
+------------------------------------------------------------
+local MainFrame
+local buildMainMenu
+local openMenu
+local closeMenu
+local langCards = {}
+
+local function showNoticeThenMenu()
+    local countdown = 7
+    NoticeLabel.Text = L.notice .. "\n\n(" .. countdown .. ")"
+    NoticeFrame.Visible = true
+    tween(NoticeFrame, { BackgroundTransparency = 0.05 }, 0.4)
+    tween(NoticeLabel, { TextTransparency = 0 }, 0.5)
+
+    task.spawn(function()
+        while countdown > 0 do
+            task.wait(1)
+            countdown = countdown - 1
+            NoticeLabel.Text = L.notice .. "\n\n(" .. countdown .. ")"
+        end
+    end)
+
+    task.delay(7, function()
+        tween(NoticeFrame, { BackgroundTransparency = 1 }, 0.5)
+        tween(NoticeLabel, { TextTransparency = 1 }, 0.4)
+        task.wait(0.5)
+        NoticeFrame.Visible = false
+
+        if not MainFrame then
+            buildMainMenu()
+        end
+        openMenu()
+    end)
+end
+
+local function selectLanguage(code)
+    CurrentLang = code
+    L = Lang[CurrentLang]
+
+    for _, card in ipairs(langCards) do
+        local isSelected = card:GetAttribute("Code") == code
+        tween(card, { BackgroundColor3 = isSelected and Theme.Accent or Theme.Card }, 0.2)
+    end
+
+    task.delay(0.25, function()
+        tween(IntroFrame, { BackgroundTransparency = 1 }, 0.4)
+        for _, obj in ipairs({ LogoLabel, ProTag, SubtitleLabel }) do
+            tween(obj, { TextTransparency = 1 }, 0.3)
+        end
+        for _, card in ipairs(langCards) do
+            tween(card, { BackgroundTransparency = 1 }, 0.25)
+        end
+        task.wait(0.4)
+        IntroFrame.Visible = false
+
+        MinimizedButton.Text = "🟣 " .. L.openBtn
+        showNoticeThenMenu()
+    end)
+end
+
+for i, opt in ipairs(LanguageOptions) do
+    local card = create("TextButton", {
+        Name = opt.code,
+        Text = "",
+        AutoButtonColor = false,
+        BackgroundColor3 = Theme.Card,
+        BackgroundTransparency = 1,
+        LayoutOrder = i,
+        ZIndex = 11,
+    })
+    corner(14).Parent = card
+    stroke().Parent = card
+    card:SetAttribute("Code", opt.code)
+
+    create("TextLabel", {
+        Text = opt.flag,
+        Font = Enum.Font.GothamBold,
+        TextSize = 26,
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, 0, 0, 34),
+        Position = UDim2.new(0, 0, 0, 10),
+        ZIndex = 12,
+    }).Parent = card
+
+    create("TextLabel", {
+        Text = opt.name,
+        Font = Enum.Font.GothamMedium,
+        TextSize = 12,
+        TextColor3 = Theme.Text,
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, -6, 0, 18),
+        Position = UDim2.new(0, 3, 0, 48),
+        TextXAlignment = Enum.TextXAlignment.Center,
+        ZIndex = 12,
+    }).Parent = card
+
+    card.MouseEnter:Connect(function()
+        if CurrentLang ~= opt.code then
+            tween(card, { BackgroundColor3 = Theme.AccentSoft }, 0.15)
+        end
+    end)
+    card.MouseLeave:Connect(function()
+        if CurrentLang ~= opt.code then
+            tween(card, { BackgroundColor3 = Theme.Card }, 0.15)
+        end
+    end)
+    card.MouseButton1Click:Connect(function()
+        selectLanguage(opt.code)
+    end)
+
+    card.Parent = LangHolder
+    table.insert(langCards, card)
+end
+
+------------------------------------------------------------
+-- GİRİŞ AKIŞI
+------------------------------------------------------------
+task.defer(function()
+    tween(LogoLabel, { TextTransparency = 0 }, 0.6)
+    tween(ProTag, { TextTransparency = 0 }, 0.6)
+    task.wait(0.15)
+    tween(Underline, { Size = UDim2.new(0, 220, 0, 3) }, 0.6, Enum.EasingStyle.Quart)
+    task.wait(0.2)
+    tween(LoadingLabel, { TextTransparency = 0 }, 0.4)
+
+    local dotsRunning = true
+    task.spawn(function()
+        local states = { L.loading, L.loading .. ".", L.loading .. "..", L.loading .. "..." }
+        local i = 1
+        while dotsRunning do
+            LoadingLabel.Text = states[i]
+            i = (i % #states) + 1
+            task.wait(0.4)
+        end
+    end)
+
+    task.wait(5)
+    dotsRunning = false
+
+    tween(LoadingLabel, { TextTransparency = 1 }, 0.3)
+    task.wait(0.3)
+    LoadingLabel.Visible = false
+
+    SubtitleLabel.Visible = true
+    LangHolder.Visible = true
+    tween(SubtitleLabel, { TextTransparency = 0 }, 0.4)
+    for i, card in ipairs(langCards) do
+        card.BackgroundTransparency = 1
+        task.delay(0.03 * i, function()
+            tween(card, { BackgroundTransparency = 0 }, 0.3)
+        end)
+    end
+end)
+
+------------------------------------------------------------
+-- ANA MENÜ
 ------------------------------------------------------------
 local MENU_W, MENU_H = 520, 330
 
@@ -888,4 +1044,4 @@ MinimizedButton.MouseButton1Click:Connect(function()
     if not MainFrame then return end
     openMenu()
 end)
-   
+    
