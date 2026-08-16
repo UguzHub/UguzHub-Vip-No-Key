@@ -1,121 +1,107 @@
---[[
-    UguzHub V2 Pro - Full Sürüm (Auto Farm, Tween/Teleport, Kill All, Şeffaf Arayüz, 4 Dil Desteği)
-]]
+-- [[ UguzHub V2 VIP - Complete Fixed & Feature Rich Edition ]] --
+repeat task.wait() until game:IsLoaded()
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
-local CoreGui = game:GetService("CoreGui")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
 
 local LocalPlayer = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
 
--- Önceki GUI'yi temizle
-if CoreGui:FindFirstChild("UguzHubV2Pro") then 
-    CoreGui.UguzHubV2Pro:Destroy() 
+-- Temizlik
+if CoreGui:FindFirstChild("UguzHubVIPMain") then 
+    CoreGui.UguzHubVIPMain:Destroy() 
 end
 
 ------------------------------------------------------------
--- ÖZELLİK BAYRAKLARI (TÜM İŞLEVLER + AUTO FARM / KILL ALL)
+-- TEMA VE BAYRAKLAR
 ------------------------------------------------------------
 local Flags = {
-    SpeedWalk = false,
-    SpeedValue = 24,
-    JumpPower = false,
-    JumpValue = 75,
-    InfiniteJump = false,
-    Noclip = false,
-    
     ESPAll = false,
-    ESPMurderer = false,
-    ESPSheriff = false,
-    ESPInnocent = false,
-    
-    AimbotEnabled = false,
-    AutoShoot = false,
-    KillAura = false,
+    ESPGun = false,
     AutoGrabGun = false,
-    
     AutoFarm = false,
-    FarmMode = "Teleport", -- "Teleport" veya "Tween"
-    KillAllActive = false,
-    
-    Fullbright = false
+    SelectedLang = "TR"
 }
 
-------------------------------------------------------------
--- TEMA
-------------------------------------------------------------
 local Theme = {
-    Background = Color3.fromRGB(18, 16, 26),
-    Sidebar    = Color3.fromRGB(24, 21, 35),
-    Card       = Color3.fromRGB(32, 28, 48),
-    Accent     = Color3.fromRGB(168, 85, 247),
-    AccentSoft = Color3.fromRGB(90, 60, 180),
-    Blue       = Color3.fromRGB(41, 121, 255),
-    BlueSoft   = Color3.fromRGB(70, 150, 255),
-    Text       = Color3.fromRGB(240, 240, 245),
-    SubText    = Color3.fromRGB(160, 155, 180),
-    Stroke     = Color3.fromRGB(147, 51, 234),
-}
-
-local RADIUS = 14
-
-------------------------------------------------------------
--- DİL PAKETLERİ (4 Dil: TR, EN, RU, DE)
-------------------------------------------------------------
-local Lang = {}
-
-Lang.TR = {
-    loading = "Yükleniyor",
-    subtitle = "Dilinizi seçin",
-    openBtn = "UguzHub",
-    notice = "Sizlere daha iyi bir deneyim sunmak amacıyla lütfen delta ayarlarindaki tüm izinleri Kapattığınıza emin olun.",
-}
-
-Lang.EN = {
-    loading = "Loading",
-    subtitle = "Select your language",
-    openBtn = "UguzHub",
-    notice = "To provide you with a better experience, please make sure to turn off all permissions in the delta settings.",
-}
-
-Lang.RU = {
-    loading = "Загрузка",
-    subtitle = "Выберите язык",
-    openBtn = "UguzHub",
-    notice = "Чтобы обеспечить вам лучший опыт, пожалуйста, убедитесь, что отключили все разрешения в настройках delta.",
-}
-
-Lang.DE = {
-    loading = "Wird geladen",
-    subtitle = "Wähle deine Sprache",
-    openBtn = "UguzHub",
-    notice = "Um Ihnen ein besseres Erlebnis zu bieten, stellen Sie bitte sicher, dass Sie alle Berechtigungen in den Delta-Einstellungen deaktivieren.",
+    Background = Color3.fromRGB(16, 16, 22),
+    Sidebar    = Color3.fromRGB(16, 23, 38),
+    Card       = Color3.fromRGB(25, 35, 50),
+    Accent     = Color3.fromRGB(138, 92, 255),
+    Text       = Color3.fromRGB(235, 235, 245),
+    SubText    = Color3.fromRGB(165, 165, 180),
+    Danger     = Color3.fromRGB(220, 38, 38),
+    Warning    = Color3.fromRGB(245, 158, 11)
 }
 
 ------------------------------------------------------------
--- 4 DİL SEÇENEĞİ
+-- DİL PAKETLERİ
 ------------------------------------------------------------
-local LanguageOptions = {
-    { code = "TR", flag = "🇹🇷", name = "Türkçe" },
-    { code = "EN", flag = "🇬🇧", name = "English" },
-    { code = "RU", flag = "🇷🇺", name = "Русский" },
-    { code = "DE", flag = "🇩🇪", name = "Deutsch" },
+local LangData = {
+    TR = {
+        name = "🇹🇷 Türkçe",
+        title = "UguzHub V2 VIP",
+        warningTitle = "⚠️ ÖNEMLİ UYARI",
+        warningMsg = "Delta Ayarlarındaki Tüm Herşeyi Kapattığınızdan Emin Olun! Sizlere Daha İyi Bir Deneyim Yaşatmak İçin Çabalıyoruz!",
+        discordMsg = "İsteklerinizi veya Şikayetlerinizi Discord sunucumuza yazabilirsiniz!",
+        tabVisuals = "Görsel (ESP)",
+        tabCombat = "Savaş & Kill",
+        tabFarm = "Auto Farm",
+        tabTP = "Teleport",
+        tabProfile = "Profil",
+        espAll = "Oyuncu ESP",
+        autoGrab = "Otomatik Silah Topla",
+        autoFarm = "Otomatik Coin Farm",
+        killAll = "🔪 Kill All (Herkesi Öldür)",
+        flingMurd = "🌀 Fling Murderer",
+        flingSheriff = "🌀 Fling Sheriff",
+        flingAll = "🌀 Fling All",
+        shootBtn = "🎯 Shoot Murderer (Buton)",
+        tpLobby = "Lobiye Işınlan",
+        tpMap = "Haritaya Işınlan",
+        tpMurd = "Katile Işınlan",
+        tpSheriff = "Şerife Işınlan",
+        userRole = "VIP Üye"
+    },
+    EN = {
+        name = "🇬🇧 English",
+        title = "UguzHub V2 VIP",
+        warningTitle = "⚠️ IMPORTANT WARNING",
+        warningMsg = "Make sure to turn off everything in Delta Settings! We are striving to provide you with a better experience!",
+        discordMsg = "You can join our Discord server for support!",
+        tabVisuals = "Visuals (ESP)",
+        tabCombat = "Combat & Kill",
+        tabFarm = "Auto Farm",
+        tabTP = "Teleport",
+        tabProfile = "Profile",
+        espAll = "Player ESP",
+        autoGrab = "Auto Grab Gun",
+        autoFarm = "Auto Coin Farm",
+        killAll = "🔪 Kill All",
+        flingMurd = "🌀 Fling Murderer",
+        flingSheriff = "🌀 Fling Sheriff",
+        flingAll = "🌀 Fling All",
+        shootBtn = "🎯 Shoot Murderer (Button)",
+        tpLobby = "Teleport to Lobby",
+        tpMap = "Teleport to Map",
+        tpMurd = "Teleport to Murderer",
+        tpSheriff = "Teleport to Sheriff",
+        userRole = "VIP Member"
+    }
 }
 
-local CurrentLang = "EN"
-local L = Lang[CurrentLang]
-
 ------------------------------------------------------------
--- OYUN ROLLERİ VE DÖNGÜLER (MM2)
+-- YARDIMCI FONKSİYONLAR & OYUN MANTIĞI
 ------------------------------------------------------------
 local function getRole(plr)
     if not plr or not plr.Character then return "Innocent" end
     local char = plr.Character
     local backpack = plr:FindFirstChild("Backpack")
+    
     if (char:FindFirstChild("Knife") or (backpack and backpack:FindFirstChild("Knife"))) then 
         return "Murderer" 
     elseif (char:FindFirstChild("Gun") or (backpack and backpack:FindFirstChild("Gun"))) then 
@@ -124,117 +110,59 @@ local function getRole(plr)
     return "Innocent"
 end
 
--- KILL ALL FONKSİYONU
-local function executeKillAll()
-    local myChar = LocalPlayer.Character
-    if not myChar then return end
-    local knife = myChar:FindFirstChild("Knife") or (LocalPlayer.Backpack and LocalPlayer.Backpack:FindFirstChild("Knife"))
-    if not knife then return end
-    knife.Parent = myChar
-    
-    local knifeHandle = knife:FindFirstChild("Handle") or knife:FindFirstChildWithClass("BasePart")
-    local myHrp = myChar:FindFirstChild("HumanoidRootPart")
-    if not myHrp then return end
-
-    for _, player in ipairs(Players:GetPlayers()) do
-        if not Flags.KillAllActive then break end
-        if player ~= LocalPlayer and player.Character then
-            local targetHrp = player.Character:FindFirstChild("HumanoidRootPart")
-            local hum = player.Character:FindFirstChildOfClass("Humanoid")
-            if targetHrp and hum and hum.Health > 0 then
-                myHrp.CFrame = targetHrp.CFrame * CFrame.new(0, 0, 1)
-                task.wait(0.05)
-                pcall(function()
-                    if firetouchinterest and knifeHandle then
-                        firetouchinterest(knifeHandle, targetHrp, 0)
-                        firetouchinterest(knifeHandle, targetHrp, 1)
-                    end
-                    knife:Activate()
-                end)
-                task.wait(0.1)
-            end
+local function getPlayerByRole(roleName)
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer and getRole(plr) == roleName then
+            return plr
         end
     end
-    Flags.KillAllActive = false
+    return nil
 end
 
--- AUTO FARM DÖNGÜSÜ (Teleport & Tween Modlu)
-task.spawn(function()
-    while task.wait(0.5) do
-        if Flags.AutoFarm then
-            pcall(function()
-                local char = LocalPlayer.Character
-                local root = char and char:FindFirstChild("HumanoidRootPart")
-                if root then
-                    for _, obj in ipairs(Workspace:GetDescendants()) do
-                        if not Flags.AutoFarm then break end
-                        if (obj:IsA("BasePart") or obj:IsA("MeshPart")) and obj.Name:lower():find("coin") and obj.Transparency < 0.9 then
-                            if Flags.FarmMode == "Tween" then
-                                local distance = (root.Position - obj.Position).Magnitude
-                                local speed = 250
-                                local tweenInfo = TweenInfo.new(distance / speed, Enum.EasingStyle.Linear)
-                                local tween = TweenService:Create(root, tweenInfo, {CFrame = obj.CFrame})
-                                tween:Play()
-                                tween.Completed:Wait()
-                            else
-                                root.CFrame = obj.CFrame
-                            end
-                            
-                            pcall(function()
-                                if firetouchinterest then
-                                    firetouchinterest(root, obj, 0)
-                                    firetouchinterest(root, obj, 1)
-                                end
-                            end)
-                            task.wait(0.1)
-                            break
-                        end
-                    end
-                end
-            end)
-        end
-    end
-end)
+-- Fling Mantığı
+local function flingTarget(targetPlr)
+    if not targetPlr or not targetPlr.Character then return end
+    local char = LocalPlayer.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    local tHrp = targetPlr.Character:FindFirstChild("HumanoidRootPart")
+    
+    if hrp and tHrp then
+        local bV = Instance.new("BodyVelocity")
+        bV.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        bV.Velocity = Vector3.new(99999, 99999, 99999)
+        bV.Parent = hrp
 
+        local timer = 0
+        while timer < 1.5 and tHrp and tHrp.Parent do
+            hrp.CFrame = tHrp.CFrame * CFrame.new(0, 0, 0)
+            task.wait(0.05)
+            timer = timer + 0.05
+        end
+        bV:Destroy()
+    end
+end
+
+------------------------------------------------------------
+-- MAIN DÖNGÜ (ESP & AUTO FARM)
+------------------------------------------------------------
 RunService.RenderStepped:Connect(function()
     pcall(function()
-        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-            local hum = LocalPlayer.Character.Humanoid
-            if Flags.SpeedWalk then hum.WalkSpeed = Flags.SpeedValue end
-            if Flags.JumpPower then hum.JumpPower = Flags.JumpValue end
-        end
-
-        if Flags.Noclip and LocalPlayer.Character then
-            for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
-                if part:IsA("BasePart") then part.CanCollide = false end
-            end
-        end
-
+        -- ESP
         for _, plr in pairs(Players:GetPlayers()) do
             if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-                local char = plr.Character
-                local esp = char:FindFirstChild("UguzTransESP")
-                local role = getRole(plr)
-                
-                local shouldShow = Flags.ESPAll or 
-                                   (Flags.ESPMurderer and role == "Murderer") or 
-                                   (Flags.ESPSheriff and role == "Sheriff") or 
-                                   (Flags.ESPInnocent and role == "Innocent")
-
-                if shouldShow then
+                local esp = plr.Character:FindFirstChild("UguzESP")
+                if Flags.ESPAll then
                     if not esp then
                         esp = Instance.new("Highlight")
-                        esp.Name = "UguzTransESP"
-                        esp.Parent = char
-                        esp.Adornee = char
-                        esp.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                        esp.Name = "UguzESP"
+                        esp.Parent = plr.Character
                     end
                     esp.Enabled = true
-                    
+                    local role = getRole(plr)
                     if role == "Murderer" then
                         esp.FillColor = Color3.fromRGB(255, 0, 0)
                     elseif role == "Sheriff" then
-                        esp.FillColor = Color3.fromRGB(0, 110, 255)
+                        esp.FillColor = Color3.fromRGB(0, 120, 255)
                     else
                         esp.FillColor = Color3.fromRGB(0, 255, 0)
                     end
@@ -244,6 +172,7 @@ RunService.RenderStepped:Connect(function()
             end
         end
 
+        -- Auto Grab Gun
         if Flags.AutoGrabGun then
             local gunDrop = Workspace:FindFirstChild("GunDrop", true)
             if gunDrop and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
@@ -251,519 +180,316 @@ RunService.RenderStepped:Connect(function()
             end
         end
 
-        if Flags.AimbotEnabled then
-            local murderer = nil
-            for _, p in pairs(Players:GetPlayers()) do
-                if getRole(p) == "Murderer" and p.Character and p.Character:FindFirstChild("Head") then
-                    murderer = p.Character.Head
-                    break
-                end
-            end
-            if murderer then
-                Camera.CFrame = CFrame.new(Camera.CFrame.Position, murderer.Position)
-            end
-        end
-
-        if Flags.KillAura and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            local hrp = LocalPlayer.Character.HumanoidRootPart
-            for _, p in pairs(Players:GetPlayers()) do
-                if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                    if (p.Character.HumanoidRootPart.Position - hrp.Position).Magnitude < 15 then
-                        local knife = LocalPlayer.Character:FindFirstChild("Knife") or (LocalPlayer.Backpack and LocalPlayer.Backpack:FindFirstChild("Knife"))
-                        if knife then knife.Parent = LocalPlayer.Character end
+        -- Auto Farm (Coins)
+        if Flags.AutoFarm and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local coinContainer = Workspace:FindFirstChild("Normal", true) or Workspace:FindFirstChild("CoinContainer", true)
+            if coinContainer then
+                for _, coin in pairs(coinContainer:GetChildren()) do
+                    if coin:IsA("BasePart") and coin.Name:lower():find("coin") then
+                        LocalPlayer.Character.HumanoidRootPart.CFrame = coin.CFrame
+                        task.wait(0.1)
+                        break
                     end
                 end
             end
         end
-
-        if Flags.Fullbright then
-            game:GetService("Lighting").Brightness = 2
-            game:GetService("Lighting").ClockTime = 14
-            game:GetService("Lighting").GlobalShadows = false
-        end
     end)
 end)
 
-UserInputService.JumpRequest:Connect(function()
-    if Flags.InfiniteJump and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-        LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-    end
-end)
-
 ------------------------------------------------------------
--- YARDIMCI FONKSİYONLAR
+-- BASE GUI OLUŞTURMA
 ------------------------------------------------------------
-local function create(class, props, children)
-    local inst = Instance.new(class)
-    for prop, value in pairs(props or {}) do
-        inst[prop] = value
-    end
-    for _, child in ipairs(children or {}) do
-        child.Parent = inst
-    end
-    return inst
-end
-
-local function corner(radius)
-    return create("UICorner", { CornerRadius = UDim.new(0, radius or RADIUS) })
-end
-
-local function stroke(color, thickness)
-    return create("UIStroke", {
-        Color = color or Theme.Stroke,
-        Thickness = thickness or 1,
-        Transparency = 0.4,
-    })
-end
-
-local function tween(obj, props, duration, style, direction)
-    local info = TweenInfo.new(
-        duration or 0.3,
-        style or Enum.EasingStyle.Quint,
-        direction or Enum.EasingDirection.Out
-    )
-    local t = TweenService:Create(obj, info, props)
-    t:Play()
-    return t
-end
-
-------------------------------------------------------------
--- ANA GUI
-------------------------------------------------------------
-local ScreenGui = create("ScreenGui", {
-    Name = "UguzHubV2Pro",
-    ResetOnSpawn = false,
-    ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
-    DisplayOrder = 100,
-    IgnoreGuiInset = true,
-})
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "UguzHubVIPMain"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.IgnoreGuiInset = true
 ScreenGui.Parent = CoreGui
 
 ------------------------------------------------------------
--- GİRİŞ EKRANI (Yükleme + 4'lü Dil Seçimi)
+-- 1. INTRO
 ------------------------------------------------------------
-local IntroFrame = create("Frame", {
-    Name = "Intro",
-    Size = UDim2.fromScale(1, 1),
-    Position = UDim2.fromScale(0, 0),
-    BorderSizePixel = 0,
-    BackgroundColor3 = Theme.Background,
-    BackgroundTransparency = 0,
-    ZIndex = 10,
-})
-IntroFrame.Parent = ScreenGui
+local LoadingFrame = Instance.new("Frame")
+LoadingFrame.Name = "Loading"
+LoadingFrame.Size = UDim2.fromScale(1, 1)
+LoadingFrame.BackgroundColor3 = Theme.Background
+LoadingFrame.ZIndex = 200
+LoadingFrame.Parent = ScreenGui
 
-local IntroContent = create("Frame", {
-    Name = "IntroContent",
-    AnchorPoint = Vector2.new(0.5, 0),
-    Position = UDim2.new(0.5, 0, 0.24, 0),
-    Size = UDim2.new(0, 360, 0, 370),
-    BackgroundTransparency = 1,
-    ZIndex = 11,
-})
-IntroContent.Parent = IntroFrame
+local Content = Instance.new("Frame")
+Content.AnchorPoint = Vector2.new(0.5, 0.5)
+Content.Position = UDim2.new(0.5, 0, 0.45, 0)
+Content.Size = UDim2.new(0, 360, 0, 140)
+Content.BackgroundTransparency = 1
+Content.ZIndex = 201
+Content.Parent = LoadingFrame
 
-local LogoLabel = create("TextLabel", {
-    Text = "UguzHub",
-    Font = Enum.Font.GothamBlack,
-    TextSize = 50,
-    TextColor3 = Theme.Text,
-    BackgroundTransparency = 1,
-    Size = UDim2.new(1, 0, 0, 60),
-    TextTransparency = 1,
-    ZIndex = 11,
-})
-LogoLabel.Parent = IntroContent
+local LogoLabel = Instance.new("TextLabel")
+LogoLabel.Text = "UguzHub"
+LogoLabel.Font = Enum.Font.GothamBlack
+LogoLabel.TextSize = 50
+LogoLabel.TextColor3 = Theme.Text
+LogoLabel.BackgroundTransparency = 1
+LogoLabel.Size = UDim2.new(1, 0, 0, 60)
+LogoLabel.TextTransparency = 1
+LogoLabel.ZIndex = 201
+LogoLabel.Parent = Content
 
-local ProTag = create("TextLabel", {
-    Text = "V2 PRO",
-    Font = Enum.Font.GothamBold,
-    TextSize = 18,
-    TextColor3 = Theme.Accent,
-    BackgroundTransparency = 1,
-    Size = UDim2.new(1, 0, 0, 22),
-    Position = UDim2.new(0, 0, 0, 58),
-    TextTransparency = 1,
-    ZIndex = 11,
-})
-ProTag.Parent = IntroContent
+local ProTag = Instance.new("TextLabel")
+ProTag.Text = "V2 PRO"
+ProTag.Font = Enum.Font.GothamBold
+ProTag.TextSize = 18
+ProTag.TextColor3 = Theme.Accent
+ProTag.BackgroundTransparency = 1
+ProTag.Size = UDim2.new(1, 0, 0, 22)
+ProTag.Position = UDim2.new(0, 0, 0, 58)
+ProTag.TextTransparency = 1
+ProTag.ZIndex = 201
+ProTag.Parent = Content
 
-local Underline = create("Frame", {
-    Name = "Underline",
-    Size = UDim2.new(0, 0, 0, 3),
-    Position = UDim2.new(0.5, 0, 0, 88),
-    AnchorPoint = Vector2.new(0.5, 0),
-    BackgroundColor3 = Theme.Accent,
-    BorderSizePixel = 0,
-    ZIndex = 11,
-})
-corner(2).Parent = Underline
-Underline.Parent = IntroContent
+local Underline = Instance.new("Frame")
+Underline.Size = UDim2.new(0, 0, 0, 3)
+Underline.Position = UDim2.new(0.5, 0, 0, 88)
+Underline.AnchorPoint = Vector2.new(0.5, 0)
+Underline.BackgroundColor3 = Theme.Accent
+Underline.BorderSizePixel = 0
+Underline.ZIndex = 201
+Underline.Parent = Content
 
-local LoadingLabel = create("TextLabel", {
-    Text = L.loading,
-    Font = Enum.Font.GothamMedium,
-    TextSize = 17,
-    TextColor3 = Theme.SubText,
-    BackgroundTransparency = 1,
-    Size = UDim2.new(1, 0, 0, 24),
-    Position = UDim2.new(0, 0, 0, 108),
-    TextTransparency = 1,
-    ZIndex = 11,
-})
-LoadingLabel.Parent = IntroContent
-
-local SubtitleLabel = create("TextLabel", {
-    Text = L.subtitle,
-    Font = Enum.Font.Gotham,
-    TextSize = 15,
-    TextColor3 = Theme.SubText,
-    BackgroundTransparency = 1,
-    Size = UDim2.new(1, 0, 0, 22),
-    Position = UDim2.new(0, 0, 0, 108),
-    TextTransparency = 1,
-    ZIndex = 11,
-    Visible = false,
-})
-SubtitleLabel.Parent = IntroContent
-
-local LangHolder = create("Frame", {
-    Name = "LangHolder",
-    Position = UDim2.new(0, 0, 0, 150),
-    Size = UDim2.new(1, 0, 0, 100),
-    BackgroundTransparency = 1,
-    ZIndex = 11,
-    Visible = false,
-})
-LangHolder.Parent = IntroContent
-
-create("UIGridLayout", {
-    CellSize = UDim2.new(0, 80, 0, 92),
-    CellPadding = UDim2.new(0, 8, 0, 0),
-    HorizontalAlignment = Enum.HorizontalAlignment.Center,
-    SortOrder = Enum.SortOrder.LayoutOrder,
-}).Parent = LangHolder
+local LoadingLabel = Instance.new("TextLabel")
+LoadingLabel.Text = "Loading"
+LoadingLabel.Font = Enum.Font.GothamMedium
+LoadingLabel.TextSize = 17
+LoadingLabel.TextColor3 = Theme.SubText
+LoadingLabel.BackgroundTransparency = 1
+LoadingLabel.Size = UDim2.new(1, 0, 0, 24)
+LoadingLabel.Position = UDim2.new(0, 0, 0, 108)
+LoadingLabel.TextTransparency = 1
+LoadingLabel.ZIndex = 201
+LoadingLabel.Parent = Content
 
 ------------------------------------------------------------
--- UYARI EKRANI
+-- 2. DİL MENÜSÜ & UYARI & MAIN BAĞLANTILARI
 ------------------------------------------------------------
-local NoticeFrame = create("Frame", {
-    Name = "Notice",
-    Size = UDim2.fromScale(1, 1),
-    Position = UDim2.fromScale(0, 0),
-    BackgroundColor3 = Theme.Background,
-    BackgroundTransparency = 1,
-    Visible = false,
-    ZIndex = 15,
-})
-NoticeFrame.Parent = ScreenGui
+local LangMenu = Instance.new("Frame")
+LangMenu.Name = "LangMenu"
+LangMenu.Size = UDim2.fromScale(1, 1)
+LangMenu.BackgroundColor3 = Theme.Background
+LangMenu.ZIndex = 100
+LangMenu.Visible = false
+LangMenu.Parent = ScreenGui
 
-local NoticeLabel = create("TextLabel", {
-    Text = "",
-    Font = Enum.Font.GothamMedium,
-    TextSize = 18,
-    TextColor3 = Theme.Text,
-    BackgroundTransparency = 1,
-    Size = UDim2.new(0, 480, 0, 160),
-    AnchorPoint = Vector2.new(0.5, 0.5),
-    Position = UDim2.new(0.5, 0, 0.5, 0),
-    TextWrapped = true,
-    TextTransparency = 1,
-    ZIndex = 16,
-})
-NoticeLabel.Parent = NoticeFrame
+local Title = Instance.new("TextLabel")
+Title.Text = "UguzHub  •  Language Selection"
+Title.Size = UDim2.new(1, 0, 0, 80)
+Title.Position = UDim2.new(0, 0, 0, 40)
+Title.TextColor3 = Theme.Text
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 26
+Title.BackgroundTransparency = 1
+Title.Parent = LangMenu
 
-------------------------------------------------------------
--- MİNİMİZE BUTONU
-------------------------------------------------------------
-local MinimizedButton = create("TextButton", {
-    Name = "MinimizedButton",
-    Text = "🟣 " .. L.openBtn,
-    Font = Enum.Font.GothamBold,
-    TextSize = 15,
-    TextColor3 = Theme.Text,
-    BackgroundColor3 = Theme.Accent,
-    Size = UDim2.new(0, 118, 0, 38),
-    Position = UDim2.new(1, -134, 0, 16),
-    AutoButtonColor = false,
-    Visible = false,
-    ZIndex = 8,
-})
-corner(12).Parent = MinimizedButton
-stroke(Color3.fromRGB(255, 255, 255), 1).Parent = MinimizedButton
-MinimizedButton.Parent = ScreenGui
+local Scroll = Instance.new("ScrollingFrame")
+Scroll.Size = UDim2.new(0, 320, 0, 300)
+Scroll.Position = UDim2.new(0.5, -160, 0.5, -100)
+Scroll.BackgroundTransparency = 1
+Scroll.ScrollBarThickness = 4
+Scroll.Parent = LangMenu
 
-------------------------------------------------------------
--- MENÜ KONTROLÜ
-------------------------------------------------------------
-local MainFrame
+local ScrollList = Instance.new("UIListLayout")
+ScrollList.Padding = UDim.new(0, 10)
+ScrollList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+ScrollList.Parent = Scroll
+
+-- İleriye dönük fonksiyon tanımları
+local showWarningScreen
 local buildMainMenu
-local openMenu
-local closeMenu
-local langCards = {}
 
-local function showNoticeThenMenu()
-    local countdown = 7
-    NoticeLabel.Text = L.notice .. "\n\n(" .. countdown .. ")"
-    NoticeFrame.Visible = true
-    tween(NoticeFrame, { BackgroundTransparency = 0.05 }, 0.4)
-    tween(NoticeLabel, { TextTransparency = 0 }, 0.5)
+for code, data in pairs(LangData) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -20, 0, 45)
+    btn.Text = data.name
+    btn.BackgroundColor3 = Theme.Card
+    btn.TextColor3 = Theme.Text
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 14
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 10)
+    corner.Parent = btn
+
+    btn.MouseButton1Click:Connect(function()
+        Flags.SelectedLang = code
+        LangMenu:Destroy()
+        showWarningScreen()
+    end)
+    btn.Parent = Scroll
+end
+
+function showWarningScreen()
+    local L = LangData[Flags.SelectedLang] or LangData.TR
+
+    local WarnMenu = Instance.new("Frame")
+    WarnMenu.Size = UDim2.fromScale(1, 1)
+    WarnMenu.BackgroundColor3 = Theme.Background
+    WarnMenu.ZIndex = 150
+    WarnMenu.Parent = ScreenGui
+
+    local WarnBox = Instance.new("Frame")
+    WarnBox.Size = UDim2.new(0, 380, 0, 220)
+    WarnBox.Position = UDim2.new(0.5, -190, 0.5, -110)
+    WarnBox.BackgroundColor3 = Theme.Card
+    WarnBox.Parent = WarnMenu
+
+    local wCorner = Instance.new("UICorner")
+    wCorner.CornerRadius = UDim.new(0, 12)
+    wCorner.Parent = WarnBox
+
+    local wTitle = Instance.new("TextLabel")
+    wTitle.Text = L.warningTitle
+    wTitle.Size = UDim2.new(1, 0, 0, 45)
+    wTitle.TextColor3 = Theme.Warning
+    wTitle.Font = Enum.Font.GothamBold
+    wTitle.TextSize = 16
+    wTitle.BackgroundTransparency = 1
+    wTitle.Parent = WarnBox
+
+    local wMsg = Instance.new("TextLabel")
+    wMsg.Text = L.warningMsg
+    wMsg.Size = UDim2.new(1, -30, 0, 90)
+    wMsg.Position = UDim2.new(0, 15, 0, 45)
+    wMsg.TextColor3 = Theme.Text
+    wMsg.Font = Enum.Font.GothamMedium
+    wMsg.TextSize = 13
+    wMsg.TextWrapped = true
+    wMsg.BackgroundTransparency = 1
+    wMsg.Parent = WarnBox
+
+    local closeBtn = Instance.new("TextButton")
+    closeBtn.Size = UDim2.new(1, -40, 0, 40)
+    closeBtn.Position = UDim2.new(0, 20, 1, -50)
+    closeBtn.BackgroundColor3 = Color3.fromRGB(40, 50, 65)
+    closeBtn.TextColor3 = Theme.SubText
+    closeBtn.Font = Enum.Font.GothamBold
+    closeBtn.TextSize = 13
+    closeBtn.Parent = WarnBox
+
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 8)
+    btnCorner.Parent = closeBtn
 
     task.spawn(function()
-        while countdown > 0 do
+        for i = 7, 1, -1 do
+            closeBtn.Text = "TAMAM (" .. i .. "s)"
             task.wait(1)
-            countdown = countdown - 1
-            NoticeLabel.Text = L.notice .. "\n\n(" .. countdown .. ")"
         end
-    end)
-
-    task.delay(7, function()
-        tween(NoticeFrame, { BackgroundTransparency = 1 }, 0.5)
-        tween(NoticeLabel, { TextTransparency = 1 }, 0.4)
-        task.wait(0.5)
-        NoticeFrame.Visible = false
-
-        if not MainFrame then
-            buildMainMenu()
-        end
-        openMenu()
+        closeBtn.Text = "TAMAM"
+        closeBtn.BackgroundColor3 = Theme.Accent
+        closeBtn.TextColor3 = Theme.Text
+        
+        task.wait(0.3)
+        WarnMenu:Destroy()
+        buildMainMenu()
     end)
 end
 
-local function selectLanguage(code)
-    CurrentLang = code
-    L = Lang[CurrentLang]
-
-    for _, card in ipairs(langCards) do
-        local isSelected = card:GetAttribute("Code") == code
-        tween(card, { BackgroundColor3 = isSelected and Theme.Accent or Theme.Card }, 0.2)
-    end
-
-    task.delay(0.25, function()
-        tween(IntroFrame, { BackgroundTransparency = 1 }, 0.4)
-        for _, obj in ipairs({ LogoLabel, ProTag, SubtitleLabel }) do
-            tween(obj, { TextTransparency = 1 }, 0.3)
-        end
-        for _, card in ipairs(langCards) do
-            tween(card, { BackgroundTransparency = 1 }, 0.25)
-        end
-        task.wait(0.4)
-        IntroFrame.Visible = false
-
-        MinimizedButton.Text = "🟣 " .. L.openBtn
-        showNoticeThenMenu()
-    end)
-end
-
-for i, opt in ipairs(LanguageOptions) do
-    local card = create("TextButton", {
-        Name = opt.code,
-        Text = "",
-        AutoButtonColor = false,
-        BackgroundColor3 = Theme.Card,
-        BackgroundTransparency = 1,
-        LayoutOrder = i,
-        ZIndex = 11,
-    })
-    corner(14).Parent = card
-    stroke().Parent = card
-    card:SetAttribute("Code", opt.code)
-
-    create("TextLabel", {
-        Text = opt.flag,
-        Font = Enum.Font.GothamBold,
-        TextSize = 26,
-        BackgroundTransparency = 1,
-        Size = UDim2.new(1, 0, 0, 34),
-        Position = UDim2.new(0, 0, 0, 10),
-        ZIndex = 12,
-    }).Parent = card
-
-    create("TextLabel", {
-        Text = opt.name,
-        Font = Enum.Font.GothamMedium,
-        TextSize = 12,
-        TextColor3 = Theme.Text,
-        BackgroundTransparency = 1,
-        Size = UDim2.new(1, -6, 0, 18),
-        Position = UDim2.new(0, 3, 0, 48),
-        TextXAlignment = Enum.TextXAlignment.Center,
-        ZIndex = 12,
-    }).Parent = card
-
-    card.MouseEnter:Connect(function()
-        if CurrentLang ~= opt.code then
-            tween(card, { BackgroundColor3 = 3 = Theme.AccentSoft }, 0.15)
-        end
-    end)
-    card.MouseLeave:Connect(function()
-        if CurrentLang ~= opt.code then
-            tween(card, { BackgroundColor3 = Theme.Card }, 0.15)
-        end
-    end)
-    card.MouseButton1Click:Connect(function()
-        selectLanguage(opt.code)
-    end)
-
-    card.Parent = LangHolder
-    table.insert(langCards, card)
-end
-
 ------------------------------------------------------------
--- GİRİŞ AKIŞI
+-- 3. ANA MENÜ
 ------------------------------------------------------------
-task.defer(function()
-    tween(LogoLabel, { TextTransparency = 0 }, 0.6)
-    tween(ProTag, { TextTransparency = 0 }, 0.6)
-    task.wait(0.15)
-    tween(Underline, { Size = UDim2.new(0, 220, 0, 3) }, 0.6, Enum.EasingStyle.Quart)
-    task.wait(0.2)
-    tween(LoadingLabel, { TextTransparency = 0 }, 0.4)
-
-    local dotsRunning = true
-    task.spawn(function()
-        local states = { L.loading, L.loading .. ".", L.loading .. "..", L.loading .. "..." }
-        local i = 1
-        while dotsRunning do
-            LoadingLabel.Text = states[i]
-            i = (i % #states) + 1
-            task.wait(0.4)
-        end
-    end)
-
-    task.wait(5)
-    dotsRunning = false
-
-    tween(LoadingLabel, { TextTransparency = 1 }, 0.3)
-    task.wait(0.3)
-    LoadingLabel.Visible = false
-
-    SubtitleLabel.Visible = true
-    LangHolder.Visible = true
-    tween(SubtitleLabel, { TextTransparency = 0 }, 0.4)
-    for i, card in ipairs(langCards) do
-        card.BackgroundTransparency = 1
-        task.delay(0.03 * i, function()
-            tween(card, { BackgroundTransparency = 0 }, 0.3)
-        end)
-    end
-end)
-
-------------------------------------------------------------
--- ANA MENÜ (Şeffaf, Sekmeli, Profil + Discord Kartlı)
-------------------------------------------------------------
-local MENU_W, MENU_H = 520, 330
-
 function buildMainMenu()
-    MainFrame = create("Frame", {
-        Name = "MainMenu",
-        Size = UDim2.new(0, MENU_W, 0, MENU_H),
-        Position = UDim2.new(0.5, 0, 0.5, 0),
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        BackgroundColor3 = Theme.Background,
-        BackgroundTransparency = 0.15,
-        ClipsDescendants = true,
-        Visible = false,
-        ZIndex = 5,
-    })
-    corner(RADIUS).Parent = MainFrame
-    stroke(Theme.Stroke, 2).Parent = MainFrame
-    MainFrame.Parent = ScreenGui
+    local L = LangData[Flags.SelectedLang] or LangData.TR
 
-    local Header = create("Frame", {
-        Size = UDim2.new(1, 0, 0, 36),
-        BackgroundColor3 = Theme.Sidebar,
-        BackgroundTransparency = 0.3,
-        Parent = MainFrame,
-        ZIndex = 6,
-    })
+    local Main = Instance.new("Frame")
+    Main.Name = "MainFrame"
+    Main.Size = UDim2.new(0, 500, 0, 340)
+    Main.Position = UDim2.new(0.5, -250, 0.5, -170)
+    Main.BackgroundColor3 = Theme.Background
+    Main.ClipsDescendants = true
+    Main.Parent = ScreenGui
 
-    create("TextLabel", {
-        Text = "  Murder Mystery 2 | UguzHub V2 Pro",
-        Size = UDim2.new(1, -40, 1, 0),
-        TextColor3 = Theme.Text,
-        Font = Enum.Font.GothamBold,
-        TextSize = 13,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        BackgroundTransparency = 1,
-        Parent = Header,
-        ZIndex = 7,
-    })
+    local MainCorner = Instance.new("UICorner")
+    MainCorner.CornerRadius = UDim.new(0, 12)
+    MainCorner.Parent = Main
 
-    local CloseBtn = create("TextButton", {
-        Text = "×",
-        Font = Enum.Font.GothamBold,
-        TextSize = 18,
-        TextColor3 = Theme.SubText,
-        BackgroundTransparency = 1,
-        Size = UDim2.new(0, 36, 0, 36),
-        Position = UDim2.new(1, -36, 0, 0),
-        Parent = Header,
-        ZIndex = 7,
-    })
+    local MainStroke = Instance.new("UIStroke")
+    MainStroke.Color = Theme.Accent
+    MainStroke.Thickness = 1.5
+    MainStroke.Parent = Main
 
-    CloseBtn.MouseButton1Click:Connect(function()
-        closeMenu()
+    -- Drag
+    local dragging, dragStart, startPos
+    Main.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true; dragStart = input.Position; startPos = Main.Position
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + (input.Position.X - dragStart.X), startPos.Y.Scale, startPos.Y.Offset + (input.Position.Y - dragStart.Y))
+        end
+    end)
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
     end)
 
-    local Sidebar = create("Frame", {
-        Size = UDim2.new(0, 130, 1, -36),
-        Position = UDim2.new(1, -130, 0, 36),
-        BackgroundColor3 = Theme.Sidebar,
-        BackgroundTransparency = 0.4,
-        Parent = MainFrame,
-        ZIndex = 6,
-    })
+    -- Header
+    local Header = Instance.new("Frame")
+    Header.Size = UDim2.new(1, 0, 0, 40)
+    Header.BackgroundColor3 = Theme.Sidebar
+    Header.Parent = Main
 
-    create("UIListLayout", {
-        Padding = UDim.new(0, 4),
-        Parent = Sidebar,
-    })
+    local HeaderTitle = Instance.new("TextLabel")
+    HeaderTitle.Text = "  ⚡ " .. L.title
+    HeaderTitle.Size = UDim2.new(1, 0, 1, 0)
+    HeaderTitle.TextColor3 = Theme.Text
+    HeaderTitle.Font = Enum.Font.GothamBold
+    HeaderTitle.TextSize = 14
+    HeaderTitle.TextXAlignment = Enum.TextXAlignment.Left
+    HeaderTitle.BackgroundTransparency = 1
+    HeaderTitle.Parent = Header
 
-    local ContentContainer = create("Frame", {
-        Size = UDim2.new(1, -135, 1, -42),
-        Position = UDim2.new(0, 4, 0, 40),
-        BackgroundTransparency = 1,
-        Parent = MainFrame,
-        ZIndex = 6,
-    })
+    -- Sidebar
+    local Sidebar = Instance.new("Frame")
+    Sidebar.Size = UDim2.new(0, 130, 1, -40)
+    Sidebar.Position = UDim2.new(0, 0, 0, 40)
+    Sidebar.BackgroundColor3 = Theme.Sidebar
+    Sidebar.Parent = Main
+
+    local SidebarList = Instance.new("UIListLayout")
+    SidebarList.Padding = UDim.new(0, 4)
+    SidebarList.Parent = Sidebar
+
+    local ContentContainer = Instance.new("Frame")
+    ContentContainer.Size = UDim2.new(1, -140, 1, -50)
+    ContentContainer.Position = UDim2.new(0, 135, 0, 45)
+    ContentContainer.BackgroundTransparency = 1
+    ContentContainer.Parent = Main
 
     local pages, tabBtns = {}, {}
 
     local function addTab(name, id)
-        local page = create("ScrollingFrame", {
-            Size = UDim2.new(1, 0, 1, 0),
-            BackgroundTransparency = 1,
-            ScrollBarThickness = 2,
-            Visible = false,
-            Parent = ContentContainer,
-            ZIndex = 6,
-        })
+        local page = Instance.new("ScrollingFrame")
+        page.Size = UDim2.new(1, 0, 1, 0)
+        page.BackgroundTransparency = 1
+        page.ScrollBarThickness = 3
+        page.Visible = false
+        page.Parent = ContentContainer
 
-        create("UIListLayout", {
-            Padding = UDim.new(0, 6),
-            Parent = page,
-        })
+        local pList = Instance.new("UIListLayout")
+        pList.Padding = UDim.new(0, 8)
+        pList.Parent = page
 
-        local btn = create("TextButton", {
-            Size = UDim2.new(1, 0, 0, 48),
-            Text = name,
-            BackgroundColor3 = Theme.Sidebar,
-            BackgroundTransparency = 0.5,
-            TextColor3 = Theme.SubText,
-            Font = Enum.Font.GothamMedium,
-            TextSize = 12,
-            AutoButtonColor = false,
-            Parent = Sidebar,
-            ZIndex = 7,
-        })
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1, 0, 0, 32)
+        btn.Text = name
+        btn.BackgroundColor3 = Theme.Sidebar
+        btn.TextColor3 = Theme.SubText
+        btn.Font = Enum.Font.GothamMedium
+        btn.TextSize = 11
+        btn.Parent = Sidebar
 
         btn.MouseButton1Click:Connect(function()
             for _, p in pairs(pages) do p.Visible = false end
-            for _, b in pairs(tabBtns) do 
-                b.BackgroundColor3 = Theme.Sidebar
-                b.TextColor3 = Theme.SubText 
-            end
+            for _, b in pairs(tabBtns) do b.BackgroundColor3 = Theme.Sidebar; b.TextColor3 = Theme.SubText end
             page.Visible = true
             btn.BackgroundColor3 = Theme.Card
             btn.TextColor3 = Theme.Accent
@@ -775,39 +501,34 @@ function buildMainMenu()
     end
 
     local function createToggle(parent, text, flag)
-        local frame = create("Frame", {
-            Size = UDim2.new(1, -4, 0, 34),
-            BackgroundColor3 = Theme.Card,
-            BackgroundTransparency = 0.25,
-            Parent = parent,
-            ZIndex = 6,
-        })
-        corner(6).Parent = frame
+        local frame = Instance.new("Frame")
+        frame.Size = UDim2.new(1, -5, 0, 36)
+        frame.BackgroundColor3 = Theme.Card
+        frame.Parent = parent
 
-        create("TextLabel", {
-            Text = "  " .. text,
-            Size = UDim2.new(0.65, 0, 1, 0),
-            TextColor3 = Theme.Text,
-            Font = Enum.Font.Gotham,
-            TextSize = 11,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            BackgroundTransparency = 1,
-            Parent = frame,
-            ZIndex = 7,
-        })
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 8)
+        corner.Parent = frame
 
-        local toggleBtn = create("TextButton", {
-            Size = UDim2.new(0, 42, 0, 20),
-            Position = UDim2.new(1, -48, 0.5, -10),
-            Text = "OFF",
-            BackgroundColor3 = Color3.fromRGB(45, 40, 60),
-            TextColor3 = Theme.SubText,
-            Font = Enum.Font.GothamBold,
-            TextSize = 10,
-            Parent = frame,
-            ZIndex = 7,
-        })
-        corner(4).Parent = toggleBtn
+        local lbl = Instance.new("TextLabel")
+        lbl.Text = "  " .. text
+        lbl.Size = UDim2.new(0.7, 0, 1, 0)
+        lbl.TextColor3 = Theme.Text
+        lbl.Font = Enum.Font.Gotham
+        lbl.TextSize = 11
+        lbl.TextXAlignment = Enum.TextXAlignment.Left
+        lbl.BackgroundTransparency = 1
+        lbl.Parent = frame
+
+        local toggleBtn = Instance.new("TextButton")
+        toggleBtn.Size = UDim2.new(0, 50, 0, 22)
+        toggleBtn.Position = UDim2.new(1, -55, 0.5, -11)
+        toggleBtn.Text = "OFF"
+        toggleBtn.BackgroundColor3 = Color3.fromRGB(40, 50, 65)
+        toggleBtn.TextColor3 = Theme.SubText
+        toggleBtn.Font = Enum.Font.GothamBold
+        toggleBtn.TextSize = 10
+        toggleBtn.Parent = frame
 
         toggleBtn.MouseButton1Click:Connect(function()
             Flags[flag] = not Flags[flag]
@@ -817,240 +538,164 @@ function buildMainMenu()
                 toggleBtn.TextColor3 = Theme.Text
             else
                 toggleBtn.Text = "OFF"
-                toggleBtn.BackgroundColor3 = Color3.fromRGB(45, 40, 60)
+                toggleBtn.BackgroundColor3 = Color3.fromRGB(40, 50, 65)
                 toggleBtn.TextColor3 = Theme.SubText
             end
         end)
     end
 
-    local MainTab   = addTab("Main", "Main")
-    local VisualTab = addTab("Visual", "Visual")
-    local CombatTab = addTab("Combat", "Combat")
-    local TeleTab   = addTab("Teleport", "Teleport")
+    local function createButton(parent, text, color, callback)
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1, -5, 0, 36)
+        btn.Text = text
+        btn.BackgroundColor3 = color or Theme.Card
+        btn.TextColor3 = Theme.Text
+        btn.Font = Enum.Font.GothamBold
+        btn.TextSize = 11
+        btn.Parent = parent
 
-    ------------------------------------------------------------
-    -- MAIN SEKME İÇERİĞİ
-    ------------------------------------------------------------
-    local ProfileCard = create("Frame", {
-        Size = UDim2.new(1, -4, 0, 85),
-        BackgroundColor3 = Theme.Card,
-        BackgroundTransparency = 0.25,
-        Parent = MainTab,
-        ZIndex = 6,
-    })
-    corner(8).Parent = ProfileCard
+        local c = Instance.new("UICorner")
+        c.CornerRadius = UDim.new(0, 8)
+        c.Parent = btn
 
-    local AvatarImg = create("ImageLabel", {
-        Size = UDim2.new(0, 60, 0, 60),
-        Position = UDim2.new(0, 10, 0.5, -30),
-        BackgroundColor3 = Color3.fromRGB(40, 35, 60),
-        Parent = ProfileCard,
-        ZIndex = 7,
-    })
-    corner(30).Parent = AvatarImg
+        btn.MouseButton1Click:Connect(callback)
+    end
 
-    pcall(function()
-        AvatarImg.Image = Players:GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size150x150)
-    end)
+    -- Tablar
+    local VisualsTab = addTab(L.tabVisuals, "Visuals")
+    local CombatTab  = addTab(L.tabCombat, "Combat")
+    local FarmTab    = addTab(L.tabFarm, "Farm")
+    local TeleportTab= addTab(L.tabTP, "TP")
+    local ProfileTab = addTab(L.tabProfile, "Profile")
 
-    create("TextLabel", {
-        Size = UDim2.new(1, -80, 0, 20),
-        Position = UDim2.new(0, 78, 0, 16),
-        Text = "Hoşgeldin, " .. LocalPlayer.Name,
-        TextColor3 = Theme.Text,
-        Font = Enum.Font.GothamBold,
-        TextSize = 13,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        BackgroundTransparency = 1,
-        Parent = ProfileCard,
-        ZIndex = 7,
-    })
+    -- Visuals
+    createToggle(VisualsTab, L.espAll, "ESPAll")
+    createToggle(VisualsTab, L.autoGrab, "AutoGrabGun")
 
-    create("TextLabel", {
-        Size = UDim2.new(1, -80, 0, 20),
-        Position = UDim2.new(0, 78, 0, 38),
-        Text = "@" .. LocalPlayer.Name .. " | ID: " .. LocalPlayer.UserId,
-        TextColor3 = Theme.SubText,
-        Font = Enum.Font.Gotham,
-        TextSize = 10,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        BackgroundTransparency = 1,
-        Parent = ProfileCard,
-        ZIndex = 7,
-    })
-
-    local DiscordCard = create("TextButton", {
-        Size = UDim2.new(1, -4, 0, 38),
-        BackgroundColor3 = Theme.Card,
-        BackgroundTransparency = 0.25,
-        Text = "",
-        AutoButtonColor = false,
-        Parent = MainTab,
-        ZIndex = 6,
-    })
-    corner(8).Parent = DiscordCard
-
-    create("TextLabel", {
-        Size = UDim2.new(0, 30, 1, 0),
-        Position = UDim2.new(0, 8, 0, 0),
-        Text = "💬",
-        TextSize = 14,
-        BackgroundTransparency = 1,
-        Parent = DiscordCard,
-        ZIndex = 7,
-    })
-
-    local DiscordText = create("TextLabel", {
-        Size = UDim2.new(1, -45, 1, 0),
-        Position = UDim2.new(0, 38, 0, 0),
-        Text = "Discord: discord.gg/uguzhub (Tıkla Kopyala)",
-        TextColor3 = Theme.Accent,
-        Font = Enum.Font.GothamBold,
-        TextSize = 11,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        BackgroundTransparency = 1,
-        Parent = DiscordCard,
-        ZIndex = 7,
-    })
-
-    DiscordCard.MouseButton1Click:Connect(function()
+    -- Combat & Actions
+    createButton(CombatTab, L.killAll, Theme.Danger, function()
         pcall(function()
-            setclipboard("https://discord.gg/uguzhub")
-            DiscordText.Text = "Discord Linki Kopyalandı!"
-            task.wait(1.5)
-            DiscordText.Text = "Discord: discord.gg/uguzhub (Tıkla Kopyala)"
+            for _, plr in pairs(Players:GetPlayers()) do
+                if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                    LocalPlayer.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame
+                    task.wait(0.2)
+                end
+            end
         end)
     end)
+    createButton(CombatTab, L.flingMurd, Theme.Card, function() flingTarget(getPlayerByRole("Murderer")) end)
+    createButton(CombatTab, L.flingSheriff, Theme.Card, function() flingTarget(getPlayerByRole("Sheriff")) end)
+    createButton(CombatTab, L.flingAll, Theme.Card, function()
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr ~= LocalPlayer then flingTarget(plr) end
+        end
+    end)
+    createButton(CombatTab, L.shootBtn, Theme.Accent, function() spawnShootButton() end)
 
-    createToggle(MainTab, "Auto Farm (Coin Topla)", "AutoFarm")
+    -- Auto Farm
+    createToggle(FarmTab, L.autoFarm, "AutoFarm")
 
-    local ModeBtn = create("TextButton", {
-        Size = UDim2.new(1, -4, 0, 34),
-        BackgroundColor3 = Theme.Card,
-        BackgroundTransparency = 0.25,
-        Text = "  Farm Mode: Teleport",
-        TextColor3 = Theme.Text,
-        Font = Enum.Font.Gotham,
-        TextSize = 11,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        Parent = MainTab,
-        ZIndex = 6,
-    })
-    corner(6).Parent = ModeBtn
-    ModeBtn.MouseButton1Click:Connect(function()
-        if Flags.FarmMode == "Teleport" then
-            Flags.FarmMode = "Tween"
-            ModeBtn.Text = "  Farm Mode: Tween"
-        else
-            Flags.FarmMode = "Teleport"
-            ModeBtn.Text = "  Farm Mode: Teleport"
+    -- Teleport
+    createButton(TeleportTab, L.tpLobby, Theme.Card, function()
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(110, 138, -12)
+        end
+    end)
+    createButton(TeleportTab, L.tpMurd, Theme.Card, function()
+        local m = getPlayerByRole("Murderer")
+        if m and m.Character and m.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = m.Character.HumanoidRootPart.CFrame
+        end
+    end)
+    createButton(TeleportTab, L.tpSheriff, Theme.Card, function()
+        local s = getPlayerByRole("Sheriff")
+        if s and s.Character and s.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = s.Character.HumanoidRootPart.CFrame
         end
     end)
 
-    local KillAllBtn = create("TextButton", {
-        Size = UDim2.new(1, -4, 0, 34),
-        BackgroundColor3 = Color3.fromRGB(150, 40, 40),
-        BackgroundTransparency = 0.2,
-        Text = "  Kill All (Herkesi Katlet)",
-        TextColor3 = Theme.Text,
-        Font = Enum.Font.GothamBold,
-        TextSize = 11,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        Parent = MainTab,
-        ZIndex = 6,
-    })
-    corner(6).Parent = KillAllBtn
-    KillAllBtn.MouseButton1Click:Connect(function()
-        Flags.KillAllActive = true
-        task.spawn(executeKillAll)
-    end)
+    -- Profile
+    local UserLabel = Instance.new("TextLabel")
+    UserLabel.Text = "👤 Kullanıcı: " .. LocalPlayer.Name .. "\nRank: " .. L.userRole .. "\n\n" .. L.discordMsg
+    UserLabel.Size = UDim2.new(1, -10, 1, 0)
+    UserLabel.TextColor3 = Theme.Text
+    UserLabel.Font = Enum.Font.GothamMedium
+    UserLabel.TextSize = 12
+    UserLabel.TextWrapped = true
+    UserLabel.BackgroundTransparency = 1
+    UserLabel.Parent = ProfileTab
 
-    createToggle(MainTab, "Speed Walk (Hız)", "SpeedWalk")
-    createToggle(MainTab, "Jump Power (Zıplama)", "JumpPower")
-    createToggle(MainTab, "Infinite Jump (Sınırsız Zıpla)", "InfiniteJump")
-    createToggle(MainTab, "Noclip (Duvardan Geç)", "Noclip")
+    -- Varsayılan Tab
+    pages["Visuals"].Visible = true
+    tabBtns["Visuals"].BackgroundColor3 = Theme.Card
+    tabBtns["Visuals"].TextColor3 = Theme.Accent
+end
 
-    createToggle(VisualTab, "Player ESP (Tümü)", "ESPAll")
-    createToggle(VisualTab, "Murderer ESP (Katil)", "ESPMurderer")
-    createToggle(VisualTab, "Sheriff ESP (Şerif)", "ESPSheriff")
-    createToggle(VisualTab, "Innocent ESP (Masum)", "ESPInnocent")
+------------------------------------------------------------
+-- 4. ATEŞ BUTONU
+------------------------------------------------------------
+function spawnShootButton()
+    if ScreenGui:FindFirstChild("ShootActionButton") then return end
 
-    createToggle(CombatTab, "Aimbot (Katile Kilitlen)", "AimbotEnabled")
-    createToggle(CombatTab, "Auto Shoot (Otomatik Ateş)", "AutoShoot")
-    createToggle(CombatTab, "KillAura (Yakındakini Kes)", "KillAura")
-    createToggle(CombatTab, "Auto Grab Gun (Silahı Al)", "AutoGrabGun")
+    local shootBtn = Instance.new("TextButton")
+    shootBtn.Name = "ShootActionButton"
+    shootBtn.Size = UDim2.new(0, 110, 0, 45)
+    shootBtn.Position = UDim2.new(0.1, 0, 0.3, 0)
+    shootBtn.Text = "🎯 SHOOT"
+    shootBtn.BackgroundColor3 = Theme.Danger
+    shootBtn.TextColor3 = Theme.Text
+    shootBtn.Font = Enum.Font.GothamBlack
+    shootBtn.TextSize = 13
+    shootBtn.Parent = ScreenGui
 
-    createToggle(TeleTab, "Fullbright (Aydınlık)", "Fullbright")
-
-    local function createTPButton(name, cf)
-        local btn = create("TextButton", {
-            Size = UDim2.new(1, -4, 0, 32),
-            Text = "  " .. name,
-            Font = Enum.Font.GothamMedium,
-            TextSize = 11,
-            TextColor3 = Theme.Text,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            BackgroundColor3 = Theme.Card,
-            BackgroundTransparency = 0.25,
-            Parent = TeleTab,
-            ZIndex = 6,
-        })
-        corner(6).Parent = btn
-        
-        btn.MouseButton1Click:Connect(function()
-            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                LocalPlayer.Character.HumanoidRootPart.CFrame = cf
-            end
-        end)
-    end
-
-    createTPButton("TP to Lobby (Lobiye Git)", CFrame.new(110, 138, -12))
-    createTPButton("TP to Map (Harita Ortası)", CFrame.new(0, 50, 0))
-
-    pages["Main"].Visible = true
-    tabBtns["Main"].BackgroundColor3 = Theme.Card
-    tabBtns["Main"].TextColor3 = Theme.Accent
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 10)
+    corner.Parent = shootBtn
 
     local dragging, dragStart, startPos
-    Header.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = MainFrame.Position
+    shootBtn.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true; dragStart = input.Position; startPos = shootBtn.Position
         end
     end)
     UserInputService.InputChanged:Connect(function(input)
-        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + (input.Position.X - dragStart.X), startPos.Y.Scale, startPos.Y.Offset + (input.Position.Y - dragStart.Y))
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            shootBtn.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + (input.Position.X - dragStart.X), startPos.Y.Scale, startPos.Y.Offset + (input.Position.Y - dragStart.Y))
         end
     end)
     UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then 
-            dragging = false 
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+    end)
+
+    shootBtn.MouseButton1Click:Connect(function()
+        local murd = getPlayerByRole("Murderer")
+        if murd and murd.Character and murd.Character:FindFirstChild("HumanoidRootPart") then
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, murd.Character.HumanoidRootPart.Position)
         end
     end)
 end
 
-function openMenu()
-    MinimizedButton.Visible = false
-    MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-    MainFrame.Visible = true
-    MainFrame.Size = UDim2.new(0, MENU_W * 0.85, 0, MENU_H * 0.85)
-    tween(MainFrame, { Size = UDim2.new(0, MENU_W, 0, MENU_H) }, 0.28, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-end
-
-function closeMenu()
-    tween(MainFrame, { Size = UDim2.new(0, MENU_W * 0.85, 0, MENU_H * 0.85) }, 0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
+------------------------------------------------------------
+-- BAŞLATMA
+------------------------------------------------------------
+task.defer(function()
+    TweenService:Create(LogoLabel, TweenInfo.new(0.6), { TextTransparency = 0 }):Play()
+    TweenService:Create(ProTag, TweenInfo.new(0.6), { TextTransparency = 0 }):Play()
+    task.wait(0.15)
+    TweenService:Create(Underline, TweenInfo.new(0.6, Enum.EasingStyle.Quart), { Size = UDim2.new(0, 220, 0, 3) }):Play()
     task.wait(0.2)
-    MainFrame.Visible = false
-    MainFrame.Size = UDim2.new(0, MENU_W, 0, MENU_H)
+    TweenService:Create(LoadingLabel, TweenInfo.new(0.4), { TextTransparency = 0 }):Play()
 
-    MinimizedButton.Visible = true
-    MinimizedButton.BackgroundTransparency = 1
-    tween(MinimizedButton, { BackgroundTransparency = 0 }, 0.25)
-end
+    task.wait(3.5)
 
-MinimizedButton.MouseButton1Click:Connect(function()
-    if not MainFrame then return end
-    openMenu()
+    TweenService:Create(LoadingFrame, TweenInfo.new(0.5), { BackgroundTransparency = 1 }):Play()
+    TweenService:Create(LogoLabel, TweenInfo.new(0.4), { TextTransparency = 1 }):Play()
+    TweenService:Create(ProTag, TweenInfo.new(0.4), { TextTransparency = 1 }):Play()
+    TweenService:Create(Underline, TweenInfo.new(0.4), { BackgroundTransparency = 1 }):Play()
+    TweenService:Create(LoadingLabel, TweenInfo.new(0.4), { TextTransparency = 1 }):Play()
+    
+    task.wait(0.5)
+    LoadingFrame:Destroy()
+    
+    LangMenu.Visible = true
 end)
