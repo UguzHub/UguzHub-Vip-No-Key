@@ -1,4 +1,4 @@
--- [[ UguzHub V2 Pro - Fully Fixed & Updated ]] --
+-- [[ UguzHub V2 Pro - MM2 Full Feature Integration ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -39,18 +39,18 @@ local CARD_TRANSPARENCY = 0.25
 local RADIUS = 16
 
 ------------------------------------------------------------
--- DİL PAKETLERİ (Delta Uyarısı Dahil)
+-- DİL PAKETLERİ
 ------------------------------------------------------------
 local Lang = {}
 
-Lang.EN = { loading = "Loading", subtitle = "Select your language", greeting = "How are you today", sectionTitle = "Settings", openBtn = "UguzHub", deltaWarn = "Please make sure you have turned off everything in the Delta Settings", continueBtn = "Continue" }
-Lang.TR = { loading = "Yükleniyor", subtitle = "Dilinizi seçin", greeting = "Bugün nasılsın", sectionTitle = "Ayarlar", openBtn = "UguzHub", deltaWarn = "Lütfen Delta Ayarlarındaki Tüm Herşeyi Kapattığınızdan Emin Olun", continueBtn = "Devam Et" }
-Lang.RU = { loading = "Загрузка", subtitle = "Выберите язык", greeting = "Как дела сегодня", sectionTitle = "Настройки", openBtn = "UguzHub", deltaWarn = "Пожалуйста, убедитесь, что вы отключили все в настройках Delta", continueBtn = "Продолжить" }
-Lang.DE = { loading = "Wird geladen", subtitle = "Wähle deine Sprache", greeting = "Wie geht es dir heute", sectionTitle = "Einstellungen", openBtn = "UguzHub", deltaWarn = "Bitte stellen Sie sicher, dass Sie alles in den Delta-Einstellungen ausgeschaltet haben", continueBtn = "Weiter" }
-Lang.FR = { loading = "Chargement", subtitle = "Choisissez votre langue", greeting = "Comment vas-tu aujourd'hui", sectionTitle = "Paramètres", openBtn = "UguzHub", deltaWarn = "Veuillez vous assurer d'avoir tout désactivé dans les paramètres Delta", continueBtn = "Continuer" }
-Lang.ES = { loading = "Cargando", subtitle = "Selecciona tu idioma", greeting = "¿Cómo estás hoy", sectionTitle = "Ajustes", openBtn = "UguzHub", deltaWarn = "Asegúrate de haber desactivado todo en la configuración de Delta", continueBtn = "Continuar" }
-Lang.AR = { loading = "جار التحميل", subtitle = "اختر لغتك", greeting = "كيف حالك اليوم", sectionTitle = "الإعدادات", openBtn = "UguzHub", deltaWarn = "يرجى التأكد من إيقاف تشغيل كل شيء في إعدادات Delta", continueBtn = "متابعة" }
-Lang.ZH = { loading = "加载中", subtitle = "选择你的语言", greeting = "你今天好吗", sectionTitle = "设置", openBtn = "UguzHub", deltaWarn = "请确保您已关闭 Delta 设置中的所有内容", continueBtn = "继续" }
+Lang.EN = { loading = "Loading", subtitle = "Select your language", greeting = "How are you today", sectionTitle = "Settings", openBtn = "UguzHub" }
+Lang.TR = { loading = "Yükleniyor", subtitle = "Dilinizi seçin", greeting = "Bugün nasılsın", sectionTitle = "Ayarlar", openBtn = "UguzHub" }
+Lang.RU = { loading = "Загрузка", subtitle = "Выберите язык", greeting = "Как дела сегодня", sectionTitle = "Настройки", openBtn = "UguzHub" }
+Lang.DE = { loading = "Wird geladen", subtitle = "Wähle deine Sprache", greeting = "Wie geht es dir heute", sectionTitle = "Einstellungen", openBtn = "UguzHub" }
+Lang.FR = { loading = "Chargement", subtitle = "Choisissez votre langue", greeting = "Comment vas-tu aujourd'hui", sectionTitle = "Paramètres", openBtn = "UguzHub" }
+Lang.ES = { loading = "Cargando", subtitle = "Selecciona tu idioma", greeting = "¿Cómo estás hoy", sectionTitle = "Ajustes", openBtn = "UguzHub" }
+Lang.AR = { loading = "جار التحميل", subtitle = "اختر لغتك", greeting = "كيف حالك اليوم", sectionTitle = "الإعدادات", openBtn = "UguzHub" }
+Lang.ZH = { loading = "加载中", subtitle = "选择你的语言", greeting = "你今天好吗", sectionTitle = "设置", openBtn = "UguzHub" }
 
 local LanguageOptions = {
     { code = "TR", flag = "🇹🇷", name = "Türkçe" },
@@ -321,114 +321,9 @@ MinimizedButton.MouseEnter:Connect(function() tween(MinimizedButton, { Backgroun
 MinimizedButton.MouseLeave:Connect(function() tween(MinimizedButton, { BackgroundColor3 = Theme.Blue }, 0.15) end)
 
 ------------------------------------------------------------
--- DELTA SAYDAM UYARI EKRANI (10 SN GERİ SAYIM)
-------------------------------------------------------------
-local WarningFrame = create("Frame", {
-    Name = "WarningFrame",
-    Size = UDim2.fromScale(1, 1),
-    Position = UDim2.fromScale(0, 0),
-    BackgroundColor3 = Theme.Background,
-    BackgroundTransparency = 0.35,
-    Visible = false,
-    ZIndex = 20,
-})
-WarningFrame.Parent = ScreenGui
-
-local WarningBox = create("Frame", {
-    Size = UDim2.new(0, 380, 0, 180),
-    Position = UDim2.new(0.5, 0, 0.5, 0),
-    AnchorPoint = Vector2.new(0.5, 0.5),
-    BackgroundColor3 = Theme.Card,
-    BackgroundTransparency = 0.15,
-    ZIndex = 21,
-})
-corner(RADIUS).Parent = WarningBox
-stroke(Theme.Accent, 1.5).Parent = WarningBox
-WarningBox.Parent = WarningFrame
-
-local WarnIcon = create("TextLabel", {
-    Text = "⚠️",
-    TextSize = 32,
-    BackgroundTransparency = 1,
-    Size = UDim2.new(1, 0, 0, 40),
-    Position = UDim2.new(0, 0, 0, 12),
-    ZIndex = 22,
-})
-WarnIcon.Parent = WarningBox
-
-local WarnText = create("TextLabel", {
-    Text = "",
-    Font = Enum.Font.GothamBold,
-    TextSize = 13,
-    TextColor3 = Theme.Text,
-    BackgroundTransparency = 1,
-    Size = UDim2.new(1, -30, 0, 50),
-    Position = UDim2.new(0, 15, 0, 52),
-    TextWrapped = true,
-    ZIndex = 22,
-})
-WarnText.Parent = WarningBox
-
-local ContinueBtn = create("TextButton", {
-    Text = "...",
-    Font = Enum.Font.GothamBold,
-    TextSize = 13,
-    TextColor3 = Theme.SubText,
-    BackgroundColor3 = Theme.Sidebar,
-    Size = UDim2.new(0, 200, 0, 36),
-    Position = UDim2.new(0.5, -100, 1, -48),
-    AutoButtonColor = false,
-    ZIndex = 22,
-})
-corner(10).Parent = ContinueBtn
-stroke(Theme.Stroke, 1).Parent = ContinueBtn
-ContinueBtn.Parent = WarningBox
-
-------------------------------------------------------------
--- TANIMLAMALAR (FORWARD DECLARATIONS)
-------------------------------------------------------------
-local MainFrame
-local buildMainMenu
-local openMenu
-local closeMenu
-
-local function showDeltaWarning()
-    WarnText.Text = L.deltaWarn
-    WarningFrame.Visible = true
-
-    task.spawn(function()
-        local canClick = false
-        for i = 10, 1, -1 do
-            ContinueBtn.Text = L.continueBtn .. " (" .. i .. ")"
-            task.wait(1)
-        end
-        canClick = true
-        ContinueBtn.Text = L.continueBtn
-        ContinueBtn.TextColor3 = Theme.Text
-        ContinueBtn.BackgroundColor3 = Theme.Accent
-        stroke(Theme.Accent, 1).Parent = ContinueBtn
-
-        local conn
-        conn = ContinueBtn.MouseButton1Click:Connect(function()
-            if not canClick then return end
-            conn:Disconnect()
-            tween(WarningFrame, { BackgroundTransparency = 1 }, 0.3)
-            task.wait(0.3)
-            WarningFrame.Visible = false
-
-            if not MainFrame then buildMainMenu() end
-
-            MinimizedButton.Text = "🔵 " .. L.openBtn
-            MinimizedButton.Visible = true
-            MinimizedButton.BackgroundTransparency = 1
-            tween(MinimizedButton, { BackgroundTransparency = 0 }, 0.3)
-        end)
-    end)
-end
-
-------------------------------------------------------------
 -- DİL KARTLARI DÖNGÜSÜ
 ------------------------------------------------------------
+local MainFrame, buildMainMenu, openMenu, closeMenu
 local langCards = {}
 
 local function selectLanguage(code)
@@ -447,7 +342,12 @@ local function selectLanguage(code)
         task.wait(0.4)
         IntroFrame.Visible = false
 
-        showDeltaWarning()
+        if not MainFrame then buildMainMenu() end
+
+        MinimizedButton.Text = "🔵 " .. L.openBtn
+        MinimizedButton.Visible = true
+        MinimizedButton.BackgroundTransparency = 1
+        tween(MinimizedButton, { BackgroundTransparency = 0 }, 0.3)
     end)
 end
 
@@ -512,7 +412,7 @@ task.defer(function()
 end)
 
 ------------------------------------------------------------
--- ANA MENÜ
+-- ANA MENÜ (Özelliklerle Genişletilmiş ve Sekmeli)
 ------------------------------------------------------------
 local MENU_W, MENU_H = 480, 280
 
@@ -555,8 +455,7 @@ function buildMainMenu()
 
     local TopBar = create("Frame", {
         Size = UDim2.new(1, 0, 0, 36),
-        BackgroundC
-                    BackgroundColor3 = Theme.Sidebar,
+        BackgroundColor3 = Theme.Sidebar,
         BackgroundTransparency = CARD_TRANSPARENCY,
         ZIndex = 6,
         Active = true,
@@ -589,6 +488,7 @@ function buildMainMenu()
     MinimizeBtn.Parent = TopBar
     MinimizeBtn.MouseButton1Click:Connect(function() closeMenu() end)
 
+    -- Sürükleme Mantığı
     do
         local dragging, dragInput, dragStart, startPos
         TopBar.InputBegan:Connect(function(input)
@@ -612,6 +512,9 @@ function buildMainMenu()
         end)
     end
 
+    ------------------------------------------------------------
+    -- SIDEBAR (SOL SEKME MENÜSÜ)
+    ------------------------------------------------------------
     local Sidebar = create("Frame", {
         Size = UDim2.new(0, 110, 1, -42),
         Position = UDim2.new(0, 6, 0, 40),
@@ -653,149 +556,4 @@ function buildMainMenu()
 
         local page = create("ScrollingFrame", {
             Size = UDim2.new(1, 0, 1, 0),
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            ScrollBarThickness = 2,
-            Visible = false,
-            ZIndex = 7,
-        })
-        page.Parent = TabContainer
-
-        create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 6) }).Parent = page
-
-        pages[name] = page
-        tabBtns[name] = btn
-
-        btn.MouseButton1Click:Connect(function()
-            for _, p in pairs(pages) do p.Visible = false end
-            for _, b in pairs(tabBtns) do
-                b.BackgroundColor3 = Theme.Card
-                b.TextColor3 = Theme.SubText
-            end
-            page.Visible = true
-            btn.BackgroundColor3 = Theme.Accent
-            btn.TextColor3 = Theme.Text
-        end)
-
-        return page
-    end
-
-    local function createToggle(parent, labelText, flag)
-        local frame = create("Frame", { Size = UDim2.new(1, -6, 0, 30), BackgroundColor3 = Theme.Card, BackgroundTransparency = CARD_TRANSPARENCY })
-        corner(8).Parent = frame
-        frame.Parent = parent
-
-        create("TextLabel", { Text = labelText, Font = Enum.Font.Gotham, TextColor3 = Theme.Text, TextSize = 10, BackgroundTransparency = 1, Size = UDim2.new(0.7, 0, 1, 0), Position = UDim2.new(0, 8, 0, 0), TextXAlignment = Enum.TextXAlignment.Left }).Parent = frame
-
-        local switch = create("Frame", { Size = UDim2.new(0, 28, 0, 14), Position = UDim2.new(1, -34, 0.5, -7), BackgroundColor3 = Color3.fromRGB(40, 40, 45) })
-        corner(10).Parent = switch
-        switch.Parent = frame
-
-        local dot = create("Frame", { Size = UDim2.new(0, 10, 0, 10), Position = UDim2.new(0, 2, 0.5, -5), BackgroundColor3 = Color3.fromRGB(200, 200, 200) })
-        corner(10).Parent = dot
-        dot.Parent = switch
-
-        local btn = create("TextButton", { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, Text = "" })
-        btn.Parent = frame
-
-        btn.MouseButton1Click:Connect(function()
-            Flags[flag] = not Flags[flag]
-            if Flags[flag] then
-                switch.BackgroundColor3 = Theme.Accent
-                dot.Position = UDim2.new(1, -12, 0.5, -5)
-                dot.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            else
-                switch.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-                dot.Position = UDim2.new(0, 2, 0.5, -5)
-                dot.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
-            end
-        end)
-    end
-
-    local function createButton(parent, labelText, callback)
-        local btn = create("TextButton", { Size = UDim2.new(1, -6, 0, 30), BackgroundColor3 = Theme.Card, Font = Enum.Font.GothamBold, Text = labelText, TextColor3 = Theme.Text, TextSize = 10 })
-        corner(8).Parent = btn
-        stroke(Theme.Accent, 1).Parent = btn
-        btn.Parent = parent
-        btn.MouseButton1Click:Connect(function() if callback then callback() end end)
-    end
-
-    local ESPTab = addTab("ESP", "👁")
-    local AimbotTab = addTab("Aimbot", "🎯")
-    local PlayersTab = addTab("Players", "👤")
-    local TeleportTab = addTab("Teleport", "🌀")
-    local SettingsTab = addTab("Ayarlar", "⚙")
-
-    createToggle(ESPTab, "ESP All", "ESPAll")
-    createToggle(ESPTab, "ESP Gun", "ESPGun")
-    createToggle(ESPTab, "Auto Grab Gun", "AutoGrabGun")
-    createButton(ESPTab, "TP Grab Gun", function()
-        local gunDrop = Workspace:FindFirstChild("GunDrop") or Workspace:FindFirstChild("Gun")
-        local myHrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if gunDrop and myHrp then
-            local oldCFrame = myHrp.CFrame
-            myHrp.CFrame = gunDrop.CFrame
-            task.wait(0.15)
-            if firetouchinterest then firetouchinterest(myHrp, gunDrop, 0); firetouchinterest(myHrp, gunDrop, 1) end
-            task.wait(0.1)
-            myHrp.CFrame = oldCFrame
-        end
-    end)
-
-    createToggle(AimbotTab, "Aimbot Enable", "AimbotEnabled")
-    createToggle(PlayersTab, "Auto Kill Murderer", "AutoKillMurderer")
-    createToggle(PlayersTab, "Auto Fling Murderer", "AutoFlingMurderer")
-    createToggle(PlayersTab, "Auto Fling Sheriff", "AutoFlingSheriff")
-    createToggle(PlayersTab, "Auto Fling All", "AutoFlingAll")
-
-    createButton(TeleportTab, "TP to Lobby", function()
-        local myHrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if not myHrp then return end
-        local lobby = Workspace:FindFirstChild("Lobby")
-        if lobby then
-            local spawnPart = lobby:FindFirstChild("Spawns") or lobby:FindFirstChildWhichIsA("BasePart", true)
-            if spawnPart then myHrp.CFrame = spawnPart.CFrame + Vector3.new(0, 3, 0) end
-        end
-    end)
-
-    create("TextLabel", { Text = L.sectionTitle, Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = Theme.SubText, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 18), TextXAlignment = Enum.TextXAlignment.Left }).Parent = SettingsTab
-
-    pages["ESP"].Visible = true
-    tabBtns["ESP"].BackgroundColor3 = Theme.Accent
-    tabBtns["ESP"].TextColor3 = Theme.Text
-end
-
-function openMenu()
-    MinimizedButton.Visible = false
-    MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-    MainFrame.Visible = true
-    MainFrame.Size = UDim2.new(0, MENU_W * 0.85, 0, MENU_H * 0.85)
-    tween(MainFrame, { Size = UDim2.new(0, MENU_W, 0, MENU_H) }, 0.28, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-end
-
-function closeMenu()
-    tween(MainFrame, { Size = UDim2.new(0, MENU_W * 0.85, 0, MENU_H * 0.85) }, 0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
-    task.wait(0.2)
-    MainFrame.Visible = false
-    MainFrame.Size = UDim2.new(0, MENU_W, 0, MENU_H)
-    MinimizedButton.Visible = true
-end
-
-MinimizedButton.MouseButton1Click:Connect(function() if MainFrame then openMenu() end end)
-
-RunService.RenderStepped:Connect(function()
-    if Flags.ESPAll then
-        for _, p in pairs(Players:GetPlayers()) do
-            if p ~= LocalPlayer and p.Character then
-                local hl = p.Character:FindFirstChild("UguzHighlight") or Instance.new("Highlight")
-                hl.Name = "UguzHighlight"
-                hl.FillColor = RoleColors[getRole(p)]
-                hl.Parent = p.Character
-            end
-        end
-    else
-        for _, p in pairs(Players:GetPlayers()) do
-            if p.Character and p.Character:FindFirstChild("UguzHighlight") then p.Character.UguzHighlight:Destroy() end
-        end
-    end
-end)
+            BackgroundTran
