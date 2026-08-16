@@ -5,13 +5,12 @@ local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
-local TextService = game:GetService("TextService")
 local Clipboard = setclipboard or toclipboard or syn and syn.clipboard
 
 local LocalPlayer = Players.LocalPlayer
 
 ------------------------------------------------------------
--- 0) 30 GÜNLÜK HESAP YAŞ KONTROLÜ (KICK)
+-- 0) 14 GÜNLÜK HESAP YAŞ KONTROLÜ (KICK)
 ------------------------------------------------------------
 if LocalPlayer.AccountAge < 14 then
     LocalPlayer:Kick("Your account is less than 14 days old.")
@@ -41,7 +40,7 @@ local CARD_TRANSPARENCY = 0.25
 local RADIUS = 16
 
 ------------------------------------------------------------
--- DİL PAKETLERİ (10 Saniyelik Uyarı Metni Dahil)
+-- DİL PAKETLERİ
 ------------------------------------------------------------
 local Lang = {}
 
@@ -225,95 +224,100 @@ local ScreenGui = create("ScreenGui", {
 })
 ScreenGui.Parent = PlayerGui
 
---------------------------------------------------------------
--- GİRİŞ EKRANI (RE-DESIGNED / CLEAN)
+------------------------------------------------------------
+-- GİRİŞ EKRANI
 ------------------------------------------------------------
 local IntroFrame = create("Frame", {
     Name = "Intro",
     Size = UDim2.fromScale(1, 1),
     Position = UDim2.fromScale(0, 0),
+    BorderSizePixel = 0,
     BackgroundColor3 = Theme.Background,
+    BackgroundTransparency = 0,
     ZIndex = 10,
 })
 IntroFrame.Parent = ScreenGui
 
-local IntroContainer = create("Frame", {
-    Name = "Container",
-    Size = UDim2.new(0, 400, 0, 300),
-    Position = UDim2.fromScale(0.5, 0.5),
+local IntroContent = create("Frame", {
+    Name = "IntroContent",
     AnchorPoint = Vector2.new(0.5, 0.5),
+    Position = UDim2.new(0.5, 0, 0.5, 0),
+    Size = UDim2.new(0, 420, 0, 320),
     BackgroundTransparency = 1,
     ZIndex = 11,
 })
-IntroContainer.Parent = IntroFrame
+IntroContent.Parent = IntroFrame
 
--- Başlık
-local Logo = create("TextLabel", {
+local LogoLabel = create("TextLabel", {
     Text = "UguzHub",
     Font = Enum.Font.GothamBlack,
-    TextSize = 40,
+    TextSize = 44,
     TextColor3 = Theme.Text,
     BackgroundTransparency = 1,
-    Size = UDim2.new(1, 0, 0, 50),
-    Position = UDim2.new(0, 0, 0, 20),
+    Size = UDim2.new(1, 0, 0, 45),
+    Position = UDim2.new(0, 0, 0, -110),
+    TextTransparency = 1,
+    ZIndex = 11,
 })
-Logo.Parent = IntroContainer
+LogoLabel.Parent = IntroContent
 
--- Yükleme Yazısı
-local Status = create("TextLabel", {
-    Text = "Initializing...",
+local ProTag = create("TextLabel", {
+    Text = "V2 PRO",
+    Font = Enum.Font.GothamBold,
+    TextSize = 16,
+    TextColor3 = Theme.Accent,
+    BackgroundTransparency = 1,
+    Size = UDim2.new(1, 0, 0, 20),
+    Position = UDim2.new(0, 0, 0, -65),
+    TextTransparency = 1,
+    ZIndex = 11,
+})
+ProTag.Parent = IntroContent
+
+local LoadingLabel = create("TextLabel", {
+    Text = L.loading,
     Font = Enum.Font.GothamMedium,
+    TextSize = 15,
+    TextColor3 = Theme.SubText,
+    BackgroundTransparency = 1,
+    Size = UDim2.new(1, 0, 0, 24),
+    Position = UDim2.new(0, 0, 0, -30),
+    TextTransparency = 1,
+    ZIndex = 11,
+})
+LoadingLabel.Parent = IntroContent
+
+local SubtitleLabel = create("TextLabel", {
+    Text = L.subtitle,
+    Font = Enum.Font.Gotham,
     TextSize = 14,
     TextColor3 = Theme.SubText,
     BackgroundTransparency = 1,
-    Size = UDim2.new(1, 0, 0, 30),
-    Position = UDim2.new(0, 0, 0, 70),
-})
-Status.Parent = IntroContainer
-
--- Dil Seçim Alanı (Daha düzgün)
-local LangHolder = create("ScrollingFrame", {
-    Name = "LangHolder",
-    Size = UDim2.new(0, 380, 0, 160),
-    Position = UDim2.new(0.5, 0, 0, 140),
-    AnchorPoint = Vector2.new(0.5, 0),
-    BackgroundTransparency = 1,
-    ScrollBarThickness = 0,
+    Size = UDim2.new(1, 0, 0, 22),
+    Position = UDim2.new(0, 0, 0, -100),
+    TextTransparency = 1,
+    ZIndex = 11,
     Visible = false,
-    ZIndex = 12,
 })
-LangHolder.Parent = IntroContainer
+SubtitleLabel.Parent = IntroContent
+
+local LangHolder = create("Frame", {
+    Name = "LangHolder",
+    Position = UDim2.new(0, 0, 0, -65),
+    Size = UDim2.new(1, 0, 0, 180),
+    BackgroundTransparency = 1,
+    ZIndex = 11,
+    Visible = false,
+})
+LangHolder.Parent = IntroContent
 
 create("UIGridLayout", {
-    CellSize = UDim2.new(0, 85, 0, 60),
+    CellSize = UDim2.new(0, 92, 0, 75),
     CellPadding = UDim2.new(0, 8, 0, 8),
     HorizontalAlignment = Enum.HorizontalAlignment.Center,
+    VerticalAlignment = Enum.VerticalAlignment.Center,
+    SortOrder = Enum.SortOrder.LayoutOrder,
 }).Parent = LangHolder
-
--- Dil Kartlarını Oluşturma (Daha şık ve sade)
-for _, opt in ipairs(LanguageOptions) do
-    local card = create("TextButton", {
-        Text = opt.flag .. " " .. opt.code,
-        Font = Enum.Font.GothamBold,
-        TextSize = 13,
-        TextColor3 = Theme.Text,
-        BackgroundColor3 = Theme.Card,
-        AutoButtonColor = true,
-    })
-    corner(8).Parent = card
-    card.MouseButton1Click:Connect(function() selectLanguage(opt.code) end)
-    card.Parent = LangHolder
-end
-
--- Giriş Animasyonu
-task.spawn(function()
-    Status.Text = "Checking assets..."
-    task.wait(1.5)
-    Status.Text = "Ready to select language."
-    task.wait(0.5)
-    LangHolder.Visible = true
-end)
-
 
 ------------------------------------------------------------
 -- MİNİMİZE BUTON (SÜRÜKLENEBİLİR)
@@ -340,43 +344,32 @@ MinimizedButton.MouseLeave:Connect(function() tween(MinimizedButton, { Backgroun
 
 do
     local dragging, dragInput, dragStart, startPos
-    
     MinimizedButton.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
             startPos = MinimizedButton.Position
-            
             input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
+                if input.UserInputState == Enum.UserInputState.End then dragging = false end
             end)
         end
     end)
-    
     MinimizedButton.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-            dragInput = input
-        end
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then dragInput = input end
     end)
-    
     UserInputService.InputChanged:Connect(function(input)
         if input == dragInput and dragging then
             local delta = input.Position - dragStart
-            MinimizedButton.Position = UDim2.new(
-                startPos.X.Scale, 
-                startPos.X.Offset + delta.X, 
-                startPos.Y.Scale, 
-                startPos.Y.Offset + delta.Y
-            )
+            MinimizedButton.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
 end
 
 ------------------------------------------------------------
--- 10 SANİYELİK UYARI EKRANI (DİL SEÇİMİNDEN SONRA)
+-- 10 SANİYELİK GERİ SAYIMLI UYARI EKRANI
 ------------------------------------------------------------
+local MainFrame, buildMainMenu, openMenu, closeMenu
+
 local function showWarningScreen()
     local WarnFrame = create("Frame", {
         Name = "WarnFrame",
@@ -389,7 +382,7 @@ local function showWarningScreen()
     WarnFrame.Parent = ScreenGui
 
     local WarnBox = create("Frame", {
-        Size = UDim2.new(0, 400, 0, 180),
+        Size = UDim2.new(0, 400, 0, 190),
         Position = UDim2.fromScale(0.5, 0.5),
         AnchorPoint = Vector2.new(0.5, 0.5),
         BackgroundColor3 = Theme.Card,
@@ -401,7 +394,7 @@ local function showWarningScreen()
     WarnBox.Parent = WarnFrame
 
     local WarnText = create("TextLabel", {
-        Text = L.warningText,
+        Text = "",
         Font = Enum.Font.GothamBold,
         TextSize = 14,
         TextColor3 = Theme.Text,
@@ -415,26 +408,34 @@ local function showWarningScreen()
     })
     WarnText.Parent = WarnBox
 
-    -- Fade In
     tween(WarnFrame, { BackgroundTransparency = 0.2 }, 0.4)
     tween(WarnBox, { BackgroundTransparency = CARD_TRANSPARENCY }, 0.4)
     tween(WarnText, { TextTransparency = 0 }, 0.4)
 
-    -- 10 Saniye Beklet ve Fade Out Yap
+    -- 10 Saniye Geri Sayım Döngüsü
     task.spawn(function()
-        task.wait(10)
+        for i = 10, 1, -1 do
+            WarnText.Text = L.warningText .. " (" .. i .. ")"
+            task.wait(1)
+        end
+        
         tween(WarnFrame, { BackgroundTransparency = 1 }, 0.5)
         tween(WarnBox, { BackgroundTransparency = 1 }, 0.5)
         tween(WarnText, { TextTransparency = 1 }, 0.5)
         task.wait(0.5)
         WarnFrame:Destroy()
+
+        if not MainFrame then buildMainMenu() end
+        MinimizedButton.Text = "🔵 " .. L.openBtn
+        MinimizedButton.Visible = true
+        MinimizedButton.BackgroundTransparency = 1
+        tween(MinimizedButton, { BackgroundTransparency = 0 }, 0.3)
     end)
 end
 
 ------------------------------------------------------------
--- DİL KARTLARI DÖNGÜSÜ
+-- DİL KARTLARI OLUŞTURMA (TEKİL OLARAK)
 ------------------------------------------------------------
-local MainFrame, buildMainMenu, openMenu, closeMenu
 local langCards = {}
 
 local function selectLanguage(code)
@@ -446,22 +447,15 @@ local function selectLanguage(code)
         tween(card, { BackgroundColor3 = isSelected and Theme.Accent or Theme.Card }, 0.2)
     end
 
-    task.delay(0.25, function()
+    task.delay(0.2, function()
         tween(IntroFrame, { BackgroundTransparency = 1 }, 0.4)
         for _, obj in ipairs({ LogoLabel, ProTag, SubtitleLabel }) do tween(obj, { TextTransparency = 1 }, 0.3) end
         for _, card in ipairs(langCards) do tween(card, { BackgroundTransparency = 1 }, 0.25) end
         task.wait(0.4)
         IntroFrame.Visible = false
 
-        -- 10 Saniyelik Uyarı Ekranını Başlat
+        -- Geri sayımlı uyarı ekranını tetikle
         showWarningScreen()
-
-        if not MainFrame then buildMainMenu() end
-
-        MinimizedButton.Text = "🔵 " .. L.openBtn
-        MinimizedButton.Visible = true
-        MinimizedButton.BackgroundTransparency = 1
-        tween(MinimizedButton, { BackgroundTransparency = 0 }, 0.3)
     end)
 end
 
@@ -475,12 +469,12 @@ for i, opt in ipairs(LanguageOptions) do
         LayoutOrder = i,
         ZIndex = 11,
     })
-    corner(14).Parent = card
+    corner(12).Parent = card
     stroke().Parent = card
     card:SetAttribute("Code", opt.code)
 
-    create("TextLabel", { Text = opt.flag, Font = Enum.Font.GothamBold, TextSize = 26, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 34), Position = UDim2.new(0, 0, 0, 10), ZIndex = 12 }).Parent = card
-    create("TextLabel", { Text = opt.name, Font = Enum.Font.GothamMedium, TextSize = 12, TextColor3 = Theme.Text, BackgroundTransparency = 1, Size = UDim2.new(1, -6, 0, 18), Position = UDim2.new(0, 3, 0, 48), TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 12 }).Parent = card
+    create("TextLabel", { Text = opt.flag, Font = Enum.Font.GothamBold, TextSize = 22, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 28), Position = UDim2.new(0, 0, 0, 10), ZIndex = 12 }).Parent = card
+    create("TextLabel", { Text = opt.name, Font = Enum.Font.GothamMedium, TextSize = 11, TextColor3 = Theme.Text, BackgroundTransparency = 1, Size = UDim2.new(1, -4, 0, 18), Position = UDim2.new(0, 2, 0, 42), TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 12 }).Parent = card
 
     card.MouseEnter:Connect(function() if CurrentLang ~= opt.code then tween(card, { BackgroundColor3 = Theme.AccentSoft }, 0.15) end end)
     card.MouseLeave:Connect(function() if CurrentLang ~= opt.code then tween(card, { BackgroundColor3 = Theme.Card }, 0.15) end end)
@@ -491,12 +485,10 @@ for i, opt in ipairs(LanguageOptions) do
 end
 
 task.defer(function()
-    tween(LogoLabel, { TextTransparency = 0 }, 0.6)
-    tween(ProTag, { TextTransparency = 0 }, 0.6)
-    task.wait(0.15)
-    tween(Underline, { Size = UDim2.new(0, 220, 0, 3) }, 0.6, Enum.EasingStyle.Quart)
+    tween(LogoLabel, { TextTransparency = 0 }, 0.5)
+    tween(ProTag, { TextTransparency = 0 }, 0.5)
     task.wait(0.2)
-    tween(LoadingLabel, { TextTransparency = 0 }, 0.4)
+    tween(LoadingLabel, { TextTransparency = 0 }, 0.3)
 
     local dotsRunning = true
     task.spawn(function()
@@ -509,7 +501,7 @@ task.defer(function()
         end
     end)
 
-    task.wait(5)
+    task.wait(2.5)
     dotsRunning = false
 
     tween(LoadingLabel, { TextTransparency = 1 }, 0.3)
@@ -521,106 +513,12 @@ task.defer(function()
     tween(SubtitleLabel, { TextTransparency = 0 }, 0.4)
     for i, card in ipairs(langCards) do
         card.BackgroundTransparency = 1
-        task.delay(0.03 * i, function() tween(card, { BackgroundTransparency = 0 }, 0.3) end)
+        task.delay(0.02 * i, function() tween(card, { BackgroundTransparency = 0 }, 0.25) end)
     end
 end)
 
 ------------------------------------------------------------
--- DİL KARTLARI DÖNGÜSÜ
-------------------------------------------------------------
-local MainFrame, buildMainMenu, openMenu, closeMenu
-local langCards = {}
-
-local function selectLanguage(code)
-    CurrentLang = code
-    L = Lang[CurrentLang]
-
-    for _, card in ipairs(langCards) do
-        local isSelected = card:GetAttribute("Code") == code
-        tween(card, { BackgroundColor3 = isSelected and Theme.Accent or Theme.Card }, 0.2)
-    end
-
-    task.delay(0.25, function()
-        tween(IntroFrame, { BackgroundTransparency = 1 }, 0.4)
-        for _, obj in ipairs({ LogoLabel, ProTag, SubtitleLabel }) do tween(obj, { TextTransparency = 1 }, 0.3) end
-        for _, card in ipairs(langCards) do tween(card, { BackgroundTransparency = 1 }, 0.25) end
-        task.wait(0.4)
-        IntroFrame.Visible = false
-
-        -- 10 Saniyelik Uyarı Ekranını Başlat
-        showWarningScreen()
-
-        if not MainFrame then buildMainMenu() end
-
-        MinimizedButton.Text = "🔵 " .. L.openBtn
-        MinimizedButton.Visible = true
-        MinimizedButton.BackgroundTransparency = 1
-        tween(MinimizedButton, { BackgroundTransparency = 0 }, 0.3)
-    end)
-end
-
-for i, opt in ipairs(LanguageOptions) do
-    local card = create("TextButton", {
-        Name = opt.code,
-        Text = "",
-        AutoButtonColor = false,
-        BackgroundColor3 = Theme.Card,
-        BackgroundTransparency = 1,
-        LayoutOrder = i,
-        ZIndex = 11,
-    })
-    corner(14).Parent = card
-    stroke().Parent = card
-    card:SetAttribute("Code", opt.code)
-
-    create("TextLabel", { Text = opt.flag, Font = Enum.Font.GothamBold, TextSize = 26, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 34), Position = UDim2.new(0, 0, 0, 10), ZIndex = 12 }).Parent = card
-    create("TextLabel", { Text = opt.name, Font = Enum.Font.GothamMedium, TextSize = 12, TextColor3 = Theme.Text, BackgroundTransparency = 1, Size = UDim2.new(1, -6, 0, 18), Position = UDim2.new(0, 3, 0, 48), TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 12 }).Parent = card
-
-    card.MouseEnter:Connect(function() if CurrentLang ~= opt.code then tween(card, { BackgroundColor3 = Theme.AccentSoft }, 0.15) end end)
-    card.MouseLeave:Connect(function() if CurrentLang ~= opt.code then tween(card, { BackgroundColor3 = Theme.Card }, 0.15) end end)
-    card.MouseButton1Click:Connect(function() selectLanguage(opt.code) end)
-
-    card.Parent = LangHolder
-    table.insert(langCards, card)
-end
-
-task.defer(function()
-    tween(LogoLabel, { TextTransparency = 0 }, 0.6)
-    tween(ProTag, { TextTransparency = 0 }, 0.6)
-    task.wait(0.15)
-    tween(Underline, { Size = UDim2.new(0, 220, 0, 3) }, 0.6, Enum.EasingStyle.Quart)
-    task.wait(0.2)
-    tween(LoadingLabel, { TextTransparency = 0 }, 0.4)
-
-    local dotsRunning = true
-    task.spawn(function()
-        local states = { L.loading, L.loading .. ".", L.loading .. "..", L.loading .. "..." }
-        local i = 1
-        while dotsRunning do
-            LoadingLabel.Text = states[i]
-            i = (i % #states) + 1
-            task.wait(0.4)
-        end
-    end)
-
-    task.wait(5)
-    dotsRunning = false
-
-    tween(LoadingLabel, { TextTransparency = 1 }, 0.3)
-    task.wait(0.3)
-    LoadingLabel.Visible = false
-
-    SubtitleLabel.Visible = true
-    LangHolder.Visible = true
-    tween(SubtitleLabel, { TextTransparency = 0 }, 0.4)
-    for i, card in ipairs(langCards) do
-        card.BackgroundTransparency = 1
-        task.delay(0.03 * i, function() tween(card, { BackgroundTransparency = 0 }, 0.3) end)
-    end
-end)
-
-------------------------------------------------------------
--- ANA MENÜ
+-- ANA MENÜ (BUILD)
 ------------------------------------------------------------
 local MENU_W, MENU_H = 480, 280
 
@@ -632,7 +530,7 @@ function buildMainMenu()
         AnchorPoint = Vector2.new(0.5, 0.5),
         BackgroundColor3 = Theme.Background,
         ClipsDescendants = true,
-        Visible = false,
+        Visible = true,
         ZIndex = 5,
     })
     corner(RADIUS).Parent = MainFrame
@@ -924,7 +822,7 @@ function buildMainMenu()
         end
     end)
 
-    -- AYARLAR SEKMESİ (Karakter resmi sağa çekildi, iç içe girme düzeltildi + Discord Butonu Eklendi)
+    -- AYARLAR SEKMESİ
     create("TextLabel", { Text = L.sectionTitle, Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = Theme.SubText, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 18), TextXAlignment = Enum.TextXAlignment.Left }).Parent = SettingsTab
 
     local AvatarFrame = create("Frame", { Size = UDim2.new(0, 44, 0, 44), Position = UDim2.new(0, 4, 0, 24), BackgroundColor3 = Theme.Card, BackgroundTransparency = CARD_TRANSPARENCY })
@@ -936,11 +834,9 @@ function buildMainMenu()
     corner(22).Parent = AvatarImage
     AvatarImage.Parent = AvatarFrame
 
-    -- Metinler sağa kaydırıldı (çakışma engellendi)
     create("TextLabel", { Text = LocalPlayer.DisplayName .. " (@" .. LocalPlayer.Name .. ")", Font = Enum.Font.GothamBold, TextSize = 11, TextColor3 = Theme.Text, BackgroundTransparency = 1, Size = UDim2.new(1, -58, 0, 18), Position = UDim2.new(0, 56, 0, 25), TextXAlignment = Enum.TextXAlignment.Left }).Parent = SettingsTab
     create("TextLabel", { Text = L.greeting .. ", " .. LocalPlayer.DisplayName .. "?", Font = Enum.Font.Gotham, TextSize = 10, TextColor3 = Theme.SubText, BackgroundTransparency = 1, Size = UDim2.new(1, -58, 0, 16), Position = UDim2.new(0, 56, 0, 43), TextXAlignment = Enum.TextXAlignment.Left }).Parent = SettingsTab
 
-    -- Discord Butonu (Ayarlar Sekmesine Eklendi)
     local DiscordBtn = create("TextButton", {
         Size = UDim2.new(1, -6, 0, 30),
         Position = UDim2.new(0, 0, 0, 78),
@@ -955,7 +851,7 @@ function buildMainMenu()
     DiscordBtn.Parent = SettingsTab
 
     DiscordBtn.MouseButton1Click:Connect(function()
-        local discordLink = "https://discord.gg/buraya_koyacagin_link" -- Buraya kendi Discord davet linkini yazabilirsin
+        local discordLink = "https://discord.gg/buraya_koyacagin_link"
         if Clipboard then
             Clipboard(discordLink)
             DiscordBtn.Text = L.discordCopied
@@ -1041,7 +937,6 @@ RunService.RenderStepped:Connect(function()
 
     if Flags.AimbotEnabled then
         local targetRole = (getRole(LocalPlayer) == "Murderer") and "Sheriff" or "Murderer"
-        
         for _, p in pairs(Players:GetPlayers()) do
             if p ~= LocalPlayer and getRole(p) == targetRole and p.Character and p.Character:FindFirstChild("Head") then
                 Camera.CFrame = CFrame.new(Camera.CFrame.Position, p.Character.Head.Position)
