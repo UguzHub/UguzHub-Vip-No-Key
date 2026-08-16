@@ -225,111 +225,95 @@ local ScreenGui = create("ScreenGui", {
 })
 ScreenGui.Parent = PlayerGui
 
-------------------------------------------------------------
--- GİRİŞ EKRANI
+--------------------------------------------------------------
+-- GİRİŞ EKRANI (RE-DESIGNED / CLEAN)
 ------------------------------------------------------------
 local IntroFrame = create("Frame", {
     Name = "Intro",
     Size = UDim2.fromScale(1, 1),
     Position = UDim2.fromScale(0, 0),
-    BorderSizePixel = 0,
     BackgroundColor3 = Theme.Background,
-    BackgroundTransparency = 0,
     ZIndex = 10,
 })
 IntroFrame.Parent = ScreenGui
 
-local IntroContent = create("Frame", {
-    Name = "IntroContent",
+local IntroContainer = create("Frame", {
+    Name = "Container",
+    Size = UDim2.new(0, 400, 0, 300),
+    Position = UDim2.fromScale(0.5, 0.5),
     AnchorPoint = Vector2.new(0.5, 0.5),
-    Position = UDim2.new(0.5, 0, 0.5, 0),
-    Size = UDim2.new(0, 360, 0, 310),
     BackgroundTransparency = 1,
     ZIndex = 11,
 })
-IntroContent.Parent = IntroFrame
+IntroContainer.Parent = IntroFrame
 
-local LogoLabel = create("TextLabel", {
+-- Başlık
+local Logo = create("TextLabel", {
     Text = "UguzHub",
     Font = Enum.Font.GothamBlack,
-    TextSize = 50,
+    TextSize = 40,
     TextColor3 = Theme.Text,
     BackgroundTransparency = 1,
     Size = UDim2.new(1, 0, 0, 50),
-    Position = UDim2.new(0, 0, 0, -130),
-    TextTransparency = 1,
-    ZIndex = 11,
+    Position = UDim2.new(0, 0, 0, 20),
 })
-LogoLabel.Parent = IntroContent
+Logo.Parent = IntroContainer
 
-local ProTag = create("TextLabel", {
-    Text = "V2 PRO",
-    Font = Enum.Font.GothamBold,
-    TextSize = 18,
-    TextColor3 = Theme.Accent,
-    BackgroundTransparency = 1,
-    Size = UDim2.new(1, 0, 0, 20),
-    Position = UDim2.new(0, 0, 0, -78),
-    TextTransparency = 1,
-    ZIndex = 11,
-})
-ProTag.Parent = IntroContent
-
-local Underline = create("Frame", {
-    Name = "Underline",
-    Size = UDim2.new(0, 0, 0, 3),
-    Position = UDim2.new(0.5, 0, 0, -52),
-    AnchorPoint = Vector2.new(0.5, 0),
-    BackgroundColor3 = Theme.Accent,
-    BorderSizePixel = 0,
-    ZIndex = 11,
-})
-corner(2).Parent = Underline
-Underline.Parent = IntroContent
-
-local LoadingLabel = create("TextLabel", {
-    Text = L.loading,
+-- Yükleme Yazısı
+local Status = create("TextLabel", {
+    Text = "Initializing...",
     Font = Enum.Font.GothamMedium,
-    TextSize = 17,
+    TextSize = 14,
     TextColor3 = Theme.SubText,
     BackgroundTransparency = 1,
-    Size = UDim2.new(1, 0, 0, 24),
-    Position = UDim2.new(0, 0, 0, -36),
-    TextTransparency = 1,
-    ZIndex = 11,
+    Size = UDim2.new(1, 0, 0, 30),
+    Position = UDim2.new(0, 0, 0, 70),
 })
-LoadingLabel.Parent = IntroContent
+Status.Parent = IntroContainer
 
-local SubtitleLabel = create("TextLabel", {
-    Text = L.subtitle,
-    Font = Enum.Font.Gotham,
-    TextSize = 15,
-    TextColor3 = Theme.SubText,
-    BackgroundTransparency = 1,
-    Size = UDim2.new(1, 0, 0, 22),
-    Position = UDim2.new(0, 0, 0, -120),
-    TextTransparency = 1,
-    ZIndex = 11,
-    Visible = false,
-})
-SubtitleLabel.Parent = IntroContent
-
-local LangHolder = create("Frame", {
+-- Dil Seçim Alanı (Daha düzgün)
+local LangHolder = create("ScrollingFrame", {
     Name = "LangHolder",
-    Position = UDim2.new(0, 0, 0, -85),
-    Size = UDim2.new(1, 0, 0, 190),
+    Size = UDim2.new(0, 380, 0, 160),
+    Position = UDim2.new(0.5, 0, 0, 140),
+    AnchorPoint = Vector2.new(0.5, 0),
     BackgroundTransparency = 1,
-    ZIndex = 11,
+    ScrollBarThickness = 0,
     Visible = false,
+    ZIndex = 12,
 })
-LangHolder.Parent = IntroContent
+LangHolder.Parent = IntroContainer
 
 create("UIGridLayout", {
-    CellSize = UDim2.new(0, 84, 0, 88),
-    CellPadding = UDim2.new(0, 6, 0, 6),
+    CellSize = UDim2.new(0, 85, 0, 60),
+    CellPadding = UDim2.new(0, 8, 0, 8),
     HorizontalAlignment = Enum.HorizontalAlignment.Center,
-    SortOrder = Enum.SortOrder.LayoutOrder,
 }).Parent = LangHolder
+
+-- Dil Kartlarını Oluşturma (Daha şık ve sade)
+for _, opt in ipairs(LanguageOptions) do
+    local card = create("TextButton", {
+        Text = opt.flag .. " " .. opt.code,
+        Font = Enum.Font.GothamBold,
+        TextSize = 13,
+        TextColor3 = Theme.Text,
+        BackgroundColor3 = Theme.Card,
+        AutoButtonColor = true,
+    })
+    corner(8).Parent = card
+    card.MouseButton1Click:Connect(function() selectLanguage(opt.code) end)
+    card.Parent = LangHolder
+end
+
+-- Giriş Animasyonu
+task.spawn(function()
+    Status.Text = "Checking assets..."
+    task.wait(1.5)
+    Status.Text = "Ready to select language."
+    task.wait(0.5)
+    LangHolder.Visible = true
+end)
+
 
 ------------------------------------------------------------
 -- MİNİMİZE BUTON (SÜRÜKLENEBİLİR)
