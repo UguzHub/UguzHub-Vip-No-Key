@@ -1,5 +1,5 @@
 --[[
-    UguzHub V2 Pro - Full Sürüm (Auto Farm, Tween/Teleport, Kill All, Şeffaf Arayüz, 4 Dil Desteği)
+    UguzHub V2 Pro - Düzeltilmiş Sürüm (Auto Farm, Tween/Teleport, Kill All, Şeffaf Arayüz)
 ]]
 
 local Players = game:GetService("Players")
@@ -39,7 +39,7 @@ local Flags = {
     AutoGrabGun = false,
     
     AutoFarm = false,
-    FarmMode = "Teleport", -- "Teleport" veya "Tween"
+    FarmMode = "Teleport",
     KillAllActive = false,
     
     Fullbright = false
@@ -62,49 +62,6 @@ local Theme = {
 local RADIUS = 14
 
 ------------------------------------------------------------
--- DİL PAKETLERİ (4 Dil: TR, EN, RU, DE)
-------------------------------------------------------------
-local Lang = {}
-
-Lang.TR = {
-    loading = "Yükleniyor",
-    subtitle = "Dilinizi seçin",
-    openBtn = "UguzHub",
-    notice = "Sizlere daha iyi bir deneyim sunmak amacıyla lütfen delta ayarlarindaki tüm izinleri Kapattığınıza emin olun.",
-}
-
-Lang.EN = {
-    loading = "Loading",
-    subtitle = "Select your language",
-    openBtn = "UguzHub",
-    notice = "To provide you with a better experience, please make sure to turn off all permissions in the delta settings.",
-}
-
-Lang.RU = {
-    loading = "Загрузка",
-    subtitle = "Выберите язык",
-    openBtn = "UguzHub",
-    notice = "Чтобы обеспечить вам лучший опыт, пожалуйста, убедитесь, что отключили все разрешения в настройках delta.",
-}
-
-Lang.DE = {
-    loading = "Wird geladen",
-    subtitle = "Wähle deine Sprache",
-    openBtn = "UguzHub",
-    notice = "Um Ihnen ein besseres Erlebnis zu bieten, stellen Sie bitte sicher, dass Sie alle Berechtigungen in den Delta-Einstellungen deaktivieren.",
-}
-
-local LanguageOptions = {
-    { code = "TR", flag = "🇹🇷", name = "Türkçe" },
-    { code = "EN", flag = "🇬🇧", name = "English" },
-    { code = "RU", flag = "🇷🇺", name = "Русский" },
-    { code = "DE", flag = "🇩🇪", name = "Deutsch" },
-}
-
-local CurrentLang = "EN"
-local L = Lang[CurrentLang]
-
-------------------------------------------------------------
 -- OYUN ROLLERİ VE DÖNGÜLER (MM2)
 ------------------------------------------------------------
 local function getRole(plr)
@@ -119,7 +76,6 @@ local function getRole(plr)
     return "Innocent"
 end
 
--- KILL ALL FONKSİYONU (Düzeltildi: Hata koruması eklendi)
 local function executeKillAll()
     local myChar = LocalPlayer.Character
     if not myChar then return end
@@ -153,7 +109,6 @@ local function executeKillAll()
     Flags.KillAllActive = false
 end
 
--- AUTO FARM DÖNGÜSÜ (Düzeltildi: Çökme önleyici ve güvenli tarama)
 task.spawn(function()
     while task.wait(0.5) do
         if Flags.AutoFarm then
@@ -311,19 +266,8 @@ local function stroke(color, thickness)
     })
 end
 
-local function tween(obj, props, duration, style, direction)
-    local info = TweenInfo.new(
-        duration or 0.3,
-        style or Enum.EasingStyle.Quint,
-        direction or Enum.EasingDirection.Out
-    )
-    local t = TweenService:Create(obj, info, props)
-    t:Play()
-    return t
-end
-
 ------------------------------------------------------------
--- ANA GUI
+-- ANA GUI OLUŞTURUCU
 ------------------------------------------------------------
 local ScreenGui = create("ScreenGui", {
     Name = "UguzHubV2Pro",
@@ -334,146 +278,9 @@ local ScreenGui = create("ScreenGui", {
 })
 ScreenGui.Parent = CoreGui
 
-------------------------------------------------------------
--- GİRİŞ EKRANI (Yükleme + 4'lü Dil Seçimi)
-------------------------------------------------------------
-local IntroFrame = create("Frame", {
-    Name = "Intro",
-    Size = UDim2.fromScale(1, 1),
-    Position = UDim2.fromScale(0, 0),
-    BorderSizePixel = 0,
-    BackgroundColor3 = Theme.Background,
-    BackgroundTransparency = 0,
-    ZIndex = 10,
-})
-IntroFrame.Parent = ScreenGui
-
-local IntroContent = create("Frame", {
-    Name = "IntroContent",
-    AnchorPoint = Vector2.new(0.5, 0),
-    Position = UDim2.new(0.5, 0, 0.24, 0),
-    Size = UDim2.new(0, 360, 0, 370),
-    BackgroundTransparency = 1,
-    ZIndex = 11,
-})
-IntroContent.Parent = IntroFrame
-
-local LogoLabel = create("TextLabel", {
-    Text = "UguzHub",
-    Font = Enum.Font.GothamBlack,
-    TextSize = 50,
-    TextColor3 = Theme.Text,
-    BackgroundTransparency = 1,
-    Size = UDim2.new(1, 0, 0, 60),
-    TextTransparency = 1,
-    ZIndex = 11,
-})
-LogoLabel.Parent = IntroContent
-
-local ProTag = create("TextLabel", {
-    Text = "V2 PRO",
-    Font = Enum.Font.GothamBold,
-    TextSize = 18,
-    TextColor3 = Theme.Accent,
-    BackgroundTransparency = 1,
-    Size = UDim2.new(1, 0, 0, 22),
-    Position = UDim2.new(0, 0, 0, 58),
-    TextTransparency = 1,
-    ZIndex = 11,
-})
-ProTag.Parent = IntroContent
-
-local Underline = create("Frame", {
-    Name = "Underline",
-    Size = UDim2.new(0, 0, 0, 3),
-    Position = UDim2.new(0.5, 0, 0, 88),
-    AnchorPoint = Vector2.new(0.5, 0),
-    BackgroundColor3 = Theme.Accent,
-    BorderSizePixel = 0,
-    ZIndex = 11,
-})
-corner(2).Parent = Underline
-Underline.Parent = IntroContent
-
-local LoadingLabel = create("TextLabel", {
-    Text = L.loading,
-    Font = Enum.Font.GothamMedium,
-    TextSize = 17,
-    TextColor3 = Theme.SubText,
-    BackgroundTransparency = 1,
-    Size = UDim2.new(1, 0, 0, 24),
-    Position = UDim2.new(0, 0, 0, 108),
-    TextTransparency = 1,
-    ZIndex = 11,
-})
-LoadingLabel.Parent = IntroContent
-
-local SubtitleLabel = create("TextLabel", {
-    Text = L.subtitle,
-    Font = Enum.Font.Gotham,
-    TextSize = 15,
-    TextColor3 = Theme.SubText,
-    BackgroundTransparency = 1,
-    Size = UDim2.new(1, 0, 0, 22),
-    Position = UDim2.new(0, 0, 0, 108),
-    TextTransparency = 1,
-    ZIndex = 11,
-    Visible = false,
-})
-SubtitleLabel.Parent = IntroContent
-
-local LangHolder = create("Frame", {
-    Name = "LangHolder",
-    Position = UDim2.new(0, 0, 0, 150),
-    Size = UDim2.new(1, 0, 0, 100),
-    BackgroundTransparency = 1,
-    ZIndex = 11,
-    Visible = false,
-})
-LangHolder.Parent = IntroContent
-
-create("UIGridLayout", {
-    CellSize = UDim2.new(0, 80, 0, 92),
-    CellPadding = UDim2.new(0, 8, 0, 0),
-    HorizontalAlignment = Enum.HorizontalAlignment.Center,
-    SortOrder = Enum.SortOrder.LayoutOrder,
-}).Parent = LangHolder
-
-------------------------------------------------------------
--- UYARI EKRANI
-------------------------------------------------------------
-local NoticeFrame = create("Frame", {
-    Name = "Notice",
-    Size = UDim2.fromScale(1, 1),
-    Position = UDim2.fromScale(0, 0),
-    BackgroundColor3 = Theme.Background,
-    BackgroundTransparency = 1,
-    Visible = false,
-    ZIndex = 15,
-})
-NoticeFrame.Parent = ScreenGui
-
-local NoticeLabel = create("TextLabel", {
-    Text = "",
-    Font = Enum.Font.GothamMedium,
-    TextSize = 18,
-    TextColor3 = Theme.Text,
-    BackgroundTransparency = 1,
-    Size = UDim2.new(0, 480, 0, 160),
-    AnchorPoint = Vector2.new(0.5, 0.5),
-    Position = UDim2.new(0.5, 0, 0.5, 0),
-    TextWrapped = true,
-    TextTransparency = 1,
-    ZIndex = 16,
-})
-NoticeLabel.Parent = NoticeFrame
-
-------------------------------------------------------------
--- MİNİMİZE BUTONU
-------------------------------------------------------------
 local MinimizedButton = create("TextButton", {
     Name = "MinimizedButton",
-    Text = "🟣 " .. L.openBtn,
+    Text = "🟣 UguzHub",
     Font = Enum.Font.GothamBold,
     TextSize = 15,
     TextColor3 = Theme.Text,
@@ -488,11 +295,10 @@ corner(12).Parent = MinimizedButton
 stroke(Color3.fromRGB(255, 255, 255), 1).Parent = MinimizedButton
 MinimizedButton.Parent = ScreenGui
 
-------------------------------------------------------------
--- MENÜ KONTROLÜ
 local MENU_W, MENU_H = 520, 330
+local MainFrame
 
-function buildMainMenu()
+local function buildMainMenu()
     MainFrame = create("Frame", {
         Name = "MainMenu",
         Size = UDim2.new(0, MENU_W, 0, MENU_H),
@@ -501,7 +307,7 @@ function buildMainMenu()
         BackgroundColor3 = Theme.Background,
         BackgroundTransparency = 0.15,
         ClipsDescendants = true,
-        Visible = false,
+        Visible = true,
         ZIndex = 5,
     })
     corner(RADIUS).Parent = MainFrame
@@ -517,8 +323,8 @@ function buildMainMenu()
     })
 
     create("TextLabel", {
-        Text = "  Murder Mystery 2 | UguzHub V2 Pro",
         Size = UDim2.new(1, -40, 1, 0),
+        Text = "  Murder Mystery 2 | UguzHub V2 Pro",
         TextColor3 = Theme.Text,
         Font = Enum.Font.GothamBold,
         TextSize = 13,
@@ -541,7 +347,8 @@ function buildMainMenu()
     })
 
     CloseBtn.MouseButton1Click:Connect(function()
-        closeMenu()
+        MainFrame.Visible = false
+        MinimizedButton.Visible = true
     end)
 
     local Sidebar = create("Frame", {
@@ -774,9 +581,6 @@ function buildMainMenu()
     corner(6).Parent = ModeBtn
     ModeBtn.MouseButton1Click:Connect(function()
         if Flags.FarmMode == "Teleport" then
-            Flags.FarmMode = "Tween"
-            ModeBtn.Text = "  Farm Mode: Tween"
-        else
             Flags.FarmMode = "Teleport"
             ModeBtn.Text = "  Farm Mode: Teleport"
         end
@@ -866,26 +670,11 @@ function buildMainMenu()
     end)
 end
 
-function openMenu()
-    MinimizedButton.Visible = false
-    MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-    MainFrame.Visible = true
-    MainFrame.Size = UDim2.new(0, MENU_W * 0.85, 0, MENU_H * 0.85)
-    tween(MainFrame, { Size = UDim2.new(0, MENU_W, 0, MENU_H) }, 0.28, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-end
-
-function closeMenu()
-    tween(MainFrame, { Size = UDim2.new(0, MENU_W * 0.85, 0, MENU_H * 0.85) }, 0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
-    task.wait(0.2)
-    MainFrame.Visible = false
-    MainFrame.Size = UDim2.new(0, MENU_W, 0, MENU_H)
-
-    MinimizedButton.Visible = true
-    MinimizedButton.BackgroundTransparency = 1
-    tween(MinimizedButton, { BackgroundTransparency = 0 }, 0.25)
-end
+buildMainMenu()
 
 MinimizedButton.MouseButton1Click:Connect(function()
-    if not MainFrame then return end
-    openMenu()
+    if MainFrame then
+        MainFrame.Visible = true
+        MinimizedButton.Visible = false
+    end
 end)
