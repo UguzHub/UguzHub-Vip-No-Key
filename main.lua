@@ -556,4 +556,279 @@ function buildMainMenu()
 
         local page = create("ScrollingFrame", {
             Size = UDim2.new(1, 0, 1, 0),
-            BackgroundTran
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            ScrollBarThickness = 2,
+            Visible = false,
+            ZIndex = 7,
+        })
+        page.Parent = TabContainer
+
+        create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 6) }).Parent = page
+
+        pages[name] = page
+        tabBtns[name] = btn
+
+        btn.MouseButton1Click:Connect(function()
+            for _, p in pairs(pages) do p.Visible = false end
+            for _, b in pairs(tabBtns) do
+                b.BackgroundColor3 = Theme.Card
+                b.TextColor3 = Theme.SubText
+            end
+            page.Visible = true
+            btn.BackgroundColor3 = Theme.Accent
+            btn.TextColor3 = Theme.Text
+        end)
+
+        return page
+    end
+
+    ------------------------------------------------------------
+    -- ARAYÜZ BİLEŞEN OLUŞTURUCULARI
+    ------------------------------------------------------------
+    local function createToggle(parent, labelText, flag)
+        local frame = create("Frame", { Size = UDim2.new(1, -6, 0, 30), BackgroundColor3 = Theme.Card, BackgroundTransparency = CARD_TRANSPARENCY })
+        corner(8).Parent = frame
+        frame.Parent = parent
+
+        create("TextLabel", { Text = labelText, Font = Enum.Font.Gotham, TextColor3 = Theme.Text, TextSize = 10, BackgroundTransparency = 1, Size = UDim2.new(0.7, 0, 1, 0), Position = UDim2.new(0, 8, 0, 0), TextXAlignment = Enum.TextXAlignment.Left }).Parent = frame
+
+        local switch = create("Frame", { Size = UDim2.new(0, 28, 0, 14), Position = UDim2.new(1, -34, 0.5, -7), BackgroundColor3 = Color3.fromRGB(40, 40, 45) })
+        corner(10).Parent = switch
+        switch.Parent = frame
+
+        local dot = create("Frame", { Size = UDim2.new(0, 10, 0, 10), Position = UDim2.new(0, 2, 0.5, -5), BackgroundColor3 = Color3.fromRGB(200, 200, 200) })
+        corner(10).Parent = dot
+        dot.Parent = switch
+
+        local btn = create("TextButton", { Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, Text = "" })
+        btn.Parent = frame
+
+        btn.MouseButton1Click:Connect(function()
+            Flags[flag] = not Flags[flag]
+            if Flags[flag] then
+                switch.BackgroundColor3 = Theme.Accent
+                dot.Position = UDim2.new(1, -12, 0.5, -5)
+                dot.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            else
+                switch.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+                dot.Position = UDim2.new(0, 2, 0.5, -5)
+                dot.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+            end
+        end)
+    end
+
+    local function createButton(parent, labelText, callback)
+        local btn = create("TextButton", { Size = UDim2.new(1, -6, 0, 30), BackgroundColor3 = Theme.Card, Font = Enum.Font.GothamBold, Text = labelText, TextColor3 = Theme.Text, TextSize = 10 })
+        corner(8).Parent = btn
+        stroke(Theme.Accent, 1).Parent = btn
+        btn.Parent = parent
+        btn.MouseButton1Click:Connect(function() if callback then callback() end end)
+    end
+
+    ------------------------------------------------------------
+    -- SEKMELERİ DOLDURMA
+    ------------------------------------------------------------
+    local ESPTab = addTab("ESP", "👁")
+    local AimbotTab = addTab("Aimbot", "🎯")
+    local PlayersTab = addTab("Players", "👤")
+    local TeleportTab = addTab("Teleport", "🌀")
+    local SettingsTab = addTab("Ayarlar", "⚙")
+
+    -- 1. ESP Tab
+    createToggle(ESPTab, "ESP All (Herkesi Göster)", "ESPAll")
+    createToggle(ESPTab, "ESP Gun (Yerdeki Silah)", "ESPGun")
+    createToggle(ESPTab, "Auto Grab Gun (Oto Al)", "AutoGrabGun")
+    createButton(ESPTab, "TP Grab Gun (Işınlan Al)", function()
+        local gunDrop = Workspace:FindFirstChild("GunDrop") or Workspace:FindFirstChild("Gun")
+        local myHrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if gunDrop and myHrp then
+            local oldCFrame = myHrp.CFrame
+            myHrp.CFrame = gunDrop.CFrame
+            task.wait(0.15)
+            if firetouchinterest then
+                firetouchinterest(myHrp, gunDrop, 0)
+                firetouchinterest(myHrp, gunDrop, 1)
+            end
+            task.wait(0.1)
+            myHrp.CFrame = oldCFrame
+        end
+    end)
+
+    -- 2. Aimbot Tab
+    createToggle(AimbotTab, "Aimbot Enable (Kilitle)", "AimbotEnabled")
+
+    -- 3. Players Tab
+    createToggle(PlayersTab, "Auto Kill Murderer (Sheriff)", "AutoKillMurderer")
+    createButton(PlayersTab, "Kill Murderer", function()
+        local myChar = LocalPlayer.Character
+        if myChar and myChar:FindFirstChild("HumanoidRootPart") then
+            for _, p in pairs(Players:GetPlayers()) do
+                if p ~= LocalPlayer and getRole(p) == "Murderer" and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                    myChar.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
+                end
+            end
+        end
+    end)
+    createButton(PlayersTab, "Kill All (Murderer Only)", function()
+        if getRole(LocalPlayer) == "Murderer" then
+            local myChar = LocalPlayer.Character
+            if myChar and myChar:FindFirstChild("HumanoidRootPart") then
+                for _, p in pairs(Players:GetPlayers()) do
+                    if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                        p.Character.HumanoidRootPart.CFrame = myChar.HumanoidRootPart.CFrame
+                    end
+                end
+            end
+        end
+    end)
+    createToggle(PlayersTab, "Auto Fling Murderer", "AutoFlingMurderer")
+    createToggle(PlayersTab, "Auto Fling Sheriff", "AutoFlingSheriff")
+    createToggle(PlayersTab, "Auto Fling All", "AutoFlingAll")
+
+    -- 4. Teleport Tab
+    createButton(TeleportTab, "TP to Lobby", function()
+        local myHrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if not myHrp then return end
+        local lobby = Workspace:FindFirstChild("Lobby")
+        if lobby then
+            local spawnPart = lobby:FindFirstChild("Spawns") or lobby:FindFirstChild("Spawn") or lobby:FindFirstChildWhichIsA("BasePart", true)
+            if spawnPart then myHrp.CFrame = spawnPart.CFrame + Vector3.new(0, 3, 0) else myHrp.CFrame = CFrame.new(-108, 140, 82) end
+        else myHrp.CFrame = CFrame.new(-108, 140, 82) end
+    end)
+    createButton(TeleportTab, "TP to Map", function()
+        local myHrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if not myHrp then return end
+        local found = false
+        for _, child in pairs(Workspace:GetChildren()) do
+            if child:FindFirstChild("Spawns") or child:FindFirstChild("CoinContainer") then
+                local spawns = child:FindFirstChild("Spawns")
+                local spawnPart = spawns and spawns:FindFirstChildWhichIsA("BasePart") or child:FindFirstChildWhichIsA("BasePart", true)
+                if spawnPart then myHrp.CFrame = spawnPart.CFrame + Vector3.new(0, 3, 0); found = true; break end
+            end
+        end
+        if not found then
+            for _, p in pairs(Players:GetPlayers()) do
+                if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                    if getRole(p) == "Murderer" or getRole(p) == "Sheriff" then myHrp.CFrame = p.Character.HumanoidRootPart.CFrame + Vector3.new(0, 2, 0); break end
+                end
+            end
+        end
+    end)
+    createButton(TeleportTab, "TP to Murderer", function()
+        local myHrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if not myHrp then return end
+        for _, p in pairs(Players:GetPlayers()) do
+            if p ~= LocalPlayer and getRole(p) == "Murderer" and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then myHrp.CFrame = p.Character.HumanoidRootPart.CFrame + Vector3.new(0, 2, 0); break end
+        end
+    end)
+    createButton(TeleportTab, "TP to Sheriff", function()
+        local myHrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if not myHrp then return end
+        for _, p in pairs(Players:GetPlayers()) do
+            if p ~= LocalPlayer and getRole(p) == "Sheriff" and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then myHrp.CFrame = p.Character.HumanoidRootPart.CFrame + Vector3.new(0, 2, 0); break end
+        end
+    end)
+
+    -- 5. Ayarlar Tab (Orijinal Profil Bloğu Korundu)
+    create("TextLabel", { Text = L.sectionTitle, Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = Theme.SubText, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 18), TextXAlignment = Enum.TextXAlignment.Left }).Parent = SettingsTab
+
+    local AvatarFrame = create("Frame", { Size = UDim2.new(0, 50, 0, 50), Position = UDim2.new(0, 0, 0, 26), BackgroundColor3 = Theme.Card, BackgroundTransparency = CARD_TRANSPARENCY })
+    corner(25).Parent = AvatarFrame
+    stroke(Theme.Accent, 2).Parent = AvatarFrame
+    AvatarFrame.Parent = SettingsTab
+
+    local AvatarImage = create("ImageLabel", { Size = UDim2.new(1, -4, 1, -4), Position = UDim2.new(0, 2, 0, 2), BackgroundTransparency = 1, Image = "rbxthumb://type=AvatarHeadShot&id=" .. LocalPlayer.UserId .. "&w=150&h=150" })
+    corner(25).Parent = AvatarImage
+    AvatarImage.Parent = AvatarFrame
+
+    create("TextLabel", { Text = LocalPlayer.DisplayName .. " (@" .. LocalPlayer.Name .. ")", Font = Enum.Font.GothamBold, TextSize = 12, TextColor3 = Theme.Text, BackgroundTransparency = 1, Size = UDim2.new(1, -60, 0, 18), Position = UDim2.new(0, 60, 0, 28), TextXAlignment = Enum.TextXAlignment.Left }).Parent = SettingsTab
+    create("TextLabel", { Text = L.greeting .. ", " .. LocalPlayer.DisplayName .. "?", Font = Enum.Font.Gotham, TextSize = 11, TextColor3 = Theme.SubText, BackgroundTransparency = 1, Size = UDim2.new(1, -60, 0, 16), Position = UDim2.new(0, 60, 0, 46), TextXAlignment = Enum.TextXAlignment.Left }).Parent = SettingsTab
+
+    -- İlk sekmeyi açık getir
+    pages["ESP"].Visible = true
+    tabBtns["ESP"].BackgroundColor3 = Theme.Accent
+    tabBtns["ESP"].TextColor3 = Theme.Text
+end
+
+------------------------------------------------------------
+-- MENÜ AÇ / KAPA
+------------------------------------------------------------
+function openMenu()
+    MinimizedButton.Visible = false
+    MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    MainFrame.Visible = true
+    MainFrame.Size = UDim2.new(0, MENU_W * 0.85, 0, MENU_H * 0.85)
+    tween(MainFrame, { Size = UDim2.new(0, MENU_W, 0, MENU_H) }, 0.28, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+end
+
+function closeMenu()
+    tween(MainFrame, { Size = UDim2.new(0, MENU_W * 0.85, 0, MENU_H * 0.85) }, 0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
+    task.wait(0.2)
+    MainFrame.Visible = false
+    MainFrame.Size = UDim2.new(0, MENU_W, 0, MENU_H)
+
+    MinimizedButton.Visible = true
+    MinimizedButton.BackgroundTransparency = 1
+    tween(MinimizedButton, { BackgroundTransparency = 0 }, 0.25)
+end
+
+MinimizedButton.MouseButton1Click:Connect(function()
+    if not MainFrame then return end
+    openMenu()
+end)
+
+------------------------------------------------------------
+-- ARKA PLAN RENDER DÖNGÜSÜ (ESP & AIMBOT)
+------------------------------------------------------------
+RunService.RenderStepped:Connect(function()
+    if Flags.ESPAll then
+        for _, p in pairs(Players:GetPlayers()) do
+            if p ~= LocalPlayer and p.Character then
+                local role = getRole(p)
+                local hl = p.Character:FindFirstChild("UguzHighlight") or Instance.new("Highlight")
+                hl.Name = "UguzHighlight"
+                hl.FillColor = RoleColors[role]
+                hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+                hl.FillTransparency = 0.4
+                hl.Parent = p.Character
+            end
+        end
+    else
+        for _, p in pairs(Players:GetPlayers()) do
+            if p.Character and p.Character:FindFirstChild("UguzHighlight") then
+                p.Character.UguzHighlight:Destroy()
+            end
+        end
+    end
+
+    local gunDrop = Workspace:FindFirstChild("GunDrop") or Workspace:FindFirstChild("Gun")
+    if gunDrop then
+        if Flags.ESPGun then
+            local hl = gunDrop:FindFirstChild("GunHighlight") or Instance.new("Highlight")
+            hl.Name = "GunHighlight"
+            hl.FillColor = RoleColors.Gun
+            hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+            hl.Parent = gunDrop
+        elseif gunDrop:FindFirstChild("GunHighlight") then
+            gunDrop.GunHighlight:Destroy()
+        end
+
+        if Flags.AutoGrabGun and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            if firetouchinterest then
+                firetouchinterest(LocalPlayer.Character.HumanoidRootPart, gunDrop, 0)
+                firetouchinterest(LocalPlayer.Character.HumanoidRootPart, gunDrop, 1)
+            else
+                LocalPlayer.Character.HumanoidRootPart.CFrame = gunDrop.CFrame
+            end
+        end
+    end
+
+    if Flags.AimbotEnabled or (Flags.AutoKillMurderer and getRole(LocalPlayer) == "Sheriff") then
+        for _, p in pairs(Players:GetPlayers()) do
+            if p ~= LocalPlayer and getRole(p) == "Murderer" and p.Character and p.Character:FindFirstChild("Head") then
+                Camera.CFrame = CFrame.new(Camera.CFrame.Position, p.Character.Head.Position)
+            end
+        end
+    end
+end)
