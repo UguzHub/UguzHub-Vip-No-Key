@@ -8,6 +8,7 @@ local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local LocalPlayer = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
@@ -37,6 +38,7 @@ local Flags = {
     AutoShoot = false,
     KillAura = false,
     AutoGrabGun = false,
+    AutoGunDropped = false, -- YENİ
     
     AutoFarm = false,
     FarmMode = "Teleport",
@@ -83,7 +85,7 @@ Lang.EN = {
 Lang.RU = {
     loading = "Загрузка",
     subtitle = "Выберите язык",
-    openBtn = "UguzHub",
+    openBtn = "Выберите язык",
     notice = "Чтобы обеспечить вам лучший опыт, пожалуйста, убедитесь, что отключили все разрешения в настройках delta.",
 }
 
@@ -119,6 +121,32 @@ local function getRole(plr)
     return "Innocent"
 end
 
+local function unlockAllEmotes()
+    pcall(function()
+        local playerData = LocalPlayer:FindFirstChild("PlayerData") or LocalPlayer:FindFirstChild("Data")
+        if playerData and playerData:FindFirstChild("Emotes") then
+            for _, emote in pairs(playerData.Emotes:GetChildren()) do
+                if emote:IsA("BoolValue") then
+                    emote.Value = true
+                end
+            end
+        end
+        
+        for _, obj in pairs(ReplicatedStorage:GetDescendants()) do
+            if obj:IsA("ModuleScript") and string.find(obj.Name:lower(), "emote") then
+                local success, emoteData = pcall(require, obj)
+                if success and type(emoteData) == "table" then
+                    for _, item in pairs(emoteData) do
+                        if type(item) == "table" and item.Owned ~= nil then
+                            item.Owned = true
+                        end
+                    end
+                end
+            end
+        end
+    end)
+end
+
 local function executeKillAll()
     local myChar = LocalPlayer.Character
     if not myChar then return end
@@ -149,6 +177,7 @@ local function executeKillAll()
             end
         end
     end
+    
     Flags.KillAllActive = false
 end
 
@@ -241,6 +270,14 @@ RunService.RenderStepped:Connect(function()
             local gunDrop = Workspace:FindFirstChild("GunDrop", true)
             if gunDrop and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
                 LocalPlayer.Character.HumanoidRootPart.CFrame = gunDrop.CFrame
+            end
+        end
+
+        if Flags.AutoGunDropped and LocalPlayer.Character then
+            for _, tool in pairs(LocalPlayer.Character:GetChildren()) do
+                if tool:IsA("Tool") and (string.find(tool.Name:lower(), "gun") or tool:FindFirstChild("Handle")) then
+                    tool.Parent = Workspace
+                end
             end
         end
 
@@ -955,6 +992,26 @@ function buildMainMenu()
         task.spawn(executeKillAll)
     end)
 
+    local UnlockEmotesBtn = create("TextButton", {
+        Size = UDim2.new(1, -4, 0, 34),
+        BackgroundColor3 = Theme.AccentSoft,
+        BackgroundTransparency = 0.2,
+        Text = "  Unlock All Shop Emotes",
+        TextColor3 = Theme.Text,
+        Font = Enum.Font.GothamBold,
+        TextSize = 11,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Parent = MainTab,
+        ZIndex = 6,
+    })
+    corner(6).Parent = UnlockEmotesBtn
+    UnlockEmotesBtn.MouseButton1Click:Connect(function()
+        unlockAllEmotes()
+        UnlockEmotesBtn.Text = "  Emotes Unlocked!"
+        task.wait(1.5)
+        UnlockEmotesBtn.Text = "  Unlock All Shop Emotes"
+    end)
+
     createToggle(MainTab, "Speed Walk (Hız)", "SpeedWalk")
     createToggle(MainTab, "Jump Power (Zıplama)", "JumpPower")
     createToggle(MainTab, "Infinite Jump (Sınırsız Zıpla)", "InfiniteJump")
@@ -969,6 +1026,7 @@ function buildMainMenu()
     createToggle(CombatTab, "Auto Shoot (Otomatik Ateş)", "AutoShoot")
     createToggle(CombatTab, "KillAura (Yakındakini Kes)", "KillAura")
     createToggle(CombatTab, "Auto Grab Gun (Silahı Al)", "AutoGrabGun")
+    createToggle(CombatTab, "Auto Gun Dropped (Silah Düşür)", "AutoGunDropped")
 
     createToggle(TeleTab, "Fullbright (Aydınlık)", "Fullbright")
 
@@ -1044,4 +1102,3 @@ MinimizedButton.MouseButton1Click:Connect(function()
     if not MainFrame then return end
     openMenu()
 end)
-    
