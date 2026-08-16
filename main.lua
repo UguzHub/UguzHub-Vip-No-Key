@@ -1,4 +1,4 @@
--- [[ UguzHub V2 Pro - Full Dynamic Localization & Custom Intro ]] --
+-- [[ UguzHub V2 Pro - Modernized UI & Custom Animated Loading Screen ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -10,7 +10,7 @@ local Clipboard = setclipboard or toclipboard or syn and syn.clipboard
 local LocalPlayer = Players.LocalPlayer
 
 ------------------------------------------------------------
--- 0) HESAP YAŞ KONTROLÜ (14 GÜN)
+-- 0) HESAP YAŞ KONTROLÜ
 ------------------------------------------------------------
 if LocalPlayer.AccountAge < 14 then
     LocalPlayer:Kick("Your account is less than 14 days old.")
@@ -21,107 +21,106 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local Camera = Workspace.CurrentCamera
 
 ------------------------------------------------------------
--- TEMA & AYARLAR
+-- TEMA & MODERN ARAYÜZ RENKLERİ
 ------------------------------------------------------------
 local Theme = {
-    Background   = Color3.fromRGB(16, 16, 22),
-    Sidebar      = Color3.fromRGB(20, 20, 28),
-    Card         = Color3.fromRGB(30, 30, 40),
-    Accent       = Color3.fromRGB(138, 92, 255),
-    AccentSoft   = Color3.fromRGB(90, 60, 180),
-    Blue         = Color3.fromRGB(41, 121, 255),
-    BlueSoft     = Color3.fromRGB(70, 150, 255),
-    Text         = Color3.fromRGB(235, 235, 245),
-    SubText      = Color3.fromRGB(165, 165, 180),
-    Stroke       = Color3.fromRGB(55, 55, 70),
+    Background   = Color3.fromRGB(13, 13, 18),
+    Sidebar      = Color3.fromRGB(18, 18, 26),
+    Card         = Color3.fromRGB(24, 24, 35),
+    Accent       = Color3.fromRGB(147, 51, 234), -- Modern Mor Neon
+    AccentSoft   = Color3.fromRGB(126, 34, 206),
+    Blue         = Color3.fromRGB(59, 130, 246),
+    Text         = Color3.fromRGB(243, 244, 246),
+    SubText      = Color3.fromRGB(156, 163, 175),
+    Stroke       = Color3.fromRGB(45, 45, 65),
 }
 
-local CARD_TRANSPARENCY = 0.25
-local RADIUS = 16
+local CARD_TRANSPARENCY = 0.15
+local RADIUS = 14
 
 ------------------------------------------------------------
--- DİL PAKETLERİ (EKSİKSİZ TAM ÇEVİRİ)
+-- DİL PAKETLERİ (EKSİKSİZ TAM DİNAMİK LOKALİZASYON)
 ------------------------------------------------------------
 local Lang = {
     TR = {
-        loading = "Yükleniyor", subtitle = "Dilinizi Seçin", greeting = "Bugün nasılsın", sectionTitle = "Ayarlar", openBtn = "UguzHub", 
+        loading = "Yükleniyor", subtitle = "Lütfen Dilinizi Seçin", greeting = "Hoş Geldin", sectionTitle = "Sistem Ayarları", openBtn = "UguzHub", 
         warningText = "Lütfen Delta Ayarlarındaki Tüm Her Şeyi Kapattığınızdan Emin Olun. Oyun Deneyiminizi En Üst Seviyeye Çıkarmak İstiyoruz",
-        discordBtn = "Discord Bağlantısını Kopyala", discordCopied = "Discord Bağlantısı Kopyalandı!",
-        espAll = "ESP Herkesi Göster", espGun = "ESP Yerdeki Silah", autoGrab = "Oto Silah Al", tpGrab = "Işınlanıp Silahı Al",
-        aimbot = "Aimbot Kilitle", autoKillMurd = "Oto Katili Öldür", killMurd = "Katili Öldür", killAll = "Herkesi Öldür (Katil)",
+        discordBtn = "Discord Sunucusuna Katıl", discordCopied = "Bağlantı Kopyalandı!",
+        espAll = "Oyuncu ESP", espGun = "Yerdeki Silah ESP", autoGrab = "Otomatik Silah Topla", tpGrab = "Işınlanıp Silahı Al",
+        aimbot = "Aimbot Kilitlenme", autoKillMurd = "Oto Katili Avla", killMurd = "Katili Öldür", killAll = "Herkesi Katlet (Katil)",
         autoFlingMurd = "Katili Savur (Fling)", autoFlingSheriff = "Şerifi Savur (Fling)", autoFlingAll = "Herkesi Savur (Fling)",
-        tpLobby = "Lobiye Işınlan", tpMap = "Haritaya Işınlan", tpMurd = "Katile Işınlan", tpSheriff = "Şerife Işınlan",
-        tabESP = "ESP", tabAimbot = "Aimbot", tabPlayers = "Oyuncular", tabTP = "Işınlanma", tabSettings = "Ayarlar"
+        tpLobby = "Lobiye Dön", tpMap = "Haritaya Geç", tpMurd = "Katile Işınlan", tpSheriff = "Şerife Işınlan",
+        tabESP = "Görüş (ESP)", tabAimbot = "Hedef (Aimbot)", tabPlayers = "Oyuncular", tabTP = "Işınlanma", tabSettings = "Ayarlar"
     },
     EN = {
-        loading = "Loading", subtitle = "Select your language", greeting = "How are you today", sectionTitle = "Settings", openBtn = "UguzHub", 
+        loading = "Loading", subtitle = "Select your language", greeting = "Welcome back", sectionTitle = "System Settings", openBtn = "UguzHub", 
         warningText = "Please Make Sure To Turn Off Everything In Delta Settings. We Want To Maximize Your Gaming Experience",
-        discordBtn = "Copy Discord Link", discordCopied = "Discord Link Copied!",
-        espAll = "ESP All Players", espGun = "ESP Dropped Gun", autoGrab = "Auto Grab Gun", tpGrab = "TP Grab Gun",
+        discordBtn = "Join Discord Server", discordCopied = "Link Copied!",
+        espAll = "Player ESP", espGun = "Dropped Gun ESP", autoGrab = "Auto Grab Gun", tpGrab = "TP Grab Gun",
         aimbot = "Aimbot Lock", autoKillMurd = "Auto Kill Murderer", killMurd = "Kill Murderer", killAll = "Kill All (As Murderer)",
         autoFlingMurd = "Auto Fling Murderer", autoFlingSheriff = "Auto Fling Sheriff", autoFlingAll = "Auto Fling All",
         tpLobby = "TP to Lobby", tpMap = "TP to Map", tpMurd = "TP to Murderer", tpSheriff = "TP to Sheriff",
-        tabESP = "ESP", tabAimbot = "Aimbot", tabPlayers = "Players", tabTP = "Teleport", tabSettings = "Settings"
+        tabESP = "ESP Visuals", tabAimbot = "Aimbot", tabPlayers = "Players", tabTP = "Teleport", tabSettings = "Settings"
     },
     RU = {
-        loading = "Загрузка", subtitle = "Выберите язык", greeting = "Как дела сегодня", sectionTitle = "Настройки", openBtn = "UguzHub", 
+        loading = "Загрузка", subtitle = "Выберите ваш язык", greeting = "Добро пожаловать", sectionTitle = "Системные Настройки", openBtn = "UguzHub", 
         warningText = "Пожалуйста, убедитесь, что вы отключили все в настройках Delta. Мы хотим максимизировать ваш игровой опыт",
-        discordBtn = "Копировать ссылку Discord", discordCopied = "Ссылка скопирована!",
-        espAll = "ESP Все Игроки", espGun = "ESP Оружие на полу", autoGrab = "Авто Подбор Оружия", tpGrab = "ТП Подбор Оружия",
+        discordBtn = "Присоединиться к Discord", discordCopied = "Ссылка скопирована!",
+        espAll = "ESP Игроков", espGun = "ESP Оружия", autoGrab = "Авто Подбор Оружия", tpGrab = "ТП Подбор Оружия",
         aimbot = "Аимбот Захват", autoKillMurd = "Авто Убийство Убийцы", killMurd = "Убить Убийцу", killAll = "Убить Всех (За Убийцу)",
         autoFlingMurd = "Авто Флинг Убийцы", autoFlingSheriff = "Авто Флинг Шерифа", autoFlingAll = "Авто Флинг Всех",
         tpLobby = "ТП в Лобби", tpMap = "ТП на Карту", tpMurd = "ТП к Убийце", tpSheriff = "ТП к Шерифу",
-        tabESP = "ESP", tabAimbot = "Аимбот", tabPlayers = "Игроки", tabTP = "Телепорт", tabSettings = "Настройки"
+        tabESP = "Визyал (ESP)", tabAimbot = "Аимбот", tabPlayers = "Игроки", tabTP = "Телепорт", tabSettings = "Настройки"
     },
     DE = {
-        loading = "Wird geladen", subtitle = "Wähle deine Sprache", greeting = "Wie geht es dir heute", sectionTitle = "Einstellungen", openBtn = "UguzHub", 
+        loading = "Wird geladen", subtitle = "Wähle deine Sprache", greeting = "Willkommen", sectionTitle = "Einstellungen", openBtn = "UguzHub", 
         warningText = "Bitte stelle sicher, dass du alles in den Delta-Einstellungen ausgeschaltet hast.",
-        discordBtn = "Discord-Link kopieren", discordCopied = "Link kopiert!",
-        espAll = "ESP Alle Spieler", espGun = "ESP Waffe am Boden", autoGrab = "Auto Waffe aufheben", tpGrab = "TP Waffe aufheben",
-        aimbot = "Aimbot Sperre", autoKillMurd = "Auto Mörder töten", killMurd = "Mörder töten", killAll = "Alle töten (Als Mörder)",
+        discordBtn = "Discord Beitreten", discordCopied = "Link kopiert!",
+        espAll = "Spieler ESP", espGun = "Waffen ESP", autoGrab = "Auto Waffe Aufheben", tpGrab = "TP Waffe Aufheben",
+        aimbot = "Aimbot Sperre", autoKillMurd = "Auto Mörder Töten", killMurd = "Mörder Töten", killAll = "Alle Töten (Als Mörder)",
         autoFlingMurd = "Auto Mörder Fling", autoFlingSheriff = "Auto Sheriff Fling", autoFlingAll = "Auto Alle Fling",
         tpLobby = "TP zur Lobby", tpMap = "TP zur Karte", tpMurd = "TP zum Mörder", tpSheriff = "TP zum Sheriff",
-        tabESP = "ESP", tabAimbot = "Aimbot", tabPlayers = "Spieler", tabTP = "Teleport", tabSettings = "Einstellungen"
+        tabESP = "ESP Visuell", tabAimbot = "Aimbot", tabPlayers = "Spieler", tabTP = "Teleport", tabSettings = "Einstellungen"
     },
     FR = {
-        loading = "Chargement", subtitle = "Choisissez votre langue", greeting = "Comment vas-tu aujourd'hui", sectionTitle = "Paramètres", openBtn = "UguzHub", 
+        loading = "Chargement", subtitle = "Choisissez votre langue", greeting = "Bienvenue", sectionTitle = "Paramètres Système", openBtn = "UguzHub", 
         warningText = "Veuillez vous assurer de tout désactiver dans les paramètres Delta.",
-        discordBtn = "Copier le lien Discord", discordCopied = "Lien copié !",
-        espAll = "ESP Tous les Joueurs", espGun = "ESP Arme au Sol", autoGrab = "Auto Ramasser Arme", tpGrab = "TP Ramasser Arme",
+        discordBtn = "Rejoindre le Discord", discordCopied = "Lien copié !",
+        espAll = "ESP Joueurs", espGun = "ESP Arme au Sol", autoGrab = "Auto Ramasser Arme", tpGrab = "TP Ramasser Arme",
         aimbot = "Aimbot Verrouillage", autoKillMurd = "Auto Tuer Meurtrier", killMurd = "Tuer Meurtrier", killAll = "Tuer Tous (Meurtrier)",
         autoFlingMurd = "Auto Fling Meurtrier", autoFlingSheriff = "Auto Fling Shérif", autoFlingAll = "Auto Fling Tous",
         tpLobby = "TP au Lobby", tpMap = "TP à la Carte", tpMurd = "TP au Meurtrier", tpSheriff = "TP au Shérif",
-        tabESP = "ESP", tabAimbot = "Aimbot", tabPlayers = "Joueurs", tabTP = "Téléportation", tabSettings = "Paramètres"
+        tabESP = "Visuels ESP", tabAimbot = "Aimbot", tabPlayers = "Joueurs", tabTP = "Téléportation", tabSettings = "Paramètres"
     },
     ES = {
-        loading = "Cargando", subtitle = "Selecciona tu idioma", greeting = "¿Cómo estás hoy", sectionTitle = "Ajustes", openBtn = "UguzHub", 
+        loading = "Cargando", subtitle = "Selecciona tu idioma", greeting = "Bienvenido", sectionTitle = "Ajustes del Sistema", openBtn = "UguzHub", 
         warningText = "Asegúrate de desactivar todo en la configuración de Delta.",
-        discordBtn = "Copiar enlace de Discord", discordCopied = "¡Enlace copiado!",
-        espAll = "ESP Todos los Jugadores", espGun = "ESP Arma en Suelo", autoGrab = "Auto Recoger Arma", tpGrab = "TP Recoger Arma",
+        discordBtn = "Unirse al Discord", discordCopied = "¡Enlace copiado!",
+        espAll = "ESP Jugadores", espGun = "ESP Armas", autoGrab = "Auto Recoger Arma", tpGrab = "TP Recoger Arma",
         aimbot = "Aimbot Fijar", autoKillMurd = "Auto Matar Asesino", killMurd = "Matar Asesino", killAll = "Matar Todos (Asesino)",
         autoFlingMurd = "Auto Fling Asesino", autoFlingSheriff = "Auto Fling Alguacil", autoFlingAll = "Auto Fling Todos",
         tpLobby = "TP al Lobby", tpMap = "TP al Mapa", tpMurd = "TP al Asesino", tpSheriff = "TP al Alguacil",
-        tabESP = "ESP", tabAimbot = "Aimbot", tabPlayers = "Jugadores", tabTP = "Teletransporte", tabSettings = "Ajustes"
+        tabESP = "Visuales ESP", tabAimbot = "Aimbot", tabPlayers = "Jugadores", tabTP = "Teletransporte", tabSettings = "Ajustes"
     },
     AR = {
-        loading = "جار التحميل", subtitle = "اختر لغتك", greeting = "كيف حالك اليوم", sectionTitle = "الإعدادات", openBtn = "UguzHub", 
+        loading = "جار التحميل", subtitle = "اختر لغتك", greeting = "مرحباً بك", sectionTitle = "إعدادات النظام", openBtn = "UguzHub", 
         warningText = "يرجى التأكد من إيقاف تشغيل كل شيء في إعدادات ديلتا.",
-        discordBtn = "نسخ رابط ديسكورد", discordCopied = "تم النسخ!",
-        espAll = "رؤية الجميع ESP", espGun = "رؤية السلاح ESP", autoGrab = "التقاط السلاح تلقائياً", tpGrab = "الانتقال السريع للسلاح",
+        discordBtn = "الانضمام لسيرفر الديسكورد", discordCopied = "تم النسخ!",
+        espAll = "رؤية اللاعبين ESP", espGun = "رؤية السلاح ESP", autoGrab = "التقاط السلاح تلقائياً", tpGrab = "الانتقال السريع للسلاح",
         aimbot = "التصويب التلقائي", autoKillMurd = "قتل القاتل تلقائياً", killMurd = "قتل القاتل", killAll = "قتل الجميع",
         autoFlingMurd = "رمي القاتل تلقائياً", autoFlingSheriff = "رمي الشريف تلقائياً", autoFlingAll = "رمي الجميع",
         tpLobby = "انتقال للانتظار", tpMap = "انتقال للخريطة", tpMurd = "انتقال للقاتل", tpSheriff = "انتقال للشريف",
-        tabESP = "رؤية", tabAimbot = "تصويب", tabPlayers = "اللاعبون", tabTP = "الانتقال", tabSettings = "الإعدادات"
+        tabESP = "رؤية ESP", tabAimbot = "تصويب", tabPlayers = "اللاعبون", tabTP = "الانتقال", tabSettings = "الإعدادات"
     },
     ZH = {
-        loading = "加载中", subtitle = "选择你的语言", greeting = "你今天好吗", sectionTitle = "设置", openBtn = "UguzHub", 
+        loading = "加载中", subtitle = "选择你的语言", greeting = "欢迎回来", sectionTitle = "系统设置", openBtn = "UguzHub", 
         warningText = "请确保关闭 Delta 设置中的所有内容。",
-        discordBtn = "复制 Discord 链接", discordCopied = "已复制链接！",
-        espAll = "ESP 显示所有玩家", espGun = "ESP 显示地上枪械", autoGrab = "自动捡枪", tpGrab = "传送捡枪",
+        discordBtn = "加入 Discord 服务器", discordCopied = "已复制链接！",
+        espAll = "玩家 透视", espGun = "地面枪械 透视", autoGrab = "自动拾取枪械", tpGrab = "传送拾取枪械",
         aimbot = "自瞄锁定", autoKillMurd = "自动击杀杀手", killMurd = "击杀杀手", killAll = "全杀（仅限杀手）",
         autoFlingMurd = "自动甩飞杀手", autoFlingSheriff = "自动甩飞警官", autoFlingAll = "自动甩飞所有人",
         tpLobby = "传送到大厅", tpMap = "传送到地图", tpMurd = "传送到杀手", tpSheriff = "传送到警官",
-        tabESP = "透视", tabAimbot = "自瞄", tabPlayers = "玩家", tabTP = "传送", tabSettings = "设置"
+        tabESP = "透视视觉", tabAimbot = "自瞄", tabPlayers = "玩家", tabTP = "传送", tabSettings = "设置"
     }
 }
 
@@ -140,7 +139,7 @@ local CurrentLang = "EN"
 local L = Lang[CurrentLang]
 
 ------------------------------------------------------------
--- HİLE DURUM BAYRAKLARI (FLAGS) & MOTORLAR
+-- HİLE BAYRAKLARI & MOTORLARI
 ------------------------------------------------------------
 local Flags = {
     ESPAll = false, ESPGun = false, AutoGrabGun = false,
@@ -206,7 +205,7 @@ task.spawn(function()
 end)
 
 ------------------------------------------------------------
--- ARAYÜZ YARDIMCILARI
+-- YARDIMCI BİLEŞENLER
 ------------------------------------------------------------
 local function create(class, props, children)
     local inst = Instance.new(class)
@@ -216,7 +215,7 @@ local function create(class, props, children)
 end
 
 local function corner(radius) return create("UICorner", { CornerRadius = UDim.new(0, radius or RADIUS) }) end
-local function stroke(color, thickness) return create("UIStroke", { Color = color or Theme.Stroke, Thickness = thickness or 1, Transparency = 0.4 }) end
+local function stroke(color, thickness) return create("UIStroke", { Color = color or Theme.Stroke, Thickness = thickness or 1, Transparency = 0.3 }) end
 local function tween(obj, props, duration, style, direction)
     local info = TweenInfo.new(duration or 0.3, style or Enum.EasingStyle.Quint, direction or Enum.EasingDirection.Out)
     local t = TweenService:Create(obj, info, props)
@@ -225,60 +224,128 @@ local function tween(obj, props, duration, style, direction)
 end
 
 ------------------------------------------------------------
--- ANA GUI
+-- ANA GUI CONTAINER
 ------------------------------------------------------------
-local ScreenGui = create("ScreenGui", { Name = "UguzHubV2Pro", ResetOnSpawn = false, ZIndexBehavior = Enum.ZIndexBehavior.Sibling, DisplayOrder = 999, IgnoreGuiInset = true })
+local ScreenGui = create("ScreenGui", { Name = "UguzHubModern", ResetOnSpawn = false, ZIndexBehavior = Enum.ZIndexBehavior.Sibling, DisplayOrder = 999, IgnoreGuiInset = true })
 ScreenGui.Parent = PlayerGui
 
 ------------------------------------------------------------
--- DİNAMİK AÇILIŞ ANIMASYONLU GİRİŞ EKRANI
+-- YENİLENMİŞ ÇİZGİ ANİMASYONLU YÜKLEME EKRANI & DİL SEÇİMİ
 ------------------------------------------------------------
-local IntroFrame = create("Frame", { Name = "Intro", Size = UDim2.fromScale(1, 1), Position = UDim2.fromScale(0, 0), BackgroundColor3 = Theme.Background, ZIndex = 10 })
-IntroFrame.Parent = ScreenGui
+local LoadingFrame = create("Frame", {
+    Name = "Loading",
+    Size = UDim2.fromScale(1, 1),
+    Position = UDim2.fromScale(0, 0),
+    BorderSizePixel = 0,
+    BackgroundColor3 = Theme.Background,
+    BackgroundTransparency = 0,
+    ZIndex = 50,
+})
+LoadingFrame.Parent = ScreenGui
 
-local IntroContent = create("Frame", { Name = "IntroContent", AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, 420, 0, 340), BackgroundTransparency = 1, ZIndex = 11 })
-IntroContent.Parent = IntroFrame
+local Content = create("Frame", {
+    Name = "Content",
+    AnchorPoint = Vector2.new(0.5, 0.5),
+    Position = UDim2.new(0.5, 0, 0.42, 0),
+    Size = UDim2.new(0, 360, 0, 140),
+    BackgroundTransparency = 1,
+    ZIndex = 51,
+})
+Content.Parent = LoadingFrame
 
-local LogoLabel = create("TextLabel", { Text = "UguzHub", Font = Enum.Font.GothamBlack, TextSize = 44, TextColor3 = Theme.Text, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 45), Position = UDim2.new(0, 0, 0, -130), TextTransparency = 1, ZIndex = 11, TextXAlignment = Enum.TextXAlignment.Center })
-LogoLabel.Parent = IntroContent
+local LogoLabel = create("TextLabel", {
+    Text = "UguzHub",
+    Font = Enum.Font.GothamBlack,
+    TextSize = 50,
+    TextColor3 = Theme.Text,
+    BackgroundTransparency = 1,
+    Size = UDim2.new(1, 0, 0, 60),
+    Position = UDim2.new(0, 0, 0, 0),
+    TextTransparency = 1,
+    ZIndex = 51,
+})
+LogoLabel.Parent = Content
 
-local ProTag = create("TextLabel", { Text = "V2 PRO", Font = Enum.Font.GothamBold, TextSize = 16, TextColor3 = Theme.Accent, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 20), Position = UDim2.new(0, 0, 0, -85), TextTransparency = 1, ZIndex = 11, TextXAlignment = Enum.TextXAlignment.Center })
-ProTag.Parent = IntroContent
+local ProTag = create("TextLabel", {
+    Text = "V2 PRO",
+    Font = Enum.Font.GothamBold,
+    TextSize = 18,
+    TextColor3 = Theme.Accent,
+    BackgroundTransparency = 1,
+    Size = UDim2.new(1, 0, 0, 22),
+    Position = UDim2.new(0, 0, 0, 58),
+    TextTransparency = 1,
+    ZIndex = 51,
+})
+ProTag.Parent = Content
 
-local LoadingLabel = create("TextLabel", { Text = L.loading, Font = Enum.Font.GothamMedium, TextSize = 15, TextColor3 = Theme.SubText, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 24), Position = UDim2.new(0, 0, 0, -45), TextTransparency = 1, ZIndex = 11, TextXAlignment = Enum.TextXAlignment.Center })
-LoadingLabel.Parent = IntroContent
+local Underline = create("Frame", {
+    Name = "Underline",
+    Size = UDim2.new(0, 0, 0, 3),
+    Position = UDim2.new(0.5, 0, 0, 88),
+    AnchorPoint = Vector2.new(0.5, 0),
+    BackgroundColor3 = Theme.Accent,
+    BorderSizePixel = 0,
+    ZIndex = 51,
+})
+corner(2).Parent = Underline
+Underline.Parent = Content
 
-local SubtitleLabel = create("TextLabel", { Text = L.subtitle, Font = Enum.Font.Gotham, TextSize = 14, TextColor3 = Theme.SubText, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 22), Position = UDim2.new(0, 0, 0, -115), TextTransparency = 1, ZIndex = 11, Visible = false, TextXAlignment = Enum.TextXAlignment.Center })
-SubtitleLabel.Parent = IntroContent
+local LoadingLabel = create("TextLabel", {
+    Text = "Loading",
+    Font = Enum.Font.GothamMedium,
+    TextSize = 17,
+    TextColor3 = Theme.SubText,
+    BackgroundTransparency = 1,
+    Size = UDim2.new(1, 0, 0, 24),
+    Position = UDim2.new(0, 0, 0, 108),
+    TextTransparency = 1,
+    ZIndex = 51,
+})
+LoadingLabel.Parent = Content
 
-local LangHolder = create("Frame", { Name = "LangHolder", AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 15), Size = UDim2.new(0, 400, 0, 180), BackgroundTransparency = 1, ZIndex = 11, Visible = false })
-LangHolder.Parent = IntroContent
+local SubtitleLabel = create("TextLabel", {
+    Text = "",
+    Font = Enum.Font.GothamMedium,
+    TextSize = 15,
+    TextColor3 = Theme.SubText,
+    BackgroundTransparency = 1,
+    Size = UDim2.new(1, 0, 0, 22),
+    Position = UDim2.new(0.5, -180, 0, 110),
+    TextTransparency = 1,
+    ZIndex = 51,
+    Visible = false
+})
+SubtitleLabel.Parent = Content
 
-create("UIGridLayout", { CellSize = UDim2.new(0, 92, 0, 75), CellPadding = UDim2.new(0, 8, 0, 8), HorizontalAlignment = Enum.HorizontalAlignment.Center, VerticalAlignment = Enum.VerticalAlignment.Center }).Parent = LangHolder
+local LangHolder = create("Frame", { Name = "LangHolder", AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 145), Size = UDim2.new(0, 420, 0, 170), BackgroundTransparency = 1, ZIndex = 51, Visible = false })
+LangHolder.Parent = Content
+
+create("UIGridLayout", { CellSize = UDim2.new(0, 96, 0, 72), CellPadding = UDim2.new(0, 8, 0, 8), HorizontalAlignment = Enum.HorizontalAlignment.Center, VerticalAlignment = Enum.VerticalAlignment.Center }).Parent = LangHolder
 
 ------------------------------------------------------------
--- MİNİMİZE BUTON
+-- MİNİMİZE BUTONU (FLOATING FAB BUTTON)
 ------------------------------------------------------------
-local MinimizedButton = create("TextButton", { Name = "MinimizedButton", Text = "🔵 " .. L.openBtn, Font = Enum.Font.GothamBold, TextSize = 15, TextColor3 = Theme.Text, BackgroundColor3 = Theme.Blue, Size = UDim2.new(0, 118, 0, 38), Position = UDim2.new(1, -134, 0, 16), AutoButtonColor = false, Visible = false, ZIndex = 8 })
-corner(12).Parent = MinimizedButton
+local MinimizedButton = create("TextButton", { Name = "MinimizedButton", Text = "⚡ UguzHub", Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = Theme.Text, BackgroundColor3 = Theme.Accent, Size = UDim2.new(0, 110, 0, 36), Position = UDim2.new(1, -126, 0, 18), AutoButtonColor = false, Visible = false, ZIndex = 40 })
+corner(10).Parent = MinimizedButton
 stroke(Color3.fromRGB(255, 255, 255), 1).Parent = MinimizedButton
 MinimizedButton.Parent = ScreenGui
 
 ------------------------------------------------------------
--- UYARI EKRANI & ANA MENÜ SİSTEMİ
+-- UYARI & ANA MENÜ YÖNETİMİ
 ------------------------------------------------------------
 local MainFrame, buildMainMenu, closeMenu, openMenu
 
 local function showWarningScreen()
-    local WarnFrame = create("Frame", { Name = "WarnFrame", Size = UDim2.fromScale(1, 1), Position = UDim2.fromScale(0, 0), BackgroundColor3 = Theme.Background, BackgroundTransparency = 1, ZIndex = 20 })
+    local WarnFrame = create("Frame", { Name = "WarnFrame", Size = UDim2.fromScale(1, 1), Position = UDim2.fromScale(0, 0), BackgroundColor3 = Theme.Background, BackgroundTransparency = 1, ZIndex = 60 })
     WarnFrame.Parent = ScreenGui
 
-    local WarnBox = create("Frame", { Size = UDim2.new(0, 400, 0, 190), Position = UDim2.fromScale(0.5, 0.5), AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Theme.Card, BackgroundTransparency = 1, ZIndex = 21 })
+    local WarnBox = create("Frame", { Size = UDim2.new(0, 420, 0, 180), Position = UDim2.fromScale(0.5, 0.5), AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Theme.Card, BackgroundTransparency = 1, ZIndex = 61 })
     corner(16).Parent = WarnBox
     stroke(Theme.Accent, 1.5).Parent = WarnBox
     WarnBox.Parent = WarnFrame
 
-    local WarnText = create("TextLabel", { Text = "", Font = Enum.Font.GothamBold, TextSize = 14, TextColor3 = Theme.Text, TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Center, TextYAlignment = Enum.TextYAlignment.Center, Size = UDim2.new(1, -40, 1, -40), Position = UDim2.fromScale(0.5, 0.5), AnchorPoint = Vector2.new(0.5, 0.5), BackgroundTransparency = 1, TextTransparency = 1, ZIndex = 22 })
+    local WarnText = create("TextLabel", { Text = "", Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = Theme.Text, TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Center, TextYAlignment = Enum.TextYAlignment.Center, Size = UDim2.new(1, -40, 1, -40), Position = UDim2.fromScale(0.5, 0.5), AnchorPoint = Vector2.new(0.5, 0.5), BackgroundTransparency = 1, TextTransparency = 1, ZIndex = 62 })
     WarnText.Parent = WarnBox
 
     tween(WarnFrame, { BackgroundTransparency = 0.2 }, 0.4)
@@ -291,14 +358,14 @@ local function showWarningScreen()
             task.wait(1)
         end
         
-        tween(WarnFrame, { BackgroundTransparency = 1 }, 0.5)
-        tween(WarnBox, { BackgroundTransparency = 1 }, 0.5)
-        tween(WarnText, { TextTransparency = 1 }, 0.5)
-        task.wait(0.5)
+        tween(WarnFrame, { BackgroundTransparency = 1 }, 0.4)
+        tween(WarnBox, { BackgroundTransparency = 1 }, 0.4)
+        tween(WarnText, { TextTransparency = 1 }, 0.4)
+        task.wait(0.4)
         WarnFrame:Destroy()
 
         buildMainMenu()
-        MinimizedButton.Text = "🔵 " .. L.openBtn
+        MinimizedButton.Text = "⚡ " .. L.openBtn
         MinimizedButton.Visible = true
         MinimizedButton.BackgroundTransparency = 1
         tween(MinimizedButton, { BackgroundTransparency = 0 }, 0.3)
@@ -306,7 +373,7 @@ local function showWarningScreen()
 end
 
 ------------------------------------------------------------
--- DİL SEÇİMİ VE TAM DİL DEĞİŞİMİ
+-- DİL SEÇİMİ SİSTEMİ
 ------------------------------------------------------------
 local langCards = {}
 
@@ -320,24 +387,27 @@ local function selectLanguage(code)
     end
 
     task.delay(0.2, function()
-        tween(IntroFrame, { BackgroundTransparency = 1 }, 0.4)
-        for _, obj in ipairs({ LogoLabel, ProTag, SubtitleLabel }) do tween(obj, { TextTransparency = 1 }, 0.3) end
+        tween(LoadingFrame, { BackgroundTransparency = 1 }, 0.5)
+        tween(LogoLabel, { TextTransparency = 1 }, 0.4)
+        tween(ProTag, { TextTransparency = 1 }, 0.4)
+        tween(SubtitleLabel,{ TextTransparency = 1 }, 0.4)
+        tween(Underline, { BackgroundTransparency = 1 }, 0.4)
         for _, card in ipairs(langCards) do tween(card, { BackgroundTransparency = 1 }, 0.25) end
-        task.wait(0.4)
-        IntroFrame.Visible = false
+        task.wait(0.5)
+        LoadingFrame.Visible = false
 
         showWarningScreen()
     end)
 end
 
 for i, opt in ipairs(LanguageOptions) do
-    local card = create("TextButton", { Name = opt.code, Text = "", AutoButtonColor = false, BackgroundColor3 = Theme.Card, BackgroundTransparency = 1, LayoutOrder = i, ZIndex = 11 })
-    corner(12).Parent = card
+    local card = create("TextButton", { Name = opt.code, Text = "", AutoButtonColor = false, BackgroundColor3 = Theme.Card, BackgroundTransparency = 1, LayoutOrder = i, ZIndex = 52 })
+    corner(10).Parent = card
     stroke().Parent = card
     card:SetAttribute("Code", opt.code)
 
-    create("TextLabel", { Text = opt.flag, Font = Enum.Font.GothamBold, TextSize = 22, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 28), Position = UDim2.new(0, 0, 0, 10), TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 12 }).Parent = card
-    create("TextLabel", { Text = opt.name, Font = Enum.Font.GothamMedium, TextSize = 11, TextColor3 = Theme.Text, BackgroundTransparency = 1, Size = UDim2.new(1, -4, 0, 18), Position = UDim2.new(0, 2, 0, 42), TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 12 }).Parent = card
+    create("TextLabel", { Text = opt.flag, Font = Enum.Font.GothamBold, TextSize = 20, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 26), Position = UDim2.new(0, 0, 0, 8), TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 53 }).Parent = card
+    create("TextLabel", { Text = opt.name, Font = Enum.Font.GothamMedium, TextSize = 11, TextColor3 = Theme.Text, BackgroundTransparency = 1, Size = UDim2.new(1, -4, 0, 18), Position = UDim2.new(0, 2, 0, 40), TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 53 }).Parent = card
 
     card.MouseButton1Click:Connect(function() selectLanguage(opt.code) end)
     card.Parent = LangHolder
@@ -345,17 +415,19 @@ for i, opt in ipairs(LanguageOptions) do
 end
 
 ------------------------------------------------------------
--- 7 SANİYELİK ÖZEL AÇILIŞ ANIMASYONU
+-- 5 SANİYELİK YÜKLEME VE ÇİZGİ ÇİZİLME ANİMASYONU
 ------------------------------------------------------------
 task.defer(function()
-    tween(LogoLabel, { TextTransparency = 0 }, 0.5)
-    tween(ProTag, { TextTransparency = 0 }, 0.5)
+    tween(LogoLabel, { TextTransparency = 0 }, 0.6)
+    tween(ProTag, { TextTransparency = 0 }, 0.6)
+    task.wait(0.15)
+    tween(Underline, { Size = UDim2.new(0, 240, 0, 3) }, 0.6, Enum.EasingStyle.Quart)
     task.wait(0.2)
-    tween(LoadingLabel, { TextTransparency = 0 }, 0.3)
+    tween(LoadingLabel, { TextTransparency = 0 }, 0.4)
 
     local dotsRunning = true
     task.spawn(function()
-        local states = { L.loading, L.loading .. ".", L.loading .. "..", L.loading .. "..." }
+        local states = { "Loading", "Loading.", "Loading..", "Loading..." }
         local i = 1
         while dotsRunning do
             LoadingLabel.Text = states[i]
@@ -364,7 +436,7 @@ task.defer(function()
         end
     end)
 
-    task.wait(7.0) -- TAM 7 SANİYE YÜKLEME ANIMASYONU
+    task.wait(5) -- Tam 5 Saniyelik Çizgili Yükleme Animasyonu
     dotsRunning = false
 
     tween(LoadingLabel, { TextTransparency = 1 }, 0.3)
@@ -375,6 +447,7 @@ task.defer(function()
     SubtitleLabel.Visible = true
     LangHolder.Visible = true
     tween(SubtitleLabel, { TextTransparency = 0 }, 0.4)
+
     for i, card in ipairs(langCards) do
         card.BackgroundTransparency = 1
         task.delay(0.02 * i, function() tween(card, { BackgroundTransparency = 0 }, 0.25) end)
@@ -382,9 +455,9 @@ task.defer(function()
 end)
 
 ------------------------------------------------------------
--- DİNAMİK ANA MENÜ OLUŞTURMA (SEÇİLEN DİLE GÖRE)
+-- MODERNLEŞTİRİLMİŞ ANA MENÜ DİZAYNI
 ------------------------------------------------------------
-local MENU_W, MENU_H = 480, 280
+local MENU_W, MENU_H = 500, 300
 
 function buildMainMenu()
     if MainFrame then MainFrame:Destroy() end
@@ -394,34 +467,32 @@ function buildMainMenu()
     stroke(Theme.Accent, 1.5).Parent = MainFrame
     MainFrame.Parent = ScreenGui
 
-    local BackgroundArt = create("ImageLabel", { Name = "BackgroundArt", Image = "rbxassetid://15732257423", Size = UDim2.new(1, 0, 1, 0), BackgroundTransparency = 1, ImageTransparency = 0.15, ScaleType = Enum.ScaleType.Crop, ZIndex = 1 })
-    corner(RADIUS).Parent = BackgroundArt
-    BackgroundArt.Parent = MainFrame
-
-    local TopBar = create("Frame", { Size = UDim2.new(1, 0, 0, 36), BackgroundColor3 = Theme.Sidebar, BackgroundTransparency = CARD_TRANSPARENCY, ZIndex = 6, Active = true })
+    -- Top Header Bar
+    local TopBar = create("Frame", { Size = UDim2.new(1, 0, 0, 38), BackgroundColor3 = Theme.Sidebar, BackgroundTransparency = CARD_TRANSPARENCY, ZIndex = 6, Active = true })
     corner(RADIUS).Parent = TopBar
     TopBar.Parent = MainFrame
 
-    create("TextLabel", { Text = "UguzHub  •  V2 Pro", Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = Theme.Text, BackgroundTransparency = 1, Size = UDim2.new(1, -56, 1, 0), Position = UDim2.new(0, 12, 0, 0), TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 7 }).Parent = TopBar
+    create("TextLabel", { Text = "UguzHub  •  V2 Pro", Font = Enum.Font.GothamBlack, TextSize = 13, TextColor3 = Theme.Text, BackgroundTransparency = 1, Size = UDim2.new(1, -56, 1, 0), Position = UDim2.new(0, 14, 0, 0), TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 7 }).Parent = TopBar
 
-    local MinimizeBtn = create("TextButton", { Text = "–", Font = Enum.Font.GothamBold, TextSize = 18, TextColor3 = Theme.SubText, BackgroundTransparency = 1, Size = UDim2.new(0, 32, 0, 32), Position = UDim2.new(1, -34, 0, 2), ZIndex = 7 })
+    local MinimizeBtn = create("TextButton", { Text = "✕", Font = Enum.Font.GothamBold, TextSize = 14, TextColor3 = Theme.SubText, BackgroundTransparency = 1, Size = UDim2.new(0, 32, 0, 32), Position = UDim2.new(1, -36, 0, 3), ZIndex = 7 })
     MinimizeBtn.Parent = TopBar
     MinimizeBtn.MouseButton1Click:Connect(function() closeMenu() end)
 
-    local Sidebar = create("Frame", { Size = UDim2.new(0, 110, 1, -42), Position = UDim2.new(0, 6, 0, 40), BackgroundColor3 = Theme.Sidebar, BackgroundTransparency = CARD_TRANSPARENCY, ZIndex = 6 })
+    -- Sidebar Area
+    local Sidebar = create("Frame", { Size = UDim2.new(0, 125, 1, -46), Position = UDim2.new(0, 8, 0, 42), BackgroundColor3 = Theme.Sidebar, BackgroundTransparency = CARD_TRANSPARENCY, ZIndex = 6 })
     corner(10).Parent = Sidebar
     Sidebar.Parent = MainFrame
 
-    local TabContainer = create("Frame", { Size = UDim2.new(1, -128, 1, -42), Position = UDim2.new(0, 122, 0, 40), BackgroundTransparency = 1, ZIndex = 6 })
+    local TabContainer = create("Frame", { Size = UDim2.new(1, -147, 1, -46), Position = UDim2.new(0, 139, 0, 42), BackgroundTransparency = 1, ZIndex = 6 })
     TabContainer.Parent = MainFrame
 
-    create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 4) }).Parent = Sidebar
+    create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 5) }).Parent = Sidebar
 
     local pages = {}
     local tabBtns = {}
 
     local function addTab(name, icon)
-        local btn = create("TextButton", { Size = UDim2.new(1, 0, 0, 30), BackgroundColor3 = Theme.Card, BackgroundTransparency = 0.5, Font = Enum.Font.GothamMedium, Text = icon .. " " .. name, TextColor3 = Theme.SubText, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 7 })
+        local btn = create("TextButton", { Size = UDim2.new(1, 0, 0, 32), BackgroundColor3 = Theme.Card, BackgroundTransparency = 0.6, Font = Enum.Font.GothamMedium, Text = " " .. icon .. "  " .. name, TextColor3 = Theme.SubText, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 7 })
         corner(8).Parent = btn
         btn.Parent = Sidebar
 
@@ -443,17 +514,18 @@ function buildMainMenu()
     end
 
     local function createToggle(parent, labelText, flag)
-        local frame = create("Frame", { Size = UDim2.new(1, -6, 0, 30), BackgroundColor3 = Theme.Card, BackgroundTransparency = CARD_TRANSPARENCY })
+        local frame = create("Frame", { Size = UDim2.new(1, -6, 0, 32), BackgroundColor3 = Theme.Card, BackgroundTransparency = CARD_TRANSPARENCY })
         corner(8).Parent = frame
+        stroke(Theme.Stroke, 1).Parent = frame
         frame.Parent = parent
 
-        create("TextLabel", { Text = labelText, Font = Enum.Font.Gotham, TextColor3 = Theme.Text, TextSize = 10, BackgroundTransparency = 1, Size = UDim2.new(0.7, 0, 1, 0), Position = UDim2.new(0, 8, 0, 0), TextXAlignment = Enum.TextXAlignment.Left }).Parent = frame
+        create("TextLabel", { Text = labelText, Font = Enum.Font.GothamMedium, TextColor3 = Theme.Text, TextSize = 11, BackgroundTransparency = 1, Size = UDim2.new(0.7, 0, 1, 0), Position = UDim2.new(0, 10, 0, 0), TextXAlignment = Enum.TextXAlignment.Left }).Parent = frame
 
-        local switch = create("Frame", { Size = UDim2.new(0, 28, 0, 14), Position = UDim2.new(1, -34, 0.5, -7), BackgroundColor3 = Color3.fromRGB(40, 40, 45) })
+        local switch = create("Frame", { Size = UDim2.new(0, 30, 0, 15), Position = UDim2.new(1, -38, 0.5, -7), BackgroundColor3 = Color3.fromRGB(35, 35, 48) })
         corner(10).Parent = switch
         switch.Parent = frame
 
-        local dot = create("Frame", { Size = UDim2.new(0, 10, 0, 10), Position = UDim2.new(0, 2, 0.5, -5), BackgroundColor3 = Color3.fromRGB(200, 200, 200) })
+        local dot = create("Frame", { Size = UDim2.new(0, 11, 0, 11), Position = UDim2.new(0, 2, 0.5, -5), BackgroundColor3 = Color3.fromRGB(180, 180, 195) })
         corner(10).Parent = dot
         dot.Parent = switch
 
@@ -463,30 +535,28 @@ function buildMainMenu()
         btn.MouseButton1Click:Connect(function()
             Flags[flag] = not Flags[flag]
             if Flags[flag] then
-                switch.BackgroundColor3 = Theme.Accent
-                dot.Position = UDim2.new(1, -12, 0.5, -5)
-                dot.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                tween(switch, { BackgroundColor3 = Theme.Accent }, 0.2)
+                tween(dot, { Position = UDim2.new(1, -13, 0.5, -5), BackgroundColor3 = Color3.fromRGB(255, 255, 255) }, 0.2)
             else
-                switch.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-                dot.Position = UDim2.new(0, 2, 0.5, -5)
-                dot.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+                tween(switch, { BackgroundColor3 = Color3.fromRGB(35, 35, 48) }, 0.2)
+                tween(dot, { Position = UDim2.new(0, 2, 0.5, -5), BackgroundColor3 = Color3.fromRGB(180, 180, 195) }, 0.2)
             end
         end)
     end
 
     local function createButton(parent, labelText, callback)
-        local btn = create("TextButton", { Size = UDim2.new(1, -6, 0, 30), BackgroundColor3 = Theme.Card, Font = Enum.Font.GothamBold, Text = labelText, TextColor3 = Theme.Text, TextSize = 10 })
+        local btn = create("TextButton", { Size = UDim2.new(1, -6, 0, 32), BackgroundColor3 = Theme.Card, Font = Enum.Font.GothamBold, Text = labelText, TextColor3 = Theme.Text, TextSize = 11 })
         corner(8).Parent = btn
         stroke(Theme.Accent, 1).Parent = btn
         btn.Parent = parent
         btn.MouseButton1Click:Connect(function() if callback then callback() end end)
     end
 
-    -- TABLAR VE METİNLER SEÇİLEN DİLE GÖRE YÜKLENİR (L.tabESP, L.espAll vb.)
+    -- TABLAR SEÇİLEN DİLE GÖRE YÜKLENİR
     local ESPTab = addTab(L.tabESP, "👁")
     local AimbotTab = addTab(L.tabAimbot, "🎯")
-    local PlayersTab = addTab(L.tabPlayers, "👤")
-    local TeleportTab = addTab(L.tabTP, "🌀")
+    local PlayersTab = addTab(L.tabPlayers, "👥")
+    local TeleportTab = addTab(L.tabTP, "🚀")
     local SettingsTab = addTab(L.tabSettings, "⚙")
 
     -- ESP TAB
@@ -566,19 +636,19 @@ function buildMainMenu()
     -- SETTINGS TAB
     create("TextLabel", { Text = L.sectionTitle, Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = Theme.SubText, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 18), TextXAlignment = Enum.TextXAlignment.Left }).Parent = SettingsTab
 
-    local AvatarFrame = create("Frame", { Size = UDim2.new(0, 44, 0, 44), Position = UDim2.new(0, 4, 0, 24), BackgroundColor3 = Theme.Card, BackgroundTransparency = CARD_TRANSPARENCY })
-    corner(22).Parent = AvatarFrame
+    local AvatarFrame = create("Frame", { Size = UDim2.new(0, 42, 0, 42), Position = UDim2.new(0, 4, 0, 24), BackgroundColor3 = Theme.Card, BackgroundTransparency = CARD_TRANSPARENCY })
+    corner(21).Parent = AvatarFrame
     stroke(Theme.Accent, 2).Parent = AvatarFrame
     AvatarFrame.Parent = SettingsTab
 
     local AvatarImage = create("ImageLabel", { Size = UDim2.new(1, -4, 1, -4), Position = UDim2.new(0, 2, 0, 2), BackgroundTransparency = 1, Image = "rbxthumb://type=AvatarHeadShot&id=" .. LocalPlayer.UserId .. "&w=150&h=150" })
-    corner(22).Parent = AvatarImage
+    corner(21).Parent = AvatarImage
     AvatarImage.Parent = AvatarFrame
 
-    create("TextLabel", { Text = LocalPlayer.DisplayName .. " (@" .. LocalPlayer.Name .. ")", Font = Enum.Font.GothamBold, TextSize = 11, TextColor3 = Theme.Text, BackgroundTransparency = 1, Size = UDim2.new(1, -58, 0, 18), Position = UDim2.new(0, 56, 0, 25), TextXAlignment = Enum.TextXAlignment.Left }).Parent = SettingsTab
-    create("TextLabel", { Text = L.greeting .. ", " .. LocalPlayer.DisplayName .. "?", Font = Enum.Font.Gotham, TextSize = 10, TextColor3 = Theme.SubText, BackgroundTransparency = 1, Size = UDim2.new(1, -58, 0, 16), Position = UDim2.new(0, 56, 0, 43), TextXAlignment = Enum.TextXAlignment.Left }).Parent = SettingsTab
+    create("TextLabel", { Text = LocalPlayer.DisplayName .. " (@" .. LocalPlayer.Name .. ")", Font = Enum.Font.GothamBold, TextSize = 11, TextColor3 = Theme.Text, BackgroundTransparency = 1, Size = UDim2.new(1, -56, 0, 18), Position = UDim2.new(0, 54, 0, 25), TextXAlignment = Enum.TextXAlignment.Left }).Parent = SettingsTab
+    create("TextLabel", { Text = L.greeting .. ", " .. LocalPlayer.DisplayName .. "!", Font = Enum.Font.Gotham, TextSize = 10, TextColor3 = Theme.SubText, BackgroundTransparency = 1, Size = UDim2.new(1, -56, 0, 16), Position = UDim2.new(0, 54, 0, 43), TextXAlignment = Enum.TextXAlignment.Left }).Parent = SettingsTab
 
-    local DiscordBtn = create("TextButton", { Size = UDim2.new(1, -6, 0, 30), Position = UDim2.new(0, 0, 0, 78), BackgroundColor3 = Theme.Card, Font = Enum.Font.GothamBold, Text = L.discordBtn, TextColor3 = Theme.Text, TextSize = 10 })
+    local DiscordBtn = create("TextButton", { Size = UDim2.new(1, -6, 0, 32), Position = UDim2.new(0, 0, 0, 78), BackgroundColor3 = Theme.Card, Font = Enum.Font.GothamBold, Text = L.discordBtn, TextColor3 = Theme.Text, TextSize = 11 })
     corner(8).Parent = DiscordBtn
     stroke(Theme.Blue, 1).Parent = DiscordBtn
     DiscordBtn.Parent = SettingsTab
@@ -614,7 +684,7 @@ end
 MinimizedButton.MouseButton1Click:Connect(function() if MainFrame then openMenu() end end)
 
 ------------------------------------------------------------
--- ARKA PLAN RENDER DÖNGÜSÜ (ESP & AIMBOT)
+-- ESP VE AIMBOT ENGINE
 ------------------------------------------------------------
 RunService.RenderStepped:Connect(function()
     if Flags.ESPAll then
