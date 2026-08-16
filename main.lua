@@ -1,4 +1,4 @@
--- [[ UguzHub V2 VIP - Modern UI, Auto Farm, Shot Murderer & Aimbot ]] --
+-- [[ UguzHub V2 VIP - Modern UI, Smooth Auto Farm (Tween) & Mobile UI ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -6,7 +6,6 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local CoreGui = game:GetService("CoreGui")
-local Lighting = game:GetService("Lighting")
 local Clipboard = setclipboard or toclipboard or syn and syn.clipboard
 
 local LocalPlayer = Players.LocalPlayer
@@ -19,7 +18,6 @@ if LocalPlayer.AccountAge < 14 then
     return
 end
 
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local Camera = Workspace.CurrentCamera
 
 ------------------------------------------------------------
@@ -41,48 +39,47 @@ local CARD_TRANSPARENCY = 0.15
 local RADIUS = 14
 
 ------------------------------------------------------------
--- DİL PAKETLERİ (TÜRK BAYRAĞI HER ZAMAN EN ÜSTTE)
+-- DİL PAKETLERİ (TÜRK BAYRAĞI EN ÜSTTE, FLİPİNCE EKLENDİ)
 ------------------------------------------------------------
 local Lang = {
     TR = {
         loading = "Yükleniyor", subtitle = "Lütfen Dilinizi Seçin", greeting = "Hoş Geldin", sectionTitle = "Sistem Ayarları", openBtn = "UguzHub", 
         warningText = "Lütfen Delta Ayarlarındaki Tüm Her Şeyi Kapattığınızdan Emin Olun. Oyun Deneyiminizi En Üst Seviyeye Çıkarmak İstiyoruz",
         discordBtn = "Discord Sunucusuna Katıl", discordCopied = "Bağlantı Kopyalandı!",
-        espAll = "Oyuncu ESP", espGun = "Yerdeki Silah ESP", autoGrab = "Otomatik Silah Topla", tpGrab = "Işınlanıp Silahı Al",
+        espAll = "Oyuncu ESP", espGun = "Yerdeki Silah ESP", autoGrab = "Otomatik Silah Topla", tpGrab = "Smooth Silaha Git",
         aimbot = "Aimbot Kilitlenme", autoKillMurd = "Oto Katili Avla", killMurd = "Katili Öldür", killAll = "Herkesi Katlet (Katil)",
-        autoFarm = "Otomatik Altın Topla (Auto Farm)",
+        autoFarm = "Smooth Auto Farm (Anti-Kick)",
         autoFlingMurd = "Katili Savur (Fling)", autoFlingSheriff = "Şerifi Savur (Fling)", autoFlingAll = "Herkesi Savur (Fling)",
         tpLobby = "Lobiye Dön", tpMap = "Haritaya Geç", tpMurd = "Katile Işınlan", tpSheriff = "Şerife Işınlan",
-        tabESP = "Görüş (ESP)", tabAimbot = "Hedef (Aimbot)", tabPlayers = "Oyuncular", tabTP = "Işınlanma", tabSettings = "Ayarlar"
+        tabESP = "Görüş (ESP)", tabAimbot = "Hedef (Aimbot)", tabPlayers = "Oto Farm & Oyuncu", tabTP = "Işınlanma", tabSettings = "Ayarlar"
     },
-    RU = {
-        loading = "Загрузка", subtitle = "Выберите ваш язык", greeting = "Добро пожаловать", sectionTitle = "Системные Настройки", openBtn = "UguzHub", 
-        warningText = "Пожалуйста, убедитесь, что вы отключили все в настройках Delta. Мы хотим максимизировать ваш игровой опыт",
-        discordBtn = "Присоединиться к Discord", discordCopied = "Ссылка скопирована!",
-        espAll = "ESP Игроков", espGun = "ESP Оружия", autoGrab = "Авто Подбор Оружия", tpGrab = "ТП Подбор Оружия",
-        aimbot = "Аимбот Захват", autoKillMurd = "Авто Убийство Убийцы", killMurd = "Убить Убийцу", killAll = "Убить Всех (За Убийцу)",
-        autoFarm = "Авто Фарм Монет",
-        autoFlingMurd = "Авто Флинг Убийцы", autoFlingSheriff = "Авто Флинг Шерифа", autoFlingAll = "Авто Флинг Всех",
-        tpLobby = "ТП в Лобби", tpMap = "ТП на Карту", tpMurd = "ТП к Убийце", tpSheriff = "ТП к Шерифу",
-        tabESP = "Визyал (ESP)", tabAimbot = "Аимбот", tabPlayers = "Игроки", tabTP = "Телепорт", tabSettings = "Настройки"
+    TL = { -- Tagalog / Filpince
+        loading = "Naglo-load", subtitle = "Pumili ng Wika", greeting = "Maligayang Pagdating", sectionTitle = "Mga Setting ng Sistema", openBtn = "UguzHub", 
+        warningText = "Mangyaring Siguraduhing Naka-off Ang Lahat Sa Delta Settings. Nais Naming Pagbutihin Ang Inyong Karanasan Sa Paglalaro",
+        discordBtn = "Sumali sa Discord Server", discordCopied = "Na-copy na ang Link!",
+        espAll = "ESP ng Manlalaro", espGun = "ESP ng Baril sa Lupa", autoGrab = "Kusa Kumuha ng Baril", tpGrab = "Smooth Punta sa Baril",
+        aimbot = "Aimbot Lock", autoKillMurd = "Auto Patayin ang Murderer", killMurd = "Patayin ang Murderer", killAll = "Patayin Lahat (Bilang Murderer)",
+        autoFarm = "Smooth Auto Farm (Anti-Kick)",
+        autoFlingMurd = "Auto Fling Murderer", autoFlingSheriff = "Auto Fling Sheriff", autoFlingAll = "Auto Fling Lahat",
+        tpLobby = "TP sa Lobby", tpMap = "TP sa Map", tpMurd = "TP sa Murderer", tpSheriff = "TP sa Sheriff",
+        tabESP = "ESP Visuals", tabAimbot = "Aimbot", tabPlayers = "Farm & Manlalaro", tabTP = "Teleport", tabSettings = "Mga Setting"
     },
     EN = {
         loading = "Loading", subtitle = "Select your language", greeting = "Welcome back", sectionTitle = "System Settings", openBtn = "UguzHub", 
         warningText = "Please Make Sure To Turn Off Everything In Delta Settings. We Want To Maximize Your Gaming Experience",
         discordBtn = "Join Discord Server", discordCopied = "Link Copied!",
-        espAll = "Player ESP", espGun = "Dropped Gun ESP", autoGrab = "Auto Grab Gun", tpGrab = "TP Grab Gun",
+        espAll = "Player ESP", espGun = "Dropped Gun ESP", autoGrab = "Auto Grab Gun", tpGrab = "Smooth Go To Gun",
         aimbot = "Aimbot Lock", autoKillMurd = "Auto Kill Murderer", killMurd = "Kill Murderer", killAll = "Kill All (As Murderer)",
-        autoFarm = "Auto Farm Coins",
+        autoFarm = "Smooth Auto Farm (Anti-Kick)",
         autoFlingMurd = "Auto Fling Murderer", autoFlingSheriff = "Auto Fling Sheriff", autoFlingAll = "Auto Fling All",
         tpLobby = "TP to Lobby", tpMap = "TP to Map", tpMurd = "TP to Murderer", tpSheriff = "TP to Sheriff",
-        tabESP = "ESP Visuals", tabAimbot = "Aimbot", tabPlayers = "Players", tabTP = "Teleport", tabSettings = "Settings"
+        tabESP = "ESP Visuals", tabAimbot = "Aimbot", tabPlayers = "Farm & Players", tabTP = "Teleport", tabSettings = "Settings"
     }
 }
 
--- TÜRK BAYRAĞI HER ZAMAN İLK SIRADA
 local LanguageOptions = {
     { code = "TR", flag = "🇹🇷", name = "Türkçe" },
-    { code = "RU", flag = "🇷🇺", name = "Русский" },
+    { code = "TL", flag = "🇵🇭", name = "Tagalog" },
     { code = "EN", flag = "🇬🇧", name = "English" }
 }
 
@@ -119,26 +116,59 @@ local function getRole(player)
 end
 
 ------------------------------------------------------------
--- AUTO FARM & KILL ALL MOTORU
+-- SMOOTH TWEEN GOTO SİSTEMİ (ANTİ-KICK AUTO FARM)
 ------------------------------------------------------------
--- AUTO FARM (Her 0.5 saniyede bir en yakın altını toplar)
+local isFarming = false
+
+local function tweenGoto(targetCFrame, speed)
+    local char = LocalPlayer.Character
+    local root = char and char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+
+    speed = speed or 28
+    local distance = (root.Position - targetCFrame.Position).Magnitude
+    local duration = distance / speed
+
+    local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle.Linear)
+    local tween = TweenService:Create(root, tweenInfo, { CFrame = targetCFrame })
+    
+    tween:Play()
+    return tween
+end
+
+-- SMART AUTO FARM LOOP
 task.spawn(function()
-    while task.wait(0.5) do
-        if Flags.AutoFarm then
+    while task.wait(0.2) do
+        if Flags.AutoFarm and not isFarming then
             local char = LocalPlayer.Character
             local root = char and char:FindFirstChild("HumanoidRootPart")
             if root then
+                local closestCoin = nil
+                local shortestDistance = math.huge
+
                 for _, obj in ipairs(Workspace:GetDescendants()) do
                     if (obj:IsA("BasePart") or obj:IsA("MeshPart")) and obj.Name:lower():find("coin") and obj.Transparency < 0.9 then
-                        root.CFrame = obj.CFrame
+                        local dist = (root.Position - obj.Position).Magnitude
+                        if dist < shortestDistance then
+                            shortestDistance = dist
+                            closestCoin = obj
+                        end
+                    end
+                end
+
+                if closestCoin then
+                    isFarming = true
+                    local tw = tweenGoto(closestCoin.CFrame, 32)
+                    if tw then
+                        tw.Completed:Wait()
                         pcall(function()
                             if firetouchinterest then
-                                firetouchinterest(root, obj, 0)
-                                firetouchinterest(root, obj, 1)
+                                firetouchinterest(root, closestCoin, 0)
+                                firetouchinterest(root, closestCoin, 1)
                             end
                         end)
-                        break
                     end
+                    isFarming = false
                 end
             end
         end
@@ -399,7 +429,7 @@ task.defer(function()
     SubtitleLabel.Text = L.subtitle
     SubtitleLabel.Visible = true
     LangHolder.Visible = true
-        tween(SubtitleLabel, { TextTransparency = 0 }, 0.4)
+    tween(SubtitleLabel, { TextTransparency = 0 }, 0.4)
 
     for i, card in ipairs(langCards) do
         card.BackgroundTransparency = 1
@@ -408,7 +438,7 @@ task.defer(function()
 end)
 
 ------------------------------------------------------------
--- KARE SHOT MURDERER BUTONU (DOLMALI & KİLİTLENMELİ)
+-- KARE SHOT MURDERER BUTONU (ZIPLAMA TUŞUNUN ÜSTÜNDE)
 ------------------------------------------------------------
 local ShotSquareButton = Instance.new("TextButton")
 local SquareCorner = Instance.new("UICorner")
@@ -419,7 +449,7 @@ local ButtonIcon = Instance.new("TextLabel")
 
 ShotSquareButton.Name = "ShotSquareButton"
 ShotSquareButton.Parent = ScreenGui
-ShotSquareButton.Position = UDim2.new(0.85, 0, 0.7, 0)
+ShotSquareButton.Position = UDim2.new(0.82, -110, 0.65, -60)
 ShotSquareButton.Size = UDim2.new(0, 55, 0, 55)
 ShotSquareButton.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
 ShotSquareButton.Text = ""
@@ -456,12 +486,11 @@ ButtonIcon.ZIndex = 101
 local isHoldingLock = false
 
 ShotSquareButton.MouseButton1Click:Connect(function()
-    -- Tek tıkta anlık Katili vur
     local myChar = LocalPlayer.Character
     if myChar and myChar:FindFirstChild("HumanoidRootPart") then
         for _, p in pairs(Players:GetPlayers()) do
             if p ~= LocalPlayer and getRole(p) == "Murderer" and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                myChar.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
+                tweenGoto(p.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3), 100)
             end
         end
     end
@@ -592,15 +621,7 @@ function buildMainMenu()
     createToggle(ESPTab, L.autoGrab, "AutoGrabGun")
     createButton(ESPTab, L.tpGrab, function()
         local gunDrop = Workspace:FindFirstChild("GunDrop") or Workspace:FindFirstChild("Gun")
-        local myHrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if gunDrop and myHrp then
-            local oldCFrame = myHrp.CFrame
-            myHrp.CFrame = gunDrop.CFrame
-            task.wait(0.15)
-            if firetouchinterest then firetouchinterest(myHrp, gunDrop, 0); firetouchinterest(myHrp, gunDrop, 1) end
-            task.wait(0.1)
-            myHrp.CFrame = oldCFrame
-        end
+        if gunDrop then tweenGoto(gunDrop.CFrame, 35) end
     end)
 
     -- AIMBOT TAB
@@ -614,7 +635,7 @@ function buildMainMenu()
         if myChar and myChar:FindFirstChild("HumanoidRootPart") then
             for _, p in pairs(Players:GetPlayers()) do
                 if p ~= LocalPlayer and getRole(p) == "Murderer" and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                    myChar.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
+                    tweenGoto(p.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3), 40)
                 end
             end
         end
@@ -628,28 +649,21 @@ function buildMainMenu()
 
     -- TELEPORT TAB
     createButton(TeleportTab, L.tpLobby, function()
-        local myHrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if myHrp then myHrp.CFrame = CFrame.new(-108, 140, 82) end
+        tweenGoto(CFrame.new(-108, 140, 82), 40)
     end)
     createButton(TeleportTab, L.tpMap, function()
-        local myHrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if not myHrp then return end
         for _, child in pairs(Workspace:GetChildren()) do
             if child:FindFirstChild("Spawns") or child:FindFirstChild("CoinContainer") then
                 local spawnPart = child:FindFirstChild("Spawns") and child.Spawns:FindFirstChildWhichIsA("BasePart") or child:FindFirstChildWhichIsA("BasePart", true)
-                if spawnPart then myHrp.CFrame = spawnPart.CFrame + Vector3.new(0, 3, 0); break end
+                if spawnPart then tweenGoto(spawnPart.CFrame + Vector3.new(0, 3, 0), 40); break end
             end
         end
     end)
     createButton(TeleportTab, L.tpMurd, function()
-        local myHrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if not myHrp then return end
-        for _, p in pairs(Players:GetPlayers()) do if p ~= LocalPlayer and getRole(p) == "Murderer" and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then myHrp.CFrame = p.Character.HumanoidRootPart.CFrame + Vector3.new(0, 2, 0); break end end
+        for _, p in pairs(Players:GetPlayers()) do if p ~= LocalPlayer and getRole(p) == "Murderer" and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then tweenGoto(p.Character.HumanoidRootPart.CFrame + Vector3.new(0, 2, 0), 40); break end end
     end)
     createButton(TeleportTab, L.tpSheriff, function()
-        local myHrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if not myHrp then return end
-        for _, p in pairs(Players:GetPlayers()) do if p ~= LocalPlayer and getRole(p) == "Sheriff" and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then myHrp.CFrame = p.Character.HumanoidRootPart.CFrame + Vector3.new(0, 2, 0); break end end
+        for _, p in pairs(Players:GetPlayers()) do if p ~= LocalPlayer and getRole(p) == "Sheriff" and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then tweenGoto(p.Character.HumanoidRootPart.CFrame + Vector3.new(0, 2, 0), 40); break end end
     end)
 
     -- SETTINGS TAB
@@ -737,13 +751,8 @@ RunService.RenderStepped:Connect(function()
             gunDrop.GunHighlight:Destroy()
         end
 
-        if Flags.AutoGrabGun and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            if firetouchinterest then
-                firetouchinterest(LocalPlayer.Character.HumanoidRootPart, gunDrop, 0)
-                firetouchinterest(LocalPlayer.Character.HumanoidRootPart, gunDrop, 1)
-            else
-                LocalPlayer.Character.HumanoidRootPart.CFrame = gunDrop.CFrame
-            end
+        if Flags.AutoGrabGun then
+            tweenGoto(gunDrop.CFrame, 35)
         end
     end
 
@@ -765,4 +774,3 @@ RunService.RenderStepped:Connect(function()
         end
     end
 end)
- 
