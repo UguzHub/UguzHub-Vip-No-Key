@@ -1,5 +1,5 @@
 --[[
-    UguzHub V2 Pro - Full Sürüm (Şeffaf Arayüz, 8 Dil Desteği, Profil, Discord ve Tüm Fonksiyonlar)
+    UguzHub V2 Pro - Full Sürüm (Auto Farm, Tween/Teleport, Kill All, Şeffaf Arayüz, 4 Dil Desteği)
 ]]
 
 local Players = game:GetService("Players")
@@ -18,7 +18,7 @@ if CoreGui:FindFirstChild("UguzHubV2Pro") then
 end
 
 ------------------------------------------------------------
--- ÖZELLİK BAYRAKLARI (TÜM İŞLEVLER)
+-- ÖZELLİK BAYRAKLARI (TÜM İŞLEVLER + AUTO FARM / KILL ALL)
 ------------------------------------------------------------
 local Flags = {
     SpeedWalk = false,
@@ -37,6 +37,10 @@ local Flags = {
     AutoShoot = false,
     KillAura = false,
     AutoGrabGun = false,
+    
+    AutoFarm = false,
+    FarmMode = "Teleport", -- "Teleport" veya "Tween"
+    KillAllActive = false,
     
     Fullbright = false
 }
@@ -60,7 +64,7 @@ local Theme = {
 local RADIUS = 14
 
 ------------------------------------------------------------
--- DİL PAKETLERİ (8 dil, delta ayar uyarısı dahil tam çeviri)
+-- DİL PAKETLERİ (4 Dil: TR, EN, RU, DE)
 ------------------------------------------------------------
 local Lang = {}
 
@@ -68,7 +72,7 @@ Lang.TR = {
     loading = "Yükleniyor",
     subtitle = "Dilinizi seçin",
     openBtn = "UguzHub",
-    notice = "Sizlere daha iyi bir deneyim sunmak amacıyla lütfen delta ayarlarindaki tüm izinleri Kapattığınıza emin olun[span_0](start_span)[span_0](end_span).",
+    notice = "Sizlere daha iyi bir deneyim sunmak amacıyla lütfen delta ayarlarindaki tüm izinleri Kapattığınıza emin olun.",
 }
 
 Lang.EN = {
@@ -85,20 +89,6 @@ Lang.RU = {
     notice = "Чтобы обеспечить вам лучший опыт, пожалуйста, убедитесь, что отключили все разрешения в настройках delta.",
 }
 
-Lang.ES = {
-    loading = "Cargando",
-    subtitle = "Selecciona tu idioma",
-    openBtn = "UguzHub",
-    notice = "Para brindarte una mejor experiencia, asegúrate de desactivar todos los permisos en la configuración de delta.",
-}
-
-Lang.AR = {
-    loading = "جار التحميل",
-    subtitle = "اختر لغتك",
-    openBtn = "UguzHub",
-    notice = "لزويدك بتجربة أفضل، يرجى التأكد من إيقاف تشغيل جميع الأذونات في إعدادات delta.",
-}
-
 Lang.DE = {
     loading = "Wird geladen",
     subtitle = "Wähle deine Sprache",
@@ -106,32 +96,14 @@ Lang.DE = {
     notice = "Um Ihnen ein besseres Erlebnis zu bieten, stellen Sie bitte sicher, dass Sie alle Berechtigungen in den Delta-Einstellungen deaktivieren.",
 }
 
-Lang.FR = {
-    loading = "Chargement",
-    subtitle = "Choisissez votre langue",
-    openBtn = "UguzHub",
-    notice = "Pour vous offrir une meilleure expérience, assurez-vous de désactiver toutes les autorisations dans les paramètres delta.",
-}
-
-Lang.PH = {
-    loading = "Naglo-load",
-    subtitle = "Piliin ang iyong wika",
-    openBtn = "UguzHub",
-    notice = "Para mabigyan ka ng mas magandang karanasan, siguraduhing i-off ang lahat ng mga pahintulot sa mga setting ng delta.",
-}
-
 ------------------------------------------------------------
--- 8 DİL SEÇENEĞİ
+-- 4 DİL SEÇENEĞİ
 ------------------------------------------------------------
 local LanguageOptions = {
     { code = "TR", flag = "🇹🇷", name = "Türkçe" },
     { code = "EN", flag = "🇬🇧", name = "English" },
     { code = "RU", flag = "🇷🇺", name = "Русский" },
-    { code = "ES", flag = "🇪🇸", name = "Español" },
-    { code = "AR", flag = "🇸🇦", name = "العربية" },
     { code = "DE", flag = "🇩🇪", name = "Deutsch" },
-    { code = "FR", flag = "🇫🇷", name = "Français" },
-    { code = "PH", flag = "🇵🇭", name = "Filipino" },
 }
 
 local CurrentLang = "EN"
@@ -151,6 +123,78 @@ local function getRole(plr)
     end
     return "Innocent"
 end
+
+-- KILL ALL FONKSİYONU
+local function executeKillAll()
+    local myChar = LocalPlayer.Character
+    if not myChar then return end
+    local knife = myChar:FindFirstChild("Knife") or (LocalPlayer.Backpack and LocalPlayer.Backpack:FindFirstChild("Knife"))
+    if not knife then return end
+    knife.Parent = myChar
+    
+    local knifeHandle = knife:FindFirstChild("Handle") or knife:FindFirstChildWithClass("BasePart")
+    local myHrp = myChar:FindFirstChild("HumanoidRootPart")
+    if not myHrp then return end
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if not Flags.KillAllActive then break end
+        if player ~= LocalPlayer and player.Character then
+            local targetHrp = player.Character:FindFirstChild("HumanoidRootPart")
+            local hum = player.Character:FindFirstChildOfClass("Humanoid")
+            if targetHrp and hum and hum.Health > 0 then
+                myHrp.CFrame = targetHrp.CFrame * CFrame.new(0, 0, 1)
+                task.wait(0.05)
+                pcall(function()
+                    if firetouchinterest and knifeHandle then
+                        firetouchinterest(knifeHandle, targetHrp, 0)
+                        firetouchinterest(knifeHandle, targetHrp, 1)
+                    end
+                    knife:Activate()
+                end)
+                task.wait(0.1)
+            end
+        end
+    end
+    Flags.KillAllActive = false
+end
+
+-- AUTO FARM DÖNGÜSÜ (Teleport & Tween Modlu)
+task.spawn(function()
+    while task.wait(0.5) do
+        if Flags.AutoFarm then
+            pcall(function()
+                local char = LocalPlayer.Character
+                local root = char and char:FindFirstChild("HumanoidRootPart")
+                if root then
+                    for _, obj in ipairs(Workspace:GetDescendants()) do
+                        if not Flags.AutoFarm then break end
+                        if (obj:IsA("BasePart") or obj:IsA("MeshPart")) and obj.Name:lower():find("coin") and obj.Transparency < 0.9 then
+                            if Flags.FarmMode == "Tween" then
+                                local distance = (root.Position - obj.Position).Magnitude
+                                local speed = 250
+                                local tweenInfo = TweenInfo.new(distance / speed, Enum.EasingStyle.Linear)
+                                local tween = TweenService:Create(root, tweenInfo, {CFrame = obj.CFrame})
+                                tween:Play()
+                                tween.Completed:Wait()
+                            else
+                                root.CFrame = obj.CFrame
+                            end
+                            
+                            pcall(function()
+                                if firetouchinterest then
+                                    firetouchinterest(root, obj, 0)
+                                    firetouchinterest(root, obj, 1)
+                                end
+                            end)
+                            task.wait(0.1)
+                            break
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
 
 RunService.RenderStepped:Connect(function()
     pcall(function()
@@ -296,7 +340,7 @@ local ScreenGui = create("ScreenGui", {
 ScreenGui.Parent = CoreGui
 
 ------------------------------------------------------------
--- GİRİŞ EKRANI (Yükleme + Dil)
+-- GİRİŞ EKRANI (Yükleme + 4'lü Dil Seçimi)
 ------------------------------------------------------------
 local IntroFrame = create("Frame", {
     Name = "Intro",
@@ -386,7 +430,7 @@ SubtitleLabel.Parent = IntroContent
 local LangHolder = create("Frame", {
     Name = "LangHolder",
     Position = UDim2.new(0, 0, 0, 150),
-    Size = UDim2.new(1, 0, 0, 200),
+    Size = UDim2.new(1, 0, 0, 100),
     BackgroundTransparency = 1,
     ZIndex = 11,
     Visible = false,
@@ -394,14 +438,14 @@ local LangHolder = create("Frame", {
 LangHolder.Parent = IntroContent
 
 create("UIGridLayout", {
-    CellSize = UDim2.new(0, 84, 0, 92),
-    CellPadding = UDim2.new(0, 6, 0, 6),
+    CellSize = UDim2.new(0, 80, 0, 92),
+    CellPadding = UDim2.new(0, 8, 0, 0),
     HorizontalAlignment = Enum.HorizontalAlignment.Center,
     SortOrder = Enum.SortOrder.LayoutOrder,
 }).Parent = LangHolder
 
 ------------------------------------------------------------
--- 7 SANİYELİK UYARI EKRANI (Dile duyarlı ve 10'dan geri sayımlı)
+-- UYARI EKRANI
 ------------------------------------------------------------
 local NoticeFrame = create("Frame", {
     Name = "Notice",
@@ -450,7 +494,7 @@ stroke(Color3.fromRGB(255, 255, 255), 1).Parent = MinimizedButton
 MinimizedButton.Parent = ScreenGui
 
 ------------------------------------------------------------
--- İLERİDE OLUŞTURULACAK FONKSİYONLAR
+-- MENÜ KONTROLÜ
 ------------------------------------------------------------
 local MainFrame
 local buildMainMenu
@@ -549,7 +593,7 @@ for i, opt in ipairs(LanguageOptions) do
 
     card.MouseEnter:Connect(function()
         if CurrentLang ~= opt.code then
-            tween(card, { BackgroundColor3 = Theme.AccentSoft }, 0.15)
+            tween(card, { BackgroundColor3 = 3 = Theme.AccentSoft }, 0.15)
         end
     end)
     card.MouseLeave:Connect(function()
@@ -566,7 +610,7 @@ for i, opt in ipairs(LanguageOptions) do
 end
 
 ------------------------------------------------------------
--- GİRİŞ AKIŞI (5 saniye yükleme)
+-- GİRİŞ AKIŞI
 ------------------------------------------------------------
 task.defer(function()
     tween(LogoLabel, { TextTransparency = 0 }, 0.6)
@@ -626,7 +670,6 @@ function buildMainMenu()
     stroke(Theme.Stroke, 2).Parent = MainFrame
     MainFrame.Parent = ScreenGui
 
-    -- Başlık Çubuğu
     local Header = create("Frame", {
         Size = UDim2.new(1, 0, 0, 36),
         BackgroundColor3 = Theme.Sidebar,
@@ -663,7 +706,6 @@ function buildMainMenu()
         closeMenu()
     end)
 
-    -- Sağ Sekme Menüsü (Sidebar)
     local Sidebar = create("Frame", {
         Size = UDim2.new(0, 130, 1, -36),
         Position = UDim2.new(1, -130, 0, 36),
@@ -787,7 +829,7 @@ function buildMainMenu()
     local TeleTab   = addTab("Teleport", "Teleport")
 
     ------------------------------------------------------------
-    -- MAIN SEKME İÇERİĞİ (Profil + Discord Kopyalama)
+    -- MAIN SEKME İÇERİĞİ
     ------------------------------------------------------------
     local ProfileCard = create("Frame", {
         Size = UDim2.new(1, -4, 0, 85),
@@ -880,6 +922,49 @@ function buildMainMenu()
         end)
     end)
 
+    createToggle(MainTab, "Auto Farm (Coin Topla)", "AutoFarm")
+
+    local ModeBtn = create("TextButton", {
+        Size = UDim2.new(1, -4, 0, 34),
+        BackgroundColor3 = Theme.Card,
+        BackgroundTransparency = 0.25,
+        Text = "  Farm Mode: Teleport",
+        TextColor3 = Theme.Text,
+        Font = Enum.Font.Gotham,
+        TextSize = 11,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Parent = MainTab,
+        ZIndex = 6,
+    })
+    corner(6).Parent = ModeBtn
+    ModeBtn.MouseButton1Click:Connect(function()
+        if Flags.FarmMode == "Teleport" then
+            Flags.FarmMode = "Tween"
+            ModeBtn.Text = "  Farm Mode: Tween"
+        else
+            Flags.FarmMode = "Teleport"
+            ModeBtn.Text = "  Farm Mode: Teleport"
+        end
+    end)
+
+    local KillAllBtn = create("TextButton", {
+        Size = UDim2.new(1, -4, 0, 34),
+        BackgroundColor3 = Color3.fromRGB(150, 40, 40),
+        BackgroundTransparency = 0.2,
+        Text = "  Kill All (Herkesi Katlet)",
+        TextColor3 = Theme.Text,
+        Font = Enum.Font.GothamBold,
+        TextSize = 11,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Parent = MainTab,
+        ZIndex = 6,
+    })
+    corner(6).Parent = KillAllBtn
+    KillAllBtn.MouseButton1Click:Connect(function()
+        Flags.KillAllActive = true
+        task.spawn(executeKillAll)
+    end)
+
     createToggle(MainTab, "Speed Walk (Hız)", "SpeedWalk")
     createToggle(MainTab, "Jump Power (Zıplama)", "JumpPower")
     createToggle(MainTab, "Infinite Jump (Sınırsız Zıpla)", "InfiniteJump")
@@ -926,9 +1011,6 @@ function buildMainMenu()
     tabBtns["Main"].BackgroundColor3 = Theme.Card
     tabBtns["Main"].TextColor3 = Theme.Accent
 
-    ------------------------------------------------------------
-    -- SÜRÜKLEME ÖZELLİĞİ
-    ------------------------------------------------------------
     local dragging, dragStart, startPos
     Header.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -949,9 +1031,6 @@ function buildMainMenu()
     end)
 end
 
-------------------------------------------------------------
--- AÇ / KAPA YÖNETİMİ
-------------------------------------------------------------
 function openMenu()
     MinimizedButton.Visible = false
     MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
