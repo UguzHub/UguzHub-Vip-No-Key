@@ -1,4 +1,4 @@
--- [[ UguzHub V2 Pro - MM2 Full Feature Integration ]] --
+-- [[ UguzHub V2 Pro - MM2 Full Feature Integration & UI Fixed ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -146,7 +146,7 @@ local function superFling(targetPlayer)
     bav.AngularVelocity = Vector3.new(0, 9999999, 0)
     bav.Parent = myHrp
 
-    for i = 1, 20 do
+    for i = 1, 15 do
         if not targetHrp or not targetHrp.Parent or not myHrp or not myHrp.Parent then break end
         for _, part in pairs(myChar:GetChildren()) do
             if part:IsA("BasePart") then part.CanCollide = false end
@@ -164,7 +164,7 @@ local function superFling(targetPlayer)
 end
 
 task.spawn(function()
-    while task.wait(0.1) do
+    while task.wait(0.15) do
         if Flags.AutoFlingMurderer then
             for _, p in pairs(Players:GetPlayers()) do
                 if p ~= LocalPlayer and getRole(p) == "Murderer" and Flags.AutoFlingMurderer then superFling(p) end
@@ -219,13 +219,13 @@ local ScreenGui = create("ScreenGui", {
     Name = "UguzHubV2Pro",
     ResetOnSpawn = false,
     ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
-    DisplayOrder = 50,
+    DisplayOrder = 999, -- Her şeyin üstünde kalması için artırıldı
     IgnoreGuiInset = true,
 })
 ScreenGui.Parent = PlayerGui
 
 ------------------------------------------------------------
--- GİRİŞ EKRANI
+-- GİRİŞ EKRANI (TAM MERKEZ HİZALAMASI DÜZELTİLDİ)
 ------------------------------------------------------------
 local IntroFrame = create("Frame", {
     Name = "Intro",
@@ -242,7 +242,7 @@ local IntroContent = create("Frame", {
     Name = "IntroContent",
     AnchorPoint = Vector2.new(0.5, 0.5),
     Position = UDim2.new(0.5, 0, 0.5, 0),
-    Size = UDim2.new(0, 420, 0, 320),
+    Size = UDim2.new(0, 420, 0, 340),
     BackgroundTransparency = 1,
     ZIndex = 11,
 })
@@ -255,9 +255,10 @@ local LogoLabel = create("TextLabel", {
     TextColor3 = Theme.Text,
     BackgroundTransparency = 1,
     Size = UDim2.new(1, 0, 0, 45),
-    Position = UDim2.new(0, 0, 0, -110),
+    Position = UDim2.new(0, 0, 0, -130),
     TextTransparency = 1,
     ZIndex = 11,
+    TextXAlignment = Enum.TextXAlignment.Center,
 })
 LogoLabel.Parent = IntroContent
 
@@ -268,9 +269,10 @@ local ProTag = create("TextLabel", {
     TextColor3 = Theme.Accent,
     BackgroundTransparency = 1,
     Size = UDim2.new(1, 0, 0, 20),
-    Position = UDim2.new(0, 0, 0, -65),
+    Position = UDim2.new(0, 0, 0, -85),
     TextTransparency = 1,
     ZIndex = 11,
+    TextXAlignment = Enum.TextXAlignment.Center,
 })
 ProTag.Parent = IntroContent
 
@@ -281,9 +283,10 @@ local LoadingLabel = create("TextLabel", {
     TextColor3 = Theme.SubText,
     BackgroundTransparency = 1,
     Size = UDim2.new(1, 0, 0, 24),
-    Position = UDim2.new(0, 0, 0, -30),
+    Position = UDim2.new(0, 0, 0, -45),
     TextTransparency = 1,
     ZIndex = 11,
+    TextXAlignment = Enum.TextXAlignment.Center,
 })
 LoadingLabel.Parent = IntroContent
 
@@ -294,17 +297,20 @@ local SubtitleLabel = create("TextLabel", {
     TextColor3 = Theme.SubText,
     BackgroundTransparency = 1,
     Size = UDim2.new(1, 0, 0, 22),
-    Position = UDim2.new(0, 0, 0, -100),
+    Position = UDim2.new(0, 0, 0, -115),
     TextTransparency = 1,
     ZIndex = 11,
     Visible = false,
+    TextXAlignment = Enum.TextXAlignment.Center,
 })
 SubtitleLabel.Parent = IntroContent
 
+-- DİL SEÇİM KUTUSU TAM MERKEZE SABİTLENDİ (AnchorPoint Eklendi)
 local LangHolder = create("Frame", {
     Name = "LangHolder",
-    Position = UDim2.new(0, 0, 0, -65),
-    Size = UDim2.new(1, 0, 0, 180),
+    AnchorPoint = Vector2.new(0.5, 0.5),
+    Position = UDim2.new(0.5, 0, 0.5, 15),
+    Size = UDim2.new(0, 400, 0, 180),
     BackgroundTransparency = 1,
     ZIndex = 11,
     Visible = false,
@@ -366,7 +372,7 @@ do
 end
 
 ------------------------------------------------------------
--- 10 SANİYELİK GERİ SAYIMLI UYARI EKRANI
+-- 5 SANİYELİK GERİ SAYIMLI UYARI EKRANI (Süre optimize edildi)
 ------------------------------------------------------------
 local MainFrame, buildMainMenu, openMenu, closeMenu
 
@@ -399,6 +405,8 @@ local function showWarningScreen()
         TextSize = 14,
         TextColor3 = Theme.Text,
         TextWrapped = true,
+        TextXAlignment = Enum.TextXAlignment.Center,
+        TextYAlignment = Enum.TextYAlignment.Center,
         Size = UDim2.new(1, -40, 1, -40),
         Position = UDim2.fromScale(0.5, 0.5),
         AnchorPoint = Vector2.new(0.5, 0.5),
@@ -412,9 +420,9 @@ local function showWarningScreen()
     tween(WarnBox, { BackgroundTransparency = CARD_TRANSPARENCY }, 0.4)
     tween(WarnText, { TextTransparency = 0 }, 0.4)
 
-    -- 10 Saniye Geri Sayım Döngüsü
+    -- 5 Saniye Geri Sayım (10 saniye çok uzundu, akıcılık için optimize edildi)
     task.spawn(function()
-        for i = 10, 1, -1 do
+        for i = 5, 1, -1 do
             WarnText.Text = L.warningText .. " (" .. i .. ")"
             task.wait(1)
         end
@@ -434,7 +442,7 @@ local function showWarningScreen()
 end
 
 ------------------------------------------------------------
--- DİL KARTLARI OLUŞTURMA (TEKİL OLARAK)
+-- DİL KARTLARI OLUŞTURMA
 ------------------------------------------------------------
 local langCards = {}
 
@@ -454,7 +462,6 @@ local function selectLanguage(code)
         task.wait(0.4)
         IntroFrame.Visible = false
 
-        -- Geri sayımlı uyarı ekranını tetikle
         showWarningScreen()
     end)
 end
@@ -473,7 +480,7 @@ for i, opt in ipairs(LanguageOptions) do
     stroke().Parent = card
     card:SetAttribute("Code", opt.code)
 
-    create("TextLabel", { Text = opt.flag, Font = Enum.Font.GothamBold, TextSize = 22, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 28), Position = UDim2.new(0, 0, 0, 10), ZIndex = 12 }).Parent = card
+    create("TextLabel", { Text = opt.flag, Font = Enum.Font.GothamBold, TextSize = 22, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 28), Position = UDim2.new(0, 0, 0, 10), TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 12 }).Parent = card
     create("TextLabel", { Text = opt.name, Font = Enum.Font.GothamMedium, TextSize = 11, TextColor3 = Theme.Text, BackgroundTransparency = 1, Size = UDim2.new(1, -4, 0, 18), Position = UDim2.new(0, 2, 0, 42), TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 12 }).Parent = card
 
     card.MouseEnter:Connect(function() if CurrentLang ~= opt.code then tween(card, { BackgroundColor3 = Theme.AccentSoft }, 0.15) end end)
@@ -501,7 +508,7 @@ task.defer(function()
         end
     end)
 
-    task.wait(2.5)
+    task.wait(2.0)
     dotsRunning = false
 
     tween(LoadingLabel, { TextTransparency = 1 }, 0.3)
@@ -517,7 +524,7 @@ task.defer(function()
     end
 end)
 
-------------------------------------------------------------
+-------------------------------
 -- ANA MENÜ (BUILD)
 ------------------------------------------------------------
 local MENU_W, MENU_H = 480, 280
@@ -851,7 +858,7 @@ function buildMainMenu()
     DiscordBtn.Parent = SettingsTab
 
     DiscordBtn.MouseButton1Click:Connect(function()
-        local discordLink = "https://discord.gg/buraya_koyacagin_link"
+        local discordLink = "https://discord.gg/uguzhub"
         if Clipboard then
             Clipboard(discordLink)
             DiscordBtn.Text = L.discordCopied
