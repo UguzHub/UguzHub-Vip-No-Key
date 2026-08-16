@@ -1,4 +1,4 @@
--- [[ UguzHub V2 VIP - Murderer Nearest Player Aimbot Addition ]] --
+-- [[ UguzHub V2 VIP - Fixed Full Working Logic ]] --
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -10,9 +10,6 @@ local Clipboard = setclipboard or toclipboard or syn and syn.clipboard
 
 local LocalPlayer = Players.LocalPlayer
 
-------------------------------------------------------------
--- HESAP YAŞ KONTROLÜ
-------------------------------------------------------------
 if LocalPlayer.AccountAge < 14 then
     LocalPlayer:Kick("Your account is less than 14 days old.")
     return
@@ -45,65 +42,21 @@ local Lang = {
         title = "Dil Seçimi", openBtn = "UguzHub", 
         warningText = "Lütfen Delta Ayarlarındaki Tüm Her Şeyi Kapattığınızdan Emin Olun. Oyun Deneyiminizi En Üst Seviyeye Çıkarmak İstiyoruz",
         discordBtn = "Discord Sunucusuna Katıl", discordCopied = "Bağlantı Kopyalandı!",
-        espAll = "Oyuncu ESP", espGun = "Yerdeki Silah ESP", autoGrab = "Otomatik Silah Topla", tpGrab = "Smooth Silaha Git",
-        aimbot = "Aimbot Kilitlenme", aimMurdClose = "Katilken En Yakındakine Kilitlen", autoKillMurd = "Oto Katili Avla", killMurd = "Katili Öldür", killAll = "Herkesi Katlet (Katil)",
+        espAll = "Oyuncu ESP", espGun = "Yerdeki Silah ESP", autoGrab = "Otomatik Silah Topla",
+        aimbot = "Aimbot Kilitlenme", aimMurdClose = "Katilken En Yakındakine Kilitlen",
+        shootMurd = "Katili Vur (Şerif/Kahraman)", autoKillMurd = "Oto Katili Avla", killAll = "Herkesi Katlet (Katil)",
         autoFarm = "Smooth Auto Farm (Anti-Kick)",
         autoFlingMurd = "Katili Savur (Fling)", autoFlingSheriff = "Şerifi Savur (Fling)", autoFlingAll = "Herkesi Savur (Fling)",
         tpLobby = "Lobiye Dön", tpMap = "Haritaya Geç", tpMurd = "Katile Işınlan", tpSheriff = "Şerife Işınlan",
         tabESP = "Görüş (ESP)", tabAimbot = "Hedef (Aimbot)", tabPlayers = "Oto Farm & Oyuncu", tabTP = "Işınlanma", tabSettings = "Ayarlar"
     },
-    TL = {
-        title = "Pumili ng Wika", openBtn = "UguzHub", 
-        warningText = "Mangyaring Siguraduhing Naka-off Ang Lahat Sa Delta Settings.",
-        discordBtn = "Sumali sa Discord Server", discordCopied = "Na-copy na ang Link!",
-        espAll = "ESP ng Manlalaro", espGun = "ESP ng Baril sa Lupa", autoGrab = "Kusa Kumuha ng Baril", tpGrab = "Smooth Punta sa Baril",
-        aimbot = "Aimbot Lock", aimMurdClose = "Lock sa Malapit (Murderer)", autoKillMurd = "Auto Patayin ang Murderer", killMurd = "Patayin ang Murderer", killAll = "Patayin Lahat",
-        autoFarm = "Smooth Auto Farm (Anti-Kick)",
-        autoFlingMurd = "Auto Fling Murderer", autoFlingSheriff = "Auto Fling Sheriff", autoFlingAll = "Auto Fling Lahat",
-        tpLobby = "TP sa Lobby", tpMap = "TP sa Map", tpMurd = "TP sa Murderer", tpSheriff = "TP sa Sheriff",
-        tabESP = "ESP Visuals", tabAimbot = "Aimbot", tabPlayers = "Farm & Manlalaro", tabTP = "Teleport", tabSettings = "Mga Setting"
-    },
-    EN = {
-        title = "Language Selection", openBtn = "UguzHub", 
-        warningText = "Please Make Sure To Turn Off Everything In Delta Settings.",
-        discordBtn = "Join Discord Server", discordCopied = "Link Copied!",
-        espAll = "Player ESP", espGun = "Dropped Gun ESP", autoGrab = "Auto Grab Gun", tpGrab = "Smooth Go To Gun",
-        aimbot = "Aimbot Lock", aimMurdClose = "Lock Nearest Player (As Murderer)", autoKillMurd = "Auto Kill Murderer", killMurd = "Kill Murderer", killAll = "Kill All",
-        autoFarm = "Smooth Auto Farm (Anti-Kick)",
-        autoFlingMurd = "Auto Fling Murderer", autoFlingSheriff = "Auto Fling Sheriff", autoFlingAll = "Auto Fling All",
-        tpLobby = "TP to Lobby", tpMap = "TP to Map", tpMurd = "TP to Murderer", tpSheriff = "TP to Sheriff",
-        tabESP = "ESP Visuals", tabAimbot = "Aimbot", tabPlayers = "Farm & Players", tabTP = "Teleport", tabSettings = "Settings"
-    },
-    ES = {
-        title = "Selección de Idioma", openBtn = "UguzHub", warningText = "Desactiva las opciones de Delta.", discordBtn = "Unirse a Discord", discordCopied = "¡Copiado!",
-        espAll = "ESP Jugadores", espGun = "ESP Arma", autoGrab = "Auto Tomar Arma", tpGrab = "Ir al Arma", aimbot = "Aimbot Fijar", aimMurdClose = "Fijar Cercano (Asesino)",
-        autoKillMurd = "Auto Matar Asesino", killMurd = "Matar Asesino", killAll = "Matar Todos", autoFarm = "Smooth Auto Farm", autoFlingMurd = "Lanzar Asesino", autoFlingSheriff = "Lanzar Alguacil", autoFlingAll = "Lanzar Todos",
-        tpLobby = "TP Lobby", tpMap = "TP Mapa", tpMurd = "TP Asesino", tpSheriff = "TP Alguacil", tabESP = "ESP", tabAimbot = "Aimbot", tabPlayers = "Jugadores", tabTP = "Teleport", tabSettings = "Ajustes"
-    },
-    DE = {
-        title = "Sprachauswahl", openBtn = "UguzHub", warningText = "Delta Einstellungen ausschalten.", discordBtn = "Discord Beitreten", discordCopied = "Kopiert!",
-        espAll = "Spieler ESP", espGun = "Waffen ESP", autoGrab = "Auto Waffe Aufheben", tpGrab = "Zur Waffe", aimbot = "Aimbot Fokus", aimMurdClose = "Mörder: Nächsten Fokus",
-        autoKillMurd = "Auto Mörder Töten", killMurd = "Mörder Töten", killAll = "Alle Töten", autoFarm = "Smooth Auto Farm", autoFlingMurd = "Mörder Schleudern", autoFlingSheriff = "Sheriff Schleudern", autoFlingAll = "Alle Schleudern",
-        tpLobby = "TP Lobby", tpMap = "TP Karte", tpMurd = "TP Mörder", tpSheriff = "TP Sheriff", tabESP = "ESP", tabAimbot = "Aimbot", tabPlayers = "Spieler", tabTP = "Teleport", tabSettings = "Einstellungen"
-    },
-    FR = {
-        title = "Choix de la Langue", openBtn = "UguzHub", warningText = "Désactiver les paramètres Delta.", discordBtn = "Rejoindre Discord", discordCopied = "Copié!",
-        espAll = "ESP Joueurs", espGun = "ESP Arme", autoGrab = "Auto Prendre Arme", tpGrab = "Aller à l'Arme", aimbot = "Aimbot", aimMurdClose = "Cible Proche (Meurtrier)",
-        autoKillMurd = "Auto Tuer Meurtrier", killMurd = "Tuer Meurtrier", killAll = "Tuer Tous", autoFarm = "Smooth Auto Farm", autoFlingMurd = "Propulser Meurtrier", autoFlingSheriff = "Propulser Sheriff", autoFlingAll = "Propulser Tous",
-        tpLobby = "TP Lobby", tpMap = "TP Carte", tpMurd = "TP Meurtrier", tpSheriff = "TP Sheriff", tabESP = "ESP", tabAimbot = "Aimbot", tabPlayers = "Joueurs", tabTP = "Téléport", tabSettings = "Options"
-    },
-    RU = {
-        title = "Выбор Языка", openBtn = "UguzHub", warningText = "Выключите настройки Delta.", discordBtn = "Вступить в Discord", discordCopied = "Скопировано!",
-        espAll = "ESP Игроков", espGun = "ESP Оружия", autoGrab = "Авто Подбор Оружия", tpGrab = "Идти к Оружию", aimbot = "Аимбот", aimMurdClose = "Убийца: Аим на ближайшего",
-        autoKillMurd = "Авто Убийство Убийцы", killMurd = "Убить Убийцу", killAll = "Убить Всех", autoFarm = "Smooth Auto Farm", autoFlingMurd = "Флинг Убийцы", autoFlingSheriff = "Флинг Шерифа", autoFlingAll = "Флинг Всех",
-        tpLobby = "ТП Лобби", tpMap = "ТП Карта", tpMurd = "ТП Убийца", tpSheriff = "ТП Шериф", tabESP = "ESP", tabAimbot = "Аимбот", tabPlayers = "Игроки", tabTP = "Телепорт", tabSettings = "Настройки"
-    },
-    AR = {
-        title = "اختيار اللغة", openBtn = "UguzHub", warningText = "يرجى إيقاف إعدادات Delta.", discordBtn = "الانضمام إلى Discord", discordCopied = "تم النسخ!",
-        espAll = "كشف اللاعبين", espGun = "كشف السلاح", autoGrab = "التقاط السلاح", tpGrab = "الذهاب للسلاح", aimbot = "التصويب", aimMurdClose = "القاتل: التصويب على الأقرب",
-        autoKillMurd = "قتل القاتل", killMurd = "قتل القاتل", killAll = "قتل الجميع", autoFarm = "تجميع تلقائي", autoFlingMurd = "طرد القاتل", autoFlingSheriff = "طرد الشريف", autoFlingAll = "طرد الجميع",
-        tpLobby = "الانتقال للوبي", tpMap = "الانتقال للخريطة", tpMurd = "الانتقال للقاتل", tpSheriff = "الانتقال للشريف", tabESP = "ESP", tabAimbot = "التصويب", tabPlayers = "اللاعبين", tabTP = "الانتقال", tabSettings = "الإعدادات"
-    }
+    TL = { title = "Pumili ng Wika", openBtn = "UguzHub", warningText = "Siguraduhing Naka-off Ang Lahat Sa Delta Settings.", discordBtn = "Discord Server", discordCopied = "Na-copy!", espAll = "Player ESP", espGun = "Gun ESP", autoGrab = "Auto Grab Gun", aimbot = "Aimbot", aimMurdClose = "Lock Nearest (Murderer)", shootMurd = "Shoot Murderer", autoKillMurd = "Auto Kill Murderer", killAll = "Kill All", autoFarm = "Auto Farm", autoFlingMurd = "Fling Murderer", autoFlingSheriff = "Fling Sheriff", autoFlingAll = "Fling All", tpLobby = "TP Lobby", tpMap = "TP Map", tpMurd = "TP Murderer", tpSheriff = "TP Sheriff", tabESP = "ESP", tabAimbot = "Aimbot", tabPlayers = "Farm & Players", tabTP = "Teleport", tabSettings = "Settings" },
+    EN = { title = "Language Selection", openBtn = "UguzHub", warningText = "Please Turn Off Everything In Delta Settings.", discordBtn = "Join Discord", discordCopied = "Copied!", espAll = "Player ESP", espGun = "Dropped Gun ESP", autoGrab = "Auto Grab Gun", aimbot = "Aimbot", aimMurdClose = "Lock Nearest (As Murderer)", shootMurd = "Shoot Murderer (Sheriff)", autoKillMurd = "Auto Kill Murderer", killAll = "Kill All", autoFarm = "Auto Farm", autoFlingMurd = "Fling Murderer", autoFlingSheriff = "Fling Sheriff", autoFlingAll = "Fling All", tpLobby = "TP Lobby", tpMap = "TP Map", tpMurd = "TP Murderer", tpSheriff = "TP Sheriff", tabESP = "ESP Visuals", tabAimbot = "Aimbot", tabPlayers = "Farm & Players", tabTP = "Teleport", tabSettings = "Settings" },
+    ES = { title = "Selección de Idioma", openBtn = "UguzHub", warningText = "Desactiva Delta Settings.", discordBtn = "Discord", discordCopied = "¡Copiado!", espAll = "ESP Jugadores", espGun = "ESP Arma", autoGrab = "Auto Tomar Arma", aimbot = "Aimbot", aimMurdClose = "Fijar Cercano (Asesino)", shootMurd = "Disparar Asesino", autoKillMurd = "Auto Matar Asesino", killAll = "Matar Todos", autoFarm = "Auto Farm", autoFlingMurd = "Lanzar Asesino", autoFlingSheriff = "Lanzar Alguacil", autoFlingAll = "Lanzar Todos", tpLobby = "TP Lobby", tpMap = "TP Mapa", tpMurd = "TP Asesino", tpSheriff = "TP Alguacil", tabESP = "ESP", tabAimbot = "Aimbot", tabPlayers = "Jugadores", tabTP = "Teleport", tabSettings = "Ajustes" },
+    DE = { title = "Sprachauswahl", openBtn = "UguzHub", warningText = "Delta Einstellungen ausschalten.", discordBtn = "Discord", discordCopied = "Kopiert!", espAll = "Spieler ESP", espGun = "Waffen ESP", autoGrab = "Auto Waffe", aimbot = "Aimbot", aimMurdClose = "Mörder: Nächsten Fokus", shootMurd = "Mörder Erschießen", autoKillMurd = "Auto Mörder Töten", killAll = "Alle Töten", autoFarm = "Auto Farm", autoFlingMurd = "Mörder Schleudern", autoFlingSheriff = "Sheriff Schleudern", autoFlingAll = "Alle Schleudern", tpLobby = "TP Lobby", tpMap = "TP Karte", tpMurd = "TP Mörder", tpSheriff = "TP Sheriff", tabESP = "ESP", tabAimbot = "Aimbot", tabPlayers = "Spieler", tabTP = "Teleport", tabSettings = "Einstellungen" },
+    FR = { title = "Choix de la Langue", openBtn = "UguzHub", warningText = "Désactiver Delta Settings.", discordBtn = "Discord", discordCopied = "Copié!", espAll = "ESP Joueurs", espGun = "ESP Arme", autoGrab = "Auto Arme", aimbot = "Aimbot", aimMurdClose = "Proche (Meurtrier)", shootMurd = "Tirer Meurtrier", autoKillMurd = "Auto Tuer Meurtrier", killAll = "Tuer Tous", autoFarm = "Auto Farm", autoFlingMurd = "Propulser Meurtrier", autoFlingSheriff = "Propulser Sheriff", autoFlingAll = "Propulser Tous", tpLobby = "TP Lobby", tpMap = "TP Carte", tpMurd = "TP Meurtrier", tpSheriff = "TP Sheriff", tabESP = "ESP", tabAimbot = "Aimbot", tabPlayers = "Joueurs", tabTP = "Téléport", tabSettings = "Options" },
+    RU = { title = "Выбор Языка", openBtn = "UguzHub", warningText = "Выключите настройки Delta.", discordBtn = "Discord", discordCopied = "Скопировано!", espAll = "ESP Игроков", espGun = "ESP Оружия", autoGrab = "Авто Подбор", aimbot = "Аимбот", aimMurdClose = "Убийца: Аим на ближайшего", shootMurd = "Застрелить Убийцу", autoKillMurd = "Авто Убийство Убийцы", killAll = "Убить Всех", autoFarm = "Auto Farm", autoFlingMurd = "Флинг Убийцы", autoFlingSheriff = "Флинг Шерифа", autoFlingAll = "Флинг Всех", tpLobby = "ТП Лобби", tpMap = "ТП Карта", tpMurd = "ТП Убийца", tpSheriff = "ТП Шериф", tabESP = "ESP", tabAimbot = "Аимбот", tabPlayers = "Игроки", tabTP = "Телепорт", tabSettings = "Настройки" },
+    AR = { title = "اختيار اللغة", openBtn = "UguzHub", warningText = "إيقاف إعدادات Delta.", discordBtn = "Discord", discordCopied = "تم النسخ!", espAll = "كشف اللاعبين", espGun = "كشف السلاح", autoGrab = "التقاط السلاح", aimbot = "التصويب", aimMurdClose = "القاتل: الأقرب", shootMurd = "إطلاق النار على القاتل", autoKillMurd = "قتل القاتل", killAll = "قتل الجميع", autoFarm = "تجميع تلقائي", autoFlingMurd = "طرد القاتل", autoFlingSheriff = "طرد الشريف", autoFlingAll = "طرد الجميع", tpLobby = "الانتقال للوبي", tpMap = "الانتقال للخريطة", tpMurd = "الانتقال للقاتل", tpSheriff = "الانتقال للشريف", tabESP = "ESP", tabAimbot = "التصويب", tabPlayers = "اللاعبين", tabTP = "الانتقال", tabSettings = "الإعدادات" }
 }
 
 local LanguageList = {
@@ -125,11 +78,14 @@ local L = Lang[CurrentLang]
 ------------------------------------------------------------
 local Flags = {
     ESPAll = false, ESPGun = false, AutoGrabGun = false,
-    AimbotEnabled = false, AimbotMurdNearest = false, -- YENİ: Katilken En Yakına Kilitlenme
+    AimbotEnabled = false, AimbotMurdNearest = false, ShootMurderer = false,
     AutoKillMurderer = false, AutoFarm = false,
     AutoFlingMurderer = false, AutoFlingSheriff = false, AutoFlingAll = false
 }
 
+------------------------------------------------------------
+-- OYUN İÇİ ROL VE NESNE TESPİTLERİ
+------------------------------------------------------------
 local function getRole(player)
     if not player or not player.Character then return "Innocent" end
     local backpack = player:FindFirstChild("Backpack")
@@ -142,16 +98,20 @@ local function getRole(player)
     return "Innocent"
 end
 
-------------------------------------------------------------
--- KATİL EN YAKIN OYUNCU HESAPLAMA DÖNGÜSÜ
-------------------------------------------------------------
+local function getPlayerByRole(roleName)
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if getRole(plr) == roleName then
+            return plr
+        end
+    end
+    return nil
+end
+
 local function getNearestPlayerToLocal()
     local nearestPlayer = nil
     local shortestDistance = math.huge
-
     if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
         local myPos = LocalPlayer.Character.HumanoidRootPart.Position
-
         for _, plr in ipairs(Players:GetPlayers()) do
             if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Health > 0 then
                 local dist = (plr.Character.HumanoidRootPart.Position - myPos).Magnitude
@@ -165,18 +125,69 @@ local function getNearestPlayerToLocal()
     return nearestPlayer
 end
 
--- Aimbot Kamera Kilitlenme RenderStepped
+------------------------------------------------------------
+-- ESP SİSTEMİ (HIGHLIGHT)
+------------------------------------------------------------
+local function applyESP(player)
+    if not player.Character then return end
+    local role = getRole(player)
+    local hl = player.Character:FindFirstChild("UguzESP")
+    
+    if Flags.ESPAll and player ~= LocalPlayer then
+        if not hl then
+            hl = Instance.new("Highlight")
+            hl.Name = "UguzESP"
+            hl.Parent = player.Character
+        end
+        hl.Enabled = true
+        if role == "Murderer" then
+            hl.FillColor = Color3.fromRGB(255, 0, 0)
+        elseif role == "Sheriff" then
+            hl.FillColor = Color3.fromRGB(0, 120, 255)
+        else
+            hl.FillColor = Color3.fromRGB(0, 255, 120)
+        end
+    else
+        if hl then hl.Enabled = false end
+    end
+end
+
+------------------------------------------------------------
+-- DÖNGÜ (RENDERSTEPPED): AIMBOT, ESP & SHOOT MURDERER
+------------------------------------------------------------
 RunService.RenderStepped:Connect(function()
+    -- ESP Güncelleme
+    for _, plr in ipairs(Players:GetPlayers()) do
+        applyESP(plr)
+    end
+
+    -- KATİL İÇİN EN YAKINA KİLİTLENME AIMBOT
     if Flags.AimbotMurdNearest and getRole(LocalPlayer) == "Murderer" then
         local target = getNearestPlayerToLocal()
         if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
             Camera.CFrame = CFrame.new(Camera.CFrame.Position, target.Character.HumanoidRootPart.Position)
         end
     end
+
+    -- ŞERİF / KAHRAMAN İÇİN KATİLİ VURMA AIMBOT (SHOOT MURDERER)
+    if (Flags.ShootMurderer or Flags.AimbotEnabled) and getRole(LocalPlayer) == "Sheriff" then
+        local murderer = getPlayerByRole("Murderer")
+        if murderer and murderer.Character and murderer.Character:FindFirstChild("HumanoidRootPart") then
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, murderer.Character.HumanoidRootPart.Position)
+        end
+    end
+
+    -- YERDEKİ SİLAHI OTOMATİK TOPLAMA
+    if Flags.AutoGrabGun then
+        local gunDrop = Workspace:FindFirstChild("GunDrop", true)
+        if gunDrop and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = gunDrop.CFrame
+        end
+    end
 end)
 
 ------------------------------------------------------------
--- YARDIMCI FONKSİYONLAR & ARAYÜZ
+-- YARDIMCI ARAYÜZ FONKSİYONLARI
 ------------------------------------------------------------
 local function create(class, props, children)
     local inst = Instance.new(class)
@@ -194,6 +205,9 @@ local function tween(obj, props, duration, style, direction)
     return t
 end
 
+------------------------------------------------------------
+-- GUI CONTAINER
+------------------------------------------------------------
 local ScreenGui = create("ScreenGui", { Name = "UguzHubVIPMain", ResetOnSpawn = false, ZIndexBehavior = Enum.ZIndexBehavior.Sibling, DisplayOrder = 999, IgnoreGuiInset = true })
 ScreenGui.Parent = CoreGui
 
@@ -204,17 +218,23 @@ MinimizedButton.Parent = ScreenGui
 
 local buildMainMenu, showLanguageMenu, showWarningScreen
 
+------------------------------------------------------------
+-- 2) DİL SEÇİM MENÜSÜ (EKRANI TAM KAPLAYAN VE SCROLLABLE)
+------------------------------------------------------------
 function showLanguageMenu()
-    local LangFrame = create("Frame", { Name = "LangMenu", Size = UDim2.new(0, 350, 0, 320), Position = UDim2.fromScale(0.5, 0.5), AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Theme.Background, ZIndex = 60 })
-    corner(16).Parent = LangFrame
-    stroke(Theme.Accent, 1.5).Parent = LangFrame
+    local LangFrame = create("Frame", { Name = "LangMenu", Size = UDim2.fromScale(1, 1), Position = UDim2.fromScale(0, 0), BackgroundColor3 = Theme.Background, ZIndex = 60 })
     LangFrame.Parent = ScreenGui
 
-    local Title = create("TextLabel", { Text = "Select Language / Dil Seçin", Font = Enum.Font.GothamBlack, TextSize = 15, TextColor3 = Theme.Text, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 40), Position = UDim2.new(0, 0, 0, 5), ZIndex = 61 })
-    Title.Parent = LangFrame
+    local CenterBox = create("Frame", { Size = UDim2.new(0, 380, 0, 340), Position = UDim2.fromScale(0.5, 0.5), AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Theme.Card, ZIndex = 61 })
+    corner(16).Parent = CenterBox
+    stroke(Theme.Accent, 1.5).Parent = CenterBox
+    CenterBox.Parent = LangFrame
 
-    local ScrollList = create("ScrollingFrame", { Size = UDim2.new(1, -24, 1, -55), Position = UDim2.new(0, 12, 0, 45), BackgroundTransparency = 1, BorderSizePixel = 0, ScrollBarThickness = 4, ScrollBarImageColor3 = Theme.Accent, ZIndex = 61 })
-    ScrollList.Parent = LangFrame
+    local Title = create("TextLabel", { Text = "Select Language / Dil Seçin", Font = Enum.Font.GothamBlack, TextSize = 16, TextColor3 = Theme.Text, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 45), Position = UDim2.new(0, 0, 0, 5), ZIndex = 62 })
+    Title.Parent = CenterBox
+
+    local ScrollList = create("ScrollingFrame", { Size = UDim2.new(1, -24, 1, -60), Position = UDim2.new(0, 12, 0, 50), BackgroundTransparency = 1, BorderSizePixel = 0, ScrollBarThickness = 4, ScrollBarImageColor3 = Theme.Accent, ZIndex = 62 })
+    ScrollList.Parent = CenterBox
 
     local ListLayout = create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 8) })
     ListLayout.Parent = ScrollList
@@ -224,19 +244,20 @@ function showLanguageMenu()
     end)
 
     for i, opt in ipairs(LanguageList) do
-        local card = create("TextButton", { Name = opt.code, Text = "", Size = UDim2.new(1, -8, 0, 42), BackgroundColor3 = Theme.Card, AutoButtonColor = false, LayoutOrder = i, ZIndex = 62 })
+        local card = create("TextButton", { Name = opt.code, Text = "", Size = UDim2.new(1, -8, 0, 42), BackgroundColor3 = Theme.Sidebar, AutoButtonColor = false, LayoutOrder = i, ZIndex = 63 })
         corner(10).Parent = card
         stroke(Theme.Stroke, 1).Parent = card
         card.Parent = ScrollList
 
-        create("TextLabel", { Text = opt.flag, Font = Enum.Font.GothamBold, TextSize = 22, BackgroundTransparency = 1, Size = UDim2.new(0, 40, 1, 0), Position = UDim2.new(0, 8, 0, 0), TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 63 }).Parent = card
-        create("TextLabel", { Text = opt.name, Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = Theme.Text, BackgroundTransparency = 1, Size = UDim2.new(1, -60, 1, 0), Position = UDim2.new(0, 52, 0, 0), TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 63 }).Parent = card
+        create("TextLabel", { Text = opt.flag, Font = Enum.Font.GothamBold, TextSize = 22, BackgroundTransparency = 1, Size = UDim2.new(0, 40, 1, 0), Position = UDim2.new(0, 8, 0, 0), TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 64 }).Parent = card
+        create("TextLabel", { Text = opt.name, Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = Theme.Text, BackgroundTransparency = 1, Size = UDim2.new(1, -60, 1, 0), Position = UDim2.new(0, 52, 0, 0), TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 64 }).Parent = card
 
         card.MouseButton1Click:Connect(function()
             CurrentLang = opt.code
             L = Lang[CurrentLang] or Lang.EN
 
-            tween(LangFrame, { Size = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 1 }, 0.3)
+            tween(LangFrame, { BackgroundTransparency = 1 }, 0.3)
+            tween(CenterBox, { Size = UDim2.new(0, 0, 0, 0) }, 0.3)
             task.wait(0.3)
             LangFrame:Destroy()
 
@@ -245,21 +266,20 @@ function showLanguageMenu()
     end
 end
 
+------------------------------------------------------------
+-- 3) UYARI EKRANI
+------------------------------------------------------------
 function showWarningScreen()
-    local WarnFrame = create("Frame", { Name = "WarnFrame", Size = UDim2.fromScale(1, 1), Position = UDim2.fromScale(0, 0), BackgroundColor3 = Theme.Background, BackgroundTransparency = 1, ZIndex = 70 })
+    local WarnFrame = create("Frame", { Name = "WarnFrame", Size = UDim2.fromScale(1, 1), Position = UDim2.fromScale(0, 0), BackgroundColor3 = Theme.Background, BackgroundTransparency = 0.2, ZIndex = 70 })
     WarnFrame.Parent = ScreenGui
 
-    local WarnBox = create("Frame", { Size = UDim2.new(0, 420, 0, 180), Position = UDim2.fromScale(0.5, 0.5), AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Theme.Card, BackgroundTransparency = 1, ZIndex = 71 })
+    local WarnBox = create("Frame", { Size = UDim2.new(0, 420, 0, 180), Position = UDim2.fromScale(0.5, 0.5), AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Theme.Card, BackgroundTransparency = CARD_TRANSPARENCY, ZIndex = 71 })
     corner(16).Parent = WarnBox
     stroke(Theme.Accent, 1.5).Parent = WarnBox
     WarnBox.Parent = WarnFrame
 
-    local WarnText = create("TextLabel", { Text = "", Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = Theme.Text, TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Center, Size = UDim2.new(1, -40, 1, -40), Position = UDim2.fromScale(0.5, 0.5), AnchorPoint = Vector2.new(0.5, 0.5), BackgroundTransparency = 1, TextTransparency = 1, ZIndex = 72 })
+    local WarnText = create("TextLabel", { Text = "", Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = Theme.Text, TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Center, Size = UDim2.new(1, -40, 1, -40), Position = UDim2.fromScale(0.5, 0.5), AnchorPoint = Vector2.new(0.5, 0.5), BackgroundTransparency = 1, ZIndex = 72 })
     WarnText.Parent = WarnBox
-
-    tween(WarnFrame, { BackgroundTransparency = 0.2 }, 0.3)
-    tween(WarnBox, { BackgroundTransparency = CARD_TRANSPARENCY }, 0.3)
-    tween(WarnText, { TextTransparency = 0 }, 0.3)
 
     task.spawn(function()
         for i = 3, 1, -1 do
@@ -279,10 +299,51 @@ function showWarningScreen()
     end)
 end
 
-showLanguageMenu()
+------------------------------------------------------------
+-- 1) ANIMASYONLU GİRİŞ EKRANI (İLK ÇALIŞAN KISIM)
+------------------------------------------------------------
+local IntroFrame = create("Frame", { Name = "Intro", Size = UDim2.fromScale(1, 1), Position = UDim2.fromScale(0, 0), BackgroundColor3 = Theme.Background, ZIndex = 80 })
+IntroFrame.Parent = ScreenGui
+
+local Content = create("Frame", { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, 360, 0, 140), BackgroundTransparency = 1, ZIndex = 81 })
+Content.Parent = IntroFrame
+
+local LogoLabel = create("TextLabel", { Text = "UguzHub", Font = Enum.Font.GothamBlack, TextSize = 52, TextColor3 = Theme.Text, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 60), TextTransparency = 1, ZIndex = 81 })
+LogoLabel.Parent = Content
+
+local ProTag = create("TextLabel", { Text = "V2 VIP PRO", Font = Enum.Font.GothamBold, TextSize = 18, TextColor3 = Theme.Accent, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 22), Position = UDim2.new(0, 0, 0, 58), TextTransparency = 1, ZIndex = 81 })
+ProTag.Parent = Content
+
+local Underline = create("Frame", { Size = UDim2.new(0, 0,0, 3), Position = UDim2.new(0.5, 0, 0, 88), AnchorPoint = Vector2.new(0.5, 0), BackgroundColor3 = Theme.Accent, BorderSizePixel = 0, ZIndex = 81 })
+corner(2).Parent = Underline
+Underline.Parent = Content
+
+local LoadingLabel = create("TextLabel", { Text = "Yükleniyor...", Font = Enum.Font.GothamMedium, TextSize = 16, TextColor3 = Theme.SubText, BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 24), Position = UDim2.new(0, 0, 0, 104), TextTransparency = 1, ZIndex = 81 })
+LoadingLabel.Parent = Content
+
+task.defer(function()
+    tween(LogoLabel, { TextTransparency = 0 }, 0.5)
+    tween(ProTag, { TextTransparency = 0 }, 0.5)
+    task.wait(0.1)
+    tween(Underline, { Size = UDim2.new(0, 240, 0, 3) }, 0.5, Enum.EasingStyle.Quart)
+    task.wait(0.2)
+    tween(LoadingLabel, { TextTransparency = 0 }, 0.3)
+
+    task.wait(1.5)
+
+    tween(IntroFrame, { BackgroundTransparency = 1 }, 0.4)
+    tween(LogoLabel, { TextTransparency = 1 }, 0.3)
+    tween(ProTag, { TextTransparency = 1 }, 0.3)
+    tween(Underline, { BackgroundTransparency = 1 }, 0.3)
+    tween(LoadingLabel, { TextTransparency = 1 }, 0.3)
+    task.wait(0.4)
+    IntroFrame:Destroy()
+
+    showLanguageMenu()
+end)
 
 ------------------------------------------------------------
--- ANA MENÜ OLUŞTURMA
+-- 4) ANA MENÜ (BUILD MAIN MENU)
 ------------------------------------------------------------
 local MainFrame
 local MENU_W, MENU_H = 500, 300
@@ -384,9 +445,10 @@ function buildMainMenu()
     createToggle(ESPTab, L.espGun, "ESPGun")
     createToggle(ESPTab, L.autoGrab, "AutoGrabGun")
 
-    -- AIMBOT TAB (YENİ KATİL AIMBOT EKLENDİ)
+    -- AIMBOT TAB
     createToggle(AimbotTab, L.aimbot, "AimbotEnabled")
     createToggle(AimbotTab, L.aimMurdClose, "AimbotMurdNearest")
+    createToggle(AimbotTab, L.shootMurd, "ShootMurderer")
 
     -- PLAYERS TAB
     createToggle(PlayersTab, L.autoFarm, "AutoFarm")
