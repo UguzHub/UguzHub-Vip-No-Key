@@ -1,5 +1,5 @@
 --[[
-    UguzHub V2 Pro - Siyah Ekran / Çizgi Sorunu Düzeltilmiş Kararlı Sürüm
+    UguzHub V2 Pro - Sheriff Fling & TP to Gun Button Update
 ]]
 
 local Players = game:GetService("Players")
@@ -8,7 +8,6 @@ local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local LocalPlayer = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
@@ -38,7 +37,9 @@ local Flags = {
     AutoShoot = false,
     KillAura = false,
     AutoGrabGun = false,
-    AutoGunDropped = false, -- YENİ
+    AutoGunDropped = false,
+    ShootButtonEnabled = false,
+    SheriffFling = false,
     
     AutoFarm = false,
     FarmMode = "Teleport",
@@ -64,7 +65,7 @@ local Theme = {
 local RADIUS = 14
 
 ------------------------------------------------------------
--- DİL PAKETLERİ (4 Dil: TR, EN, RU, DE)
+-- DİL PAKETLERİ (4 DİL TAM ÇEVİRİ)
 ------------------------------------------------------------
 local Lang = {}
 
@@ -73,6 +74,35 @@ Lang.TR = {
     subtitle = "Dilinizi seçin",
     openBtn = "UguzHub",
     notice = "Sizlere daha iyi bir deneyim sunmak amacıyla lütfen delta ayarlarindaki tüm izinleri Kapattığınıza emin olun.",
+    title = "  Murder Mystery 2 | UguzHub V2 Pro",
+    tabs = { Main = "Ana Menü", Visual = "Görsel", Combat = "Savaş", Teleport = "Işınlanma" },
+    welcome = "Hoşgeldin",
+    discordBtn = "Discord: discord.gg/uguzhub (Tıkla Kopyala)",
+    discordCopied = "Discord Linki Kopyalandı!",
+    autoFarm = "Auto Farm (Coin Topla)",
+    farmModeTp = "  Farm Modu: Teleport",
+    farmModeTween = "  Farm Modu: Tween",
+    killAll = "  Kill All (Herkesi Katlet)",
+    speedWalk = "Speed Walk (Hız)",
+    jumpPower = "Jump Power (Zıplama)",
+    infJump = "Infinite Jump (Sınırsız Zıpla)",
+    noclip = "Noclip (Duvardan Geç)",
+    espAll = "Player ESP (Tümü)",
+    espMur = "Murderer ESP (Katil)",
+    espSher = "Sheriff ESP (Şerif)",
+    espInno = "Innocent ESP (Masum)",
+    aimbot = "Aimbot (Katile Kilitlen)",
+    autoShoot = "Auto Shoot (Otomatik Ateş)",
+    killAura = "KillAura (Yakındakini Kes)",
+    autoGrab = "Auto Grab Gun (Silahı Al)",
+    autoDrop = "Auto Gun Dropped (Silah Düşür)",
+    shootBtnToggle = "Shoot Murderer Butonu",
+    sheriffFling = "Sheriff Fling (Şerif Fırlat)",
+    tpToDroppedGun = "Düşen Silaha Işınlan",
+    fullbright = "Fullbright (Aydınlık)",
+    tpLobby = "  Lobiye Git",
+    tpMap = "  Harita Ortasına Git",
+    shootBtnText = "🎯 Katili Vur"
 }
 
 Lang.EN = {
@@ -80,13 +110,71 @@ Lang.EN = {
     subtitle = "Select your language",
     openBtn = "UguzHub",
     notice = "To provide you with a better experience, please make sure to turn off all permissions in the delta settings.",
+    title = "  Murder Mystery 2 | UguzHub V2 Pro",
+    tabs = { Main = "Main", Visual = "Visual", Combat = "Combat", Teleport = "Teleport" },
+    welcome = "Welcome",
+    discordBtn = "Discord: discord.gg/uguzhub (Click to Copy)",
+    discordCopied = "Discord Link Copied!",
+    autoFarm = "Auto Farm (Coins)",
+    farmModeTp = "  Farm Mode: Teleport",
+    farmModeTween = "  Farm Mode: Tween",
+    killAll = "  Kill All Players",
+    speedWalk = "Speed Walk",
+    jumpPower = "Jump Power",
+    infJump = "Infinite Jump",
+    noclip = "Noclip",
+    espAll = "Player ESP (All)",
+    espMur = "Murderer ESP",
+    espSher = "Sheriff ESP",
+    espInno = "Innocent ESP",
+    aimbot = "Aimbot (Lock Murderer)",
+    autoShoot = "Auto Shoot",
+    killAura = "KillAura",
+    autoGrab = "Auto Grab Gun",
+    autoDrop = "Auto Gun Dropped",
+    shootBtnToggle = "Shoot Murderer Button",
+    sheriffFling = "Sheriff Fling",
+    tpToDroppedGun = "TP to Dropped Gun",
+    fullbright = "Fullbright",
+    tpLobby = "  Teleport to Lobby",
+    tpMap = "  Teleport to Map Center",
+    shootBtnText = "🎯 Shoot Murderer"
 }
 
 Lang.RU = {
     loading = "Загрузка",
     subtitle = "Выберите язык",
-    openBtn = "Выберите язык",
+    openBtn = "UguzHub",
     notice = "Чтобы обеспечить вам лучший опыт, пожалуйста, убедитесь, что отключили все разрешения в настройках delta.",
+    title = "  Murder Mystery 2 | UguzHub V2 Pro",
+    tabs = { Main = "Главное", Visual = "Визуал", Combat = "Бой", Teleport = "Телепорт" },
+    welcome = "Добро пожаловать",
+    discordBtn = "Discord: discord.gg/uguzhub (Нажмите для копирования)",
+    discordCopied = "Ссылка Discord скопирована!",
+    autoFarm = "Авто Фарм (Монеты)",
+    farmModeTp = "  Режим Фарма: Телепорт",
+    farmModeTween = "  Режим Фарма: Плавный",
+    killAll = "  Убить Всех",
+    speedWalk = "Скорость бега",
+    jumpPower = "Сила прыжка",
+    infJump = "Бесконечный прыжок",
+    noclip = "Проход сквозь стены",
+    espAll = "ESP Игроков (Все)",
+    espMur = "ESP Убийцы",
+    espSher = "ESP Шерифа",
+    espInno = "ESP Мирных",
+    aimbot = "Аимбот (На Убийцу)",
+    autoShoot = "Авто Выстрел",
+    killAura = "Киллаура",
+    autoGrab = "Авто Подбор Пушки",
+    autoDrop = "Авто Сброс Пушки",
+    shootBtnToggle = "Кнопка Выстрела в Убийцу",
+    sheriffFling = "Флинг Шерифа",
+    tpToDroppedGun = "ТП к Выпавшей Пушке",
+    fullbright = "Яркое Освещение",
+    tpLobby = "  Телепорт в Лобби",
+    tpMap = "  Телепорт в Центр Карты",
+    shootBtnText = "🎯 Убить Убийцу"
 }
 
 Lang.DE = {
@@ -94,6 +182,35 @@ Lang.DE = {
     subtitle = "Wähle deine Sprache",
     openBtn = "UguzHub",
     notice = "Um Ihnen ein besseres Erlebnis zu bieten, stellen Sie bitte sicher, dass Sie alle Berechtigungen in den Delta-Einstellungen deaktivieren.",
+    title = "  Murder Mystery 2 | UguzHub V2 Pro",
+    tabs = { Main = "Haupt", Visual = "Visuell", Combat = "Kampf", Teleport = "Teleport" },
+    welcome = "Willkommen",
+    discordBtn = "Discord: discord.gg/uguzhub (Klicken zum Kopieren)",
+    discordCopied = "Discord Link kopiert!",
+    autoFarm = "Auto-Farm (Münzen)",
+    farmModeTp = "  Farm-Modus: Teleport",
+    farmModeTween = "  Farm-Modus: Tween",
+    killAll = "  Alle Töten",
+    speedWalk = "Laufgeschwindigkeit",
+    jumpPower = "Sprungkraft",
+    infJump = "Unendlicher Sprung",
+    noclip = "Durch Wände gehen",
+    espAll = "Spieler ESP (Alle)",
+    espMur = "Mörder ESP",
+    espSher = "Sheriff ESP",
+    espInno = "Unschuldige ESP",
+    aimbot = "Aimbot (Mörder Fokus)",
+    autoShoot = "Auto Schießen",
+    killAura = "KillAura",
+    autoGrab = "Waffe Auto-Aufheben",
+    autoDrop = "Waffe Auto-Fallenlassen",
+    shootBtnToggle = "Mörder-Schießen Button",
+    sheriffFling = "Sheriff Fling",
+    tpToDroppedGun = "TP zur Gelandeten Waffe",
+    fullbright = "Helles Licht",
+    tpLobby = "  Zum Lobby Teleportieren",
+    tpMap = "  Zur Kartenmitte Teleportieren",
+    shootBtnText = "🎯 Mörder Erschießen"
 }
 
 local LanguageOptions = {
@@ -107,7 +224,7 @@ local CurrentLang = "EN"
 local L = Lang[CurrentLang]
 
 ------------------------------------------------------------
--- OYUN ROLLERİ VE DÖNGÜLER (MM2)
+-- ROLLER VE OYUN İŞLEVLERİ
 ------------------------------------------------------------
 local function getRole(plr)
     if not plr or not plr.Character then return "Innocent" end
@@ -119,32 +236,6 @@ local function getRole(plr)
         return "Sheriff" 
     end
     return "Innocent"
-end
-
-local function unlockAllEmotes()
-    pcall(function()
-        local playerData = LocalPlayer:FindFirstChild("PlayerData") or LocalPlayer:FindFirstChild("Data")
-        if playerData and playerData:FindFirstChild("Emotes") then
-            for _, emote in pairs(playerData.Emotes:GetChildren()) do
-                if emote:IsA("BoolValue") then
-                    emote.Value = true
-                end
-            end
-        end
-        
-        for _, obj in pairs(ReplicatedStorage:GetDescendants()) do
-            if obj:IsA("ModuleScript") and string.find(obj.Name:lower(), "emote") then
-                local success, emoteData = pcall(require, obj)
-                if success and type(emoteData) == "table" then
-                    for _, item in pairs(emoteData) do
-                        if type(item) == "table" and item.Owned ~= nil then
-                            item.Owned = true
-                        end
-                    end
-                end
-            end
-        end
-    end)
 end
 
 local function executeKillAll()
@@ -181,6 +272,37 @@ local function executeKillAll()
     Flags.KillAllActive = false
 end
 
+local function shootMurdererOnce()
+    local char = LocalPlayer.Character
+    if not char then return end
+    
+    local gun = char:FindFirstChild("Gun") or (LocalPlayer:FindFirstChild("Backpack") and LocalPlayer.Backpack:FindFirstChild("Gun"))
+    if not gun then return end
+    gun.Parent = char
+    
+    local murdererHead = nil
+    for _, p in pairs(Players:GetPlayers()) do
+        if p ~= LocalPlayer and getRole(p) == "Murderer" and p.Character and p.Character:FindFirstChild("Head") then
+            murdererHead = p.Character.Head
+            break
+        end
+    end
+    
+    if murdererHead then
+        local startTime = tick()
+        while tick() - startTime < 0.8 do
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, murdererHead.Position)
+            pcall(function()
+                gun:Activate()
+            end)
+            task.wait(0.03)
+        end
+    end
+end
+
+------------------------------------------------------------
+-- DÖNGÜLER
+------------------------------------------------------------
 task.spawn(function()
     while task.wait(0.5) do
         if Flags.AutoFarm then
@@ -281,6 +403,18 @@ RunService.RenderStepped:Connect(function()
             end
         end
 
+        if Flags.SheriffFling and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local myHrp = LocalPlayer.Character.HumanoidRootPart
+            for _, p in pairs(Players:GetPlayers()) do
+                if p ~= LocalPlayer and getRole(p) == "Sheriff" and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                    local targetHrp = p.Character.HumanoidRootPart
+                    myHrp.CFrame = targetHrp.CFrame * CFrame.new(0, 0, 0)
+                    myHrp.Velocity = Vector3.new(10000, 10000, 10000)
+                    break
+                end
+            end
+        end
+
         if Flags.AimbotEnabled then
             local murderer = nil
             for _, p in pairs(Players:GetPlayers()) do
@@ -368,6 +502,58 @@ local ScreenGui = create("ScreenGui", {
     IgnoreGuiInset = true,
 })
 ScreenGui.Parent = CoreGui
+
+------------------------------------------------------------
+-- HAREKET ETTİRİLEBİLİR SHOOT MURDERER BUTONU
+------------------------------------------------------------
+local ShootActionButton = create("TextButton", {
+    Name = "ShootActionButton",
+    Text = "🎯 Shoot Murderer",
+    Font = Enum.Font.GothamBold,
+    TextSize = 14,
+    TextColor3 = Theme.Text,
+    BackgroundColor3 = Theme.Accent,
+    Size = UDim2.new(0, 150, 0, 44),
+    Position = UDim2.new(0.5, -75, 0.75, 0),
+    AutoButtonColor = false,
+    Visible = false,
+    ZIndex = 50,
+})
+corner(12).Parent = ShootActionButton
+stroke(Color3.fromRGB(255, 255, 255), 1.5).Parent = ShootActionButton
+ShootActionButton.Parent = ScreenGui
+
+-- Buton Sürükleme Mantığı
+local btnDragging, btnDragStart, btnStartPos
+ShootActionButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        btnDragging = true
+        btnDragStart = input.Position
+        btnStartPos = ShootActionButton.Position
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if btnDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - btnDragStart
+        ShootActionButton.Position = UDim2.new(
+            btnStartPos.X.Scale,
+            btnStartPos.X.Offset + delta.X,
+            btnStartPos.Y.Scale,
+            btnStartPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then 
+        btnDragging = false 
+    end
+end)
+
+ShootActionButton.MouseButton1Click:Connect(function()
+    shootMurdererOnce()
+end)
 
 ------------------------------------------------------------
 -- GİRİŞ EKRANI (Yükleme + 4'lü Dil Seçimi)
@@ -581,6 +767,7 @@ local function selectLanguage(code)
         IntroFrame.Visible = false
 
         MinimizedButton.Text = "🟣 " .. L.openBtn
+        ShootActionButton.Text = L.shootBtnText
         showNoticeThenMenu()
     end)
 end
@@ -709,7 +896,7 @@ function buildMainMenu()
     })
 
     create("TextLabel", {
-        Text = "  Murder Mystery 2 | UguzHub V2 Pro",
+        Text = L.title,
         Size = UDim2.new(1, -40, 1, 0),
         TextColor3 = Theme.Text,
         Font = Enum.Font.GothamBold,
@@ -804,7 +991,7 @@ function buildMainMenu()
         return page
     end
 
-    local function createToggle(parent, text, flag)
+    local function createToggle(parent, text, flag, callback)
         local frame = create("Frame", {
             Size = UDim2.new(1, -4, 0, 34),
             BackgroundColor3 = Theme.Card,
@@ -850,13 +1037,66 @@ function buildMainMenu()
                 toggleBtn.BackgroundColor3 = Color3.fromRGB(45, 40, 60)
                 toggleBtn.TextColor3 = Theme.SubText
             end
+            if callback then callback(Flags[flag]) end
         end)
     end
 
-    local MainTab   = addTab("Main", "Main")
-    local VisualTab = addTab("Visual", "Visual")
-    local CombatTab = addTab("Combat", "Combat")
-    local TeleTab   = addTab("Teleport", "Teleport")
+    local function createSingleClickToggle(parent, text, onAction)
+        local frame = create("Frame", {
+            Size = UDim2.new(1, -4, 0, 34),
+            BackgroundColor3 = Theme.Card,
+            BackgroundTransparency = 0.25,
+            Parent = parent,
+            ZIndex = 6,
+        })
+        corner(6).Parent = frame
+
+        create("TextLabel", {
+            Text = "  " .. text,
+            Size = UDim2.new(0.65, 0, 1, 0),
+            TextColor3 = Theme.Text,
+            Font = Enum.Font.Gotham,
+            TextSize = 11,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            BackgroundTransparency = 1,
+            Parent = frame,
+            ZIndex = 7,
+        })
+
+        local actionBtn = create("TextButton", {
+            Size = UDim2.new(0, 42, 0, 20),
+            Position = UDim2.new(1, -48, 0.5, -10),
+            Text = "OFF",
+            BackgroundColor3 = Color3.fromRGB(45, 40, 60),
+            TextColor3 = Theme.SubText,
+            Font = Enum.Font.GothamBold,
+            TextSize = 10,
+            Parent = frame,
+            ZIndex = 7,
+        })
+        corner(4).Parent = actionBtn
+
+        local isOn = false
+        actionBtn.MouseButton1Click:Connect(function()
+            if not isOn then
+                isOn = true
+                actionBtn.Text = "ON"
+                actionBtn.BackgroundColor3 = Theme.Accent
+                actionBtn.TextColor3 = Theme.Text
+                if onAction then onAction() end
+            else
+                isOn = false
+                actionBtn.Text = ""
+                actionBtn.BackgroundColor3 = Color3.fromRGB(45, 40, 60)
+                actionBtn.TextColor3 = Theme.SubText
+            end
+        end)
+    end
+
+    local MainTab   = addTab(L.tabs.Main, "Main")
+    local VisualTab = addTab(L.tabs.Visual, "Visual")
+    local CombatTab = addTab(L.tabs.Combat, "Combat")
+    local TeleTab   = addTab(L.tabs.Teleport, "Teleport")
 
     local ProfileCard = create("Frame", {
         Size = UDim2.new(1, -4, 0, 85),
@@ -883,7 +1123,7 @@ function buildMainMenu()
     create("TextLabel", {
         Size = UDim2.new(1, -80, 0, 20),
         Position = UDim2.new(0, 78, 0, 16),
-        Text = "Hoşgeldin, " .. LocalPlayer.Name,
+        Text = L.welcome .. ", " .. LocalPlayer.Name,
         TextColor3 = Theme.Text,
         Font = Enum.Font.GothamBold,
         TextSize = 13,
@@ -930,7 +1170,7 @@ function buildMainMenu()
     local DiscordText = create("TextLabel", {
         Size = UDim2.new(1, -45, 1, 0),
         Position = UDim2.new(0, 38, 0, 0),
-        Text = "Discord: discord.gg/uguzhub (Tıkla Kopyala)",
+        Text = L.discordBtn,
         TextColor3 = Theme.Accent,
         Font = Enum.Font.GothamBold,
         TextSize = 11,
@@ -943,19 +1183,19 @@ function buildMainMenu()
     DiscordCard.MouseButton1Click:Connect(function()
         pcall(function()
             setclipboard("https://discord.gg/uguzhub")
-            DiscordText.Text = "Discord Linki Kopyalandı!"
+            DiscordText.Text = L.discordCopied
             task.wait(1.5)
-            DiscordText.Text = "Discord: discord.gg/uguzhub (Tıkla Kopyala)"
+            DiscordText.Text = L.discordBtn
         end)
     end)
 
-    createToggle(MainTab, "Auto Farm (Coin Topla)", "AutoFarm")
+    createToggle(MainTab, L.autoFarm, "AutoFarm")
 
     local ModeBtn = create("TextButton", {
         Size = UDim2.new(1, -4, 0, 34),
         BackgroundColor3 = Theme.Card,
         BackgroundTransparency = 0.25,
-        Text = "  Farm Mode: Teleport",
+        Text = L.farmModeTp,
         TextColor3 = Theme.Text,
         Font = Enum.Font.Gotham,
         TextSize = 11,
@@ -967,10 +1207,10 @@ function buildMainMenu()
     ModeBtn.MouseButton1Click:Connect(function()
         if Flags.FarmMode == "Teleport" then
             Flags.FarmMode = "Tween"
-            ModeBtn.Text = "  Farm Mode: Tween"
+            ModeBtn.Text = L.farmModeTween
         else
             Flags.FarmMode = "Teleport"
-            ModeBtn.Text = "  Farm Mode: Teleport"
+            ModeBtn.Text = L.farmModeTp
         end
     end)
 
@@ -978,7 +1218,7 @@ function buildMainMenu()
         Size = UDim2.new(1, -4, 0, 34),
         BackgroundColor3 = Color3.fromRGB(150, 40, 40),
         BackgroundTransparency = 0.2,
-        Text = "  Kill All (Herkesi Katlet)",
+        Text = L.killAll,
         TextColor3 = Theme.Text,
         Font = Enum.Font.GothamBold,
         TextSize = 11,
@@ -992,48 +1232,40 @@ function buildMainMenu()
         task.spawn(executeKillAll)
     end)
 
-    local UnlockEmotesBtn = create("TextButton", {
-        Size = UDim2.new(1, -4, 0, 34),
-        BackgroundColor3 = Theme.AccentSoft,
-        BackgroundTransparency = 0.2,
-        Text = "  Unlock All Shop Emotes",
-        TextColor3 = Theme.Text,
-        Font = Enum.Font.GothamBold,
-        TextSize = 11,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        Parent = MainTab,
-        ZIndex = 6,
-    })
-    corner(6).Parent = UnlockEmotesBtn
-    UnlockEmotesBtn.MouseButton1Click:Connect(function()
-        unlockAllEmotes()
-        UnlockEmotesBtn.Text = "  Emotes Unlocked!"
-        task.wait(1.5)
-        UnlockEmotesBtn.Text = "  Unlock All Shop Emotes"
+    createToggle(MainTab, L.speedWalk, "SpeedWalk")
+    createToggle(MainTab, L.jumpPower, "JumpPower")
+    createToggle(MainTab, L.infJump, "InfiniteJump")
+    createToggle(MainTab, L.noclip, "Noclip")
+
+    createToggle(VisualTab, L.espAll, "ESPAll")
+    createToggle(VisualTab, L.espMur, "ESPMurderer")
+    createToggle(VisualTab, L.espSher, "ESPSheriff")
+    createToggle(VisualTab, L.espInno, "ESPInnocent")
+
+    createToggle(CombatTab, L.aimbot, "AimbotEnabled")
+    createToggle(CombatTab, L.autoShoot, "AutoShoot")
+    createToggle(CombatTab, L.killAura, "KillAura")
+    createToggle(CombatTab, L.autoGrab, "AutoGrabGun")
+    createToggle(CombatTab, L.autoDrop, "AutoGunDropped")
+    createToggle(CombatTab, L.sheriffFling, "SheriffFling")
+
+    createSingleClickToggle(CombatTab, L.tpToDroppedGun, function()
+        local gunDrop = Workspace:FindFirstChild("GunDrop", true)
+        if gunDrop and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = gunDrop.CFrame
+        end
     end)
 
-    createToggle(MainTab, "Speed Walk (Hız)", "SpeedWalk")
-    createToggle(MainTab, "Jump Power (Zıplama)", "JumpPower")
-    createToggle(MainTab, "Infinite Jump (Sınırsız Zıpla)", "InfiniteJump")
-    createToggle(MainTab, "Noclip (Duvardan Geç)", "Noclip")
+    createToggle(CombatTab, L.shootBtnToggle, "ShootButtonEnabled", function(state)
+        ShootActionButton.Visible = state
+    end)
 
-    createToggle(VisualTab, "Player ESP (Tümü)", "ESPAll")
-    createToggle(VisualTab, "Murderer ESP (Katil)", "ESPMurderer")
-    createToggle(VisualTab, "Sheriff ESP (Şerif)", "ESPSheriff")
-    createToggle(VisualTab, "Innocent ESP (Masum)", "ESPInnocent")
-
-    createToggle(CombatTab, "Aimbot (Katile Kilitlen)", "AimbotEnabled")
-    createToggle(CombatTab, "Auto Shoot (Otomatik Ateş)", "AutoShoot")
-    createToggle(CombatTab, "KillAura (Yakındakini Kes)", "KillAura")
-    createToggle(CombatTab, "Auto Grab Gun (Silahı Al)", "AutoGrabGun")
-    createToggle(CombatTab, "Auto Gun Dropped (Silah Düşür)", "AutoGunDropped")
-
-    createToggle(TeleTab, "Fullbright (Aydınlık)", "Fullbright")
+    createToggle(TeleTab, L.fullbright, "Fullbright")
 
     local function createTPButton(name, cf)
         local btn = create("TextButton", {
             Size = UDim2.new(1, -4, 0, 32),
-            Text = "  " .. name,
+            Text = name,
             Font = Enum.Font.GothamMedium,
             TextSize = 11,
             TextColor3 = Theme.Text,
@@ -1052,8 +1284,8 @@ function buildMainMenu()
         end)
     end
 
-    createTPButton("TP to Lobby (Lobiye Git)", CFrame.new(110, 138, -12))
-    createTPButton("TP to Map (Harita Ortası)", CFrame.new(0, 50, 0))
+    createTPButton(L.tpLobby, CFrame.new(110, 138, -12))
+    createTPButton(L.tpMap, CFrame.new(0, 50, 0))
 
     pages["Main"].Visible = true
     tabBtns["Main"].BackgroundColor3 = Theme.Card
