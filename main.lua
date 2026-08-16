@@ -1,698 +1,496 @@
--- [[ UguzHub V2 VIP - Complete Fixed & Feature Rich Edition ]] --
-repeat task.wait() until game:IsLoaded()
-
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
-local Workspace = game:GetService("Workspace")
-local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 
 local LocalPlayer = Players.LocalPlayer
-local Camera = Workspace.CurrentCamera
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- Temizlik
-if CoreGui:FindFirstChild("UguzHubVIPMain") then 
-    CoreGui.UguzHubVIPMain:Destroy() 
-end
-
-------------------------------------------------------------
--- TEMA VE BAYRAKLAR
-------------------------------------------------------------
-local Flags = {
-    ESPAll = false,
-    ESPGun = false,
-    AutoGrabGun = false,
-    AutoFarm = false,
-    SelectedLang = "TR"
-}
-
-local Theme = {
-    Background = Color3.fromRGB(16, 16, 22),
-    Sidebar    = Color3.fromRGB(16, 23, 38),
-    Card       = Color3.fromRGB(25, 35, 50),
-    Accent     = Color3.fromRGB(138, 92, 255),
-    Text       = Color3.fromRGB(235, 235, 245),
-    SubText    = Color3.fromRGB(165, 165, 180),
-    Danger     = Color3.fromRGB(220, 38, 38),
-    Warning    = Color3.fromRGB(245, 158, 11)
-}
-
-------------------------------------------------------------
--- DİL PAKETLERİ
-------------------------------------------------------------
-local LangData = {
+-- Çeviri Sözlüğü (8 Dil - Resmi Dil Kullanımı)
+local Translations = {
     TR = {
-        name = "🇹🇷 Türkçe",
-        title = "UguzHub V2 VIP",
-        warningTitle = "⚠️ ÖNEMLİ UYARI",
-        warningMsg = "Delta Ayarlarındaki Tüm Herşeyi Kapattığınızdan Emin Olun! Sizlere Daha İyi Bir Deneyim Yaşatmak İçin Çabalıyoruz!",
-        discordMsg = "İsteklerinizi veya Şikayetlerinizi Discord sunucumuza yazabilirsiniz!",
-        tabVisuals = "Görsel (ESP)",
-        tabCombat = "Savaş & Kill",
-        tabFarm = "Auto Farm",
-        tabTP = "Teleport",
-        tabProfile = "Profil",
-        espAll = "Oyuncu ESP",
-        autoGrab = "Otomatik Silah Topla",
-        autoFarm = "Otomatik Coin Farm",
-        killAll = "🔪 Kill All (Herkesi Öldür)",
-        flingMurd = "🌀 Fling Murderer",
-        flingSheriff = "🌀 Fling Sheriff",
-        flingAll = "🌀 Fling All",
-        shootBtn = "🎯 Shoot Murderer (Buton)",
-        tpLobby = "Lobiye Işınlan",
-        tpMap = "Haritaya Işınlan",
-        tpMurd = "Katile Işınlan",
-        tpSheriff = "Şerife Işınlan",
-        userRole = "VIP Üye"
+        title = "UguzHub - Yönetim Paneli",
+        delta_title = "Sistem Bilgilendirmesi",
+        delta_msg = "Sizlere daha kaliteli ve kesintisiz bir hizmet sunabilmemiz adına, lütfen Delta uygulamasının ayarlarında yer alan kısıtlayıcı izinleri kapattığınızdan emin olunuz.",
+        confirm_close = "Uygulamayı kapatmak istediğinize emin misiniz?",
+        yes = "Evet",
+        no = "Hayır",
+        continue = "Devam Et",
+        greetings = {"Bugün nasılsınız?", "Gününüz nasıl geçiyor?", "Hoş geldiniz.", "Sisteme erişim sağlandı."},
+        discord = "Görüş, şikayet ve önerilerinizi resmi Discord sunucumuza katılarak iletebilirsiniz."
     },
     EN = {
-        name = "🇬🇧 English",
-        title = "UguzHub V2 VIP",
-        warningTitle = "⚠️ IMPORTANT WARNING",
-        warningMsg = "Make sure to turn off everything in Delta Settings! We are striving to provide you with a better experience!",
-        discordMsg = "You can join our Discord server for support!",
-        tabVisuals = "Visuals (ESP)",
-        tabCombat = "Combat & Kill",
-        tabFarm = "Auto Farm",
-        tabTP = "Teleport",
-        tabProfile = "Profile",
-        espAll = "Player ESP",
-        autoGrab = "Auto Grab Gun",
-        autoFarm = "Auto Coin Farm",
-        killAll = "🔪 Kill All",
-        flingMurd = "🌀 Fling Murderer",
-        flingSheriff = "🌀 Fling Sheriff",
-        flingAll = "🌀 Fling All",
-        shootBtn = "🎯 Shoot Murderer (Button)",
-        tpLobby = "Teleport to Lobby",
-        tpMap = "Teleport to Map",
-        tpMurd = "Teleport to Murderer",
-        tpSheriff = "Teleport to Sheriff",
-        userRole = "VIP Member"
+        title = "UguzHub - Control Panel",
+        delta_title = "System Notification",
+        delta_msg = "To provide you with better and uninterrupted service, please make sure you have disabled the restrictive permissions in Delta settings.",
+        confirm_close = "Are you sure you want to close the application?",
+        yes = "Yes",
+        no = "No",
+        continue = "Continue",
+        greetings = {"How are you today?", "How is your day going?", "Welcome.", "System access granted."},
+        discord = "You can submit your feedback, complaints, and suggestions by joining our official Discord server."
+    },
+    ES = {
+        title = "UguzHub - Panel de Control",
+        delta_title = "Notificación del Sistema",
+        delta_msg = "Para brindarle un servicio de mejor calidad y sin interrupciones, asegúrese de haber desactivado los permisos restrictivos en la configuración de Delta.",
+        confirm_close = "¿Está seguro de que desea cerrar la aplicación?",
+        yes = "Sí",
+        no = "No",
+        continue = "Continuar",
+        greetings = {"¿Cómo está hoy?", "¿Cómo va su día?", "Bienvenido.", "Acceso al sistema concedido."},
+        discord = "Puede enviar sus comentarios, quejas y sugerencias uniéndose a nuestro servidor oficial de Discord."
+    },
+    DE = {
+        title = "UguzHub - Kontrollzentrum",
+        delta_title = "Systembenachrichtigung",
+        delta_msg = "Um Ihnen einen besseren und unterbrechungsfreien Service zu bieten, stellen Sie bitte sicher, dass Sie die einschränkenden Berechtigungen in den Delta-Einstellungen deaktiviert haben.",
+        confirm_close = "Sind Sie sicher, dass Sie die Anwendung schließen möchten?",
+        yes = "Ja",
+        no = "Nein",
+        continue = "Fortfahren",
+        greetings = {"Wie geht es Ihnen heute?", "Wie verläuft Ihr Tag?", "Willkommen.", "Systemzugriff gewährt."},
+        discord = "Sie können Ihr Feedback, Ihre Beschwerden und Vorschläge einreichen, indem Sie unserem offiziellen Discord-Server beitreten."
+    },
+    FR = {
+        title = "UguzHub - Panneau de Contrôle",
+        delta_title = "Notification Système",
+        delta_msg = "Afin de vous fournir un service de meilleure qualité et sans interruption, veuillez vous assurer d'avoir désactivé les autorisations restrictives dans les paramètres de Delta.",
+        confirm_close = "Êtes-vous sûr de vouloir fermer l'application?",
+        yes = "Oui",
+        no = "Non",
+        continue = "Continuer",
+        greetings = {"Comment allez-vous aujourd'hui?", "Comment se passe votre journée?", "Bienvenue.", "Accès au système accordé."},
+        discord = "Vous pouvez soumettre vos remarques, réclamations et suggestions en rejoignant notre serveur Discord officiel."
+    },
+    RU = {
+        title = "UguzHub - Панель управления",
+        delta_title = "Системное уведомление",
+        delta_msg = "Чтобы мы могли предоставить вам более качественный и бесперебойный сервис, убедитесь, что вы отключили ограничительные разрешения в настройках Delta.",
+        confirm_close = "Вы уверены, что хотите закрыть приложение?",
+        yes = "Да",
+        no = "Нет",
+        continue = "Продолжить",
+        greetings = {"Как ваши дела сегодня?", "Как проходит ваш день?", "Добро пожаловать.", "Доступ к системе разрешен."},
+        discord = "Вы можете отправить свои отзывы, жалобы и предложения, присоединившись к нашему официальному серверу Discord."
+    },
+    PT = {
+        title = "UguzHub - Painel de Controle",
+        delta_title = "Notificação do Sistema",
+        delta_msg = "Para que possamos oferecer um serviço de melhor qualidade e sem interrupções, certifique-se de ter desativado as permissões restritivas nas configurações do Delta.",
+        confirm_close = "Tem certeza de que deseja fechar o aplicativo?",
+        yes = "Sim",
+        no = "Não",
+        continue = "Continuar",
+        greetings = {"Como você está hoje?", "Como está sendo seu dia?", "Bem-vindo.", "Acesso ao sistema concedido."},
+        discord = "Você pode enviar seus comentários, reclamações e sugestões entrando em nosso servidor oficial do Discord."
+    },
+    AR = {
+        title = "UguzHub - لوحة التحكم",
+        delta_title = "إشعار النظام",
+        delta_msg = "من أجل تقديم خدمة أفضل ودون انقطاع، يرجى التأكد من تعطيل الأذونات المقيدة في إعدادات تطبيق Delta.",
+        confirm_close = "هل أنت تأكد من أنك تريد إغلاق التطبيق؟",
+        yes = "نعم",
+        no = "لا",
+        continue = "متابعة",
+        greetings = {"كيف حالك اليوم؟", "كيف يسير يومك؟", "أهلاً بك.", "تم منح الوصول إلى النظام."},
+        discord = "يمكنك تقديم ملاحظاتك وشكواك واقتراحاتك من خلال الانضمام إلى خادم Discord الرسمي الخاص بنا."
     }
 }
 
-------------------------------------------------------------
--- YARDIMCI FONKSİYONLAR & OYUN MANTIĞI
-------------------------------------------------------------
-local function getRole(plr)
-    if not plr or not plr.Character then return "Innocent" end
-    local char = plr.Character
-    local backpack = plr:FindFirstChild("Backpack")
-    
-    if (char:FindFirstChild("Knife") or (backpack and backpack:FindFirstChild("Knife"))) then 
-        return "Murderer" 
-    elseif (char:FindFirstChild("Gun") or (backpack and backpack:FindFirstChild("Gun"))) then 
-        return "Sheriff" 
-    end
-    return "Innocent"
+local CurrentLang = "TR"
+
+-- Eski UI Temizliği
+if PlayerGui:FindFirstChild("UguzHubUI") then
+    PlayerGui.UguzHubUI:Destroy()
 end
 
-local function getPlayerByRole(roleName)
-    for _, plr in pairs(Players:GetPlayers()) do
-        if plr ~= LocalPlayer and getRole(plr) == roleName then
-            return plr
-        end
-    end
-    return nil
-end
-
--- Fling Mantığı
-local function flingTarget(targetPlr)
-    if not targetPlr or not targetPlr.Character then return end
-    local char = LocalPlayer.Character
-    local hrp = char and char:FindFirstChild("HumanoidRootPart")
-    local tHrp = targetPlr.Character:FindFirstChild("HumanoidRootPart")
-    
-    if hrp and tHrp then
-        local bV = Instance.new("BodyVelocity")
-        bV.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-        bV.Velocity = Vector3.new(99999, 99999, 99999)
-        bV.Parent = hrp
-
-        local timer = 0
-        while timer < 1.5 and tHrp and tHrp.Parent do
-            hrp.CFrame = tHrp.CFrame * CFrame.new(0, 0, 0)
-            task.wait(0.05)
-            timer = timer + 0.05
-        end
-        bV:Destroy()
-    end
-end
-
-------------------------------------------------------------
--- MAIN DÖNGÜ (ESP & AUTO FARM)
-------------------------------------------------------------
-RunService.RenderStepped:Connect(function()
-    pcall(function()
-        -- ESP
-        for _, plr in pairs(Players:GetPlayers()) do
-            if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-                local esp = plr.Character:FindFirstChild("UguzESP")
-                if Flags.ESPAll then
-                    if not esp then
-                        esp = Instance.new("Highlight")
-                        esp.Name = "UguzESP"
-                        esp.Parent = plr.Character
-                    end
-                    esp.Enabled = true
-                    local role = getRole(plr)
-                    if role == "Murderer" then
-                        esp.FillColor = Color3.fromRGB(255, 0, 0)
-                    elseif role == "Sheriff" then
-                        esp.FillColor = Color3.fromRGB(0, 120, 255)
-                    else
-                        esp.FillColor = Color3.fromRGB(0, 255, 0)
-                    end
-                elseif esp then
-                    esp.Enabled = false
-                end
-            end
-        end
-
-        -- Auto Grab Gun
-        if Flags.AutoGrabGun then
-            local gunDrop = Workspace:FindFirstChild("GunDrop", true)
-            if gunDrop and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                LocalPlayer.Character.HumanoidRootPart.CFrame = gunDrop.CFrame
-            end
-        end
-
-        -- Auto Farm (Coins)
-        if Flags.AutoFarm and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            local coinContainer = Workspace:FindFirstChild("Normal", true) or Workspace:FindFirstChild("CoinContainer", true)
-            if coinContainer then
-                for _, coin in pairs(coinContainer:GetChildren()) do
-                    if coin:IsA("BasePart") and coin.Name:lower():find("coin") then
-                        LocalPlayer.Character.HumanoidRootPart.CFrame = coin.CFrame
-                        task.wait(0.1)
-                        break
-                    end
-                end
-            end
-        end
-    end)
-end)
-
-------------------------------------------------------------
--- BASE GUI OLUŞTURMA
-------------------------------------------------------------
+-- ScreenGui
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "UguzHubVIPMain"
+ScreenGui.Name = "UguzHubUI"
 ScreenGui.ResetOnSpawn = false
-ScreenGui.IgnoreGuiInset = true
-ScreenGui.Parent = CoreGui
+ScreenGui.Parent = PlayerGui
 
-------------------------------------------------------------
--- 1. INTRO
-------------------------------------------------------------
-local LoadingFrame = Instance.new("Frame")
-LoadingFrame.Name = "Loading"
-LoadingFrame.Size = UDim2.fromScale(1, 1)
-LoadingFrame.BackgroundColor3 = Theme.Background
-LoadingFrame.ZIndex = 200
-LoadingFrame.Parent = ScreenGui
-
-local Content = Instance.new("Frame")
-Content.AnchorPoint = Vector2.new(0.5, 0.5)
-Content.Position = UDim2.new(0.5, 0, 0.45, 0)
-Content.Size = UDim2.new(0, 360, 0, 140)
-Content.BackgroundTransparency = 1
-Content.ZIndex = 201
-Content.Parent = LoadingFrame
-
-local LogoLabel = Instance.new("TextLabel")
-LogoLabel.Text = "UguzHub"
-LogoLabel.Font = Enum.Font.GothamBlack
-LogoLabel.TextSize = 50
-LogoLabel.TextColor3 = Theme.Text
-LogoLabel.BackgroundTransparency = 1
-LogoLabel.Size = UDim2.new(1, 0, 0, 60)
-LogoLabel.TextTransparency = 1
-LogoLabel.ZIndex = 201
-LogoLabel.Parent = Content
-
-local ProTag = Instance.new("TextLabel")
-ProTag.Text = "V2 PRO"
-ProTag.Font = Enum.Font.GothamBold
-ProTag.TextSize = 18
-ProTag.TextColor3 = Theme.Accent
-ProTag.BackgroundTransparency = 1
-ProTag.Size = UDim2.new(1, 0, 0, 22)
-ProTag.Position = UDim2.new(0, 0, 0, 58)
-ProTag.TextTransparency = 1
-ProTag.ZIndex = 201
-ProTag.Parent = Content
-
-local Underline = Instance.new("Frame")
-Underline.Size = UDim2.new(0, 0, 0, 3)
-Underline.Position = UDim2.new(0.5, 0, 0, 88)
-Underline.AnchorPoint = Vector2.new(0.5, 0)
-Underline.BackgroundColor3 = Theme.Accent
-Underline.BorderSizePixel = 0
-Underline.ZIndex = 201
-Underline.Parent = Content
-
-local LoadingLabel = Instance.new("TextLabel")
-LoadingLabel.Text = "Loading"
-LoadingLabel.Font = Enum.Font.GothamMedium
-LoadingLabel.TextSize = 17
-LoadingLabel.TextColor3 = Theme.SubText
-LoadingLabel.BackgroundTransparency = 1
-LoadingLabel.Size = UDim2.new(1, 0, 0, 24)
-LoadingLabel.Position = UDim2.new(0, 0, 0, 108)
-LoadingLabel.TextTransparency = 1
-LoadingLabel.ZIndex = 201
-LoadingLabel.Parent = Content
-
-------------------------------------------------------------
--- 2. DİL MENÜSÜ & UYARI & MAIN BAĞLANTILARI
-------------------------------------------------------------
-local LangMenu = Instance.new("Frame")
-LangMenu.Name = "LangMenu"
-LangMenu.Size = UDim2.fromScale(1, 1)
-LangMenu.BackgroundColor3 = Theme.Background
-LangMenu.ZIndex = 100
-LangMenu.Visible = false
-LangMenu.Parent = ScreenGui
-
-local Title = Instance.new("TextLabel")
-Title.Text = "UguzHub  •  Language Selection"
-Title.Size = UDim2.new(1, 0, 0, 80)
-Title.Position = UDim2.new(0, 0, 0, 40)
-Title.TextColor3 = Theme.Text
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 26
-Title.BackgroundTransparency = 1
-Title.Parent = LangMenu
-
-local Scroll = Instance.new("ScrollingFrame")
-Scroll.Size = UDim2.new(0, 320, 0, 300)
-Scroll.Position = UDim2.new(0.5, -160, 0.5, -100)
-Scroll.BackgroundTransparency = 1
-Scroll.ScrollBarThickness = 4
-Scroll.Parent = LangMenu
-
-local ScrollList = Instance.new("UIListLayout")
-ScrollList.Padding = UDim.new(0, 10)
-ScrollList.HorizontalAlignment = Enum.HorizontalAlignment.Center
-ScrollList.Parent = Scroll
-
-for code, data in pairs(LangData) do
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, -20, 0, 45)
-    btn.Text = data.name
-    btn.BackgroundColor3 = Theme.Card
-    btn.TextColor3 = Theme.Text
-    btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 14
-    
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 10)
-    corner.Parent = btn
-
-    btn.MouseButton1Click:Connect(function()
-        Flags.SelectedLang = code
-        LangMenu:Destroy()
-        showWarningScreen()
-    end)
-    btn.Parent = Scroll
-end
-
-function showWarningScreen()
-    local L = LangData[Flags.SelectedLang] or LangData.TR
-
-    local WarnMenu = Instance.new("Frame")
-    WarnMenu.Size = UDim2.fromScale(1, 1)
-    WarnMenu.BackgroundColor3 = Theme.Background
-    WarnMenu.ZIndex = 150
-    WarnMenu.Parent = ScreenGui
-
-    local WarnBox = Instance.new("Frame")
-    WarnBox.Size = UDim2.new(0, 380, 0, 220)
-    WarnBox.Position = UDim2.new(0.5, -190, 0.5, -110)
-    WarnBox.BackgroundColor3 = Theme.Card
-    WarnBox.Parent = WarnMenu
-
-    local wCorner = Instance.new("UICorner")
-    wCorner.CornerRadius = UDim.new(0, 12)
-    wCorner.Parent = WarnBox
-
-    local wTitle = Instance.new("TextLabel")
-    wTitle.Text = L.warningTitle
-    wTitle.Size = UDim2.new(1, 0, 0, 45)
-    wTitle.TextColor3 = Theme.Warning
-    wTitle.Font = Enum.Font.GothamBold
-    wTitle.TextSize = 16
-    wTitle.BackgroundTransparency = 1
-    wTitle.Parent = WarnBox
-
-    local wMsg = Instance.new("TextLabel")
-    wMsg.Text = L.warningMsg
-    wMsg.Size = UDim2.new(1, -30, 0, 90)
-    wMsg.Position = UDim2.new(0, 15, 0, 45)
-    wMsg.TextColor3 = Theme.Text
-    wMsg.Font = Enum.Font.GothamMedium
-    wMsg.TextSize = 13
-    wMsg.TextWrapped = true
-    wMsg.BackgroundTransparency = 1
-    wMsg.Parent = WarnBox
-
-    local closeBtn = Instance.new("TextButton")
-    closeBtn.Size = UDim2.new(1, -40, 0, 40)
-    closeBtn.Position = UDim2.new(0, 20, 1, -50)
-    closeBtn.BackgroundColor3 = Color3.fromRGB(40, 50, 65)
-    closeBtn.TextColor3 = Theme.SubText
-    closeBtn.Font = Enum.Font.GothamBold
-    closeBtn.TextSize = 13
-    closeBtn.Parent = WarnBox
-
-    local btnCorner = Instance.new("UICorner")
-    btnCorner.CornerRadius = UDim.new(0, 8)
-    btnCorner.Parent = closeBtn
-
-    task.spawn(function()
-        for i = 7, 1, -1 do
-            closeBtn.Text = "TAMAM (" .. i .. "s)"
-            task.wait(1)
+-- Sürüklenebilirlik Fonksiyonu
+local function makeDraggable(frame, handle)
+    handle = handle or frame
+    local dragging, dragInput, dragStart, startPos
+    handle.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then dragging = false end
+            end)
         end
-        closeBtn.Text = "TAMAM"
-        closeBtn.BackgroundColor3 = Theme.Accent
-        closeBtn.TextColor3 = Theme.Text
-        
-        task.wait(0.3)
-        WarnMenu:Destroy()
-        buildMainMenu()
     end)
-end
-
-------------------------------------------------------------
--- 3. ANA MENÜ
-------------------------------------------------------------
-function buildMainMenu()
-    local L = LangData[Flags.SelectedLang] or LangData.TR
-
-    local Main = Instance.new("Frame")
-    Main.Name = "MainFrame"
-    Main.Size = UDim2.new(0, 500, 0, 340)
-    Main.Position = UDim2.new(0.5, -250, 0.5, -170)
-    Main.BackgroundColor3 = Theme.Background
-    Main.ClipsDescendants = true
-    Main.Parent = ScreenGui
-
-    local MainCorner = Instance.new("UICorner")
-    MainCorner.CornerRadius = UDim.new(0, 12)
-    MainCorner.Parent = Main
-
-    local MainStroke = Instance.new("UIStroke")
-    MainStroke.Color = Theme.Accent
-    MainStroke.Thickness = 1.5
-    MainStroke.Parent = Main
-
-    -- Drag
-    local dragging, dragStart, startPos
-    Main.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true; dragStart = input.Position; startPos = Main.Position
+    handle.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
         end
     end)
     UserInputService.InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + (input.Position.X - dragStart.X), startPos.Y.Scale, startPos.Y.Offset + (input.Position.Y - dragStart.Y))
-        end
-    end)
-    UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
-    end)
-
-    -- Header
-    local Header = Instance.new("Frame")
-    Header.Size = UDim2.new(1, 0, 0, 40)
-    Header.BackgroundColor3 = Theme.Sidebar
-    Header.Parent = Main
-
-    local HeaderTitle = Instance.new("TextLabel")
-    HeaderTitle.Text = "  ⚡ " .. L.title
-    HeaderTitle.Size = UDim2.new(1, 0, 1, 0)
-    HeaderTitle.TextColor3 = Theme.Text
-    HeaderTitle.Font = Enum.Font.GothamBold
-    HeaderTitle.TextSize = 14
-    HeaderTitle.TextXAlignment = Enum.TextXAlignment.Left
-    HeaderTitle.BackgroundTransparency = 1
-    HeaderTitle.Parent = Header
-
-    -- Sidebar
-    local Sidebar = Instance.new("Frame")
-    Sidebar.Size = UDim2.new(0, 130, 1, -40)
-    Sidebar.Position = UDim2.new(0, 0, 0, 40)
-    Sidebar.BackgroundColor3 = Theme.Sidebar
-    Sidebar.Parent = Main
-
-    local SidebarList = Instance.new("UIListLayout")
-    SidebarList.Padding = UDim.new(0, 4)
-    SidebarList.Parent = Sidebar
-
-    local ContentContainer = Instance.new("Frame")
-    ContentContainer.Size = UDim2.new(1, -140, 1, -50)
-    ContentContainer.Position = UDim2.new(0, 135, 0, 45)
-    ContentContainer.BackgroundTransparency = 1
-    ContentContainer.Parent = Main
-
-    local pages, tabBtns = {}, {}
-
-    local function addTab(name, id)
-        local page = Instance.new("ScrollingFrame")
-        page.Size = UDim2.new(1, 0, 1, 0)
-        page.BackgroundTransparency = 1
-        page.ScrollBarThickness = 3
-        page.Visible = false
-        page.Parent = ContentContainer
-
-        local pList = Instance.new("UIListLayout")
-        pList.Padding = UDim.new(0, 8)
-        pList.Parent = page
-
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(1, 0, 0, 32)
-        btn.Text = name
-        btn.BackgroundColor3 = Theme.Sidebar
-        btn.TextColor3 = Theme.SubText
-        btn.Font = Enum.Font.GothamMedium
-        btn.TextSize = 11
-        btn.Parent = Sidebar
-
-        btn.MouseButton1Click:Connect(function()
-            for _, p in pairs(pages) do p.Visible = false end
-            for _, b in pairs(tabBtns) do b.BackgroundColor3 = Theme.Sidebar; b.TextColor3 = Theme.SubText end
-            page.Visible = true
-            btn.BackgroundColor3 = Theme.Card
-            btn.TextColor3 = Theme.Accent
-        end)
-
-        pages[id] = page
-        tabBtns[id] = btn
-        return page
-    end
-
-    local function createToggle(parent, text, flag)
-        local frame = Instance.new("Frame")
-        frame.Size = UDim2.new(1, -5, 0, 36)
-        frame.BackgroundColor3 = Theme.Card
-        frame.Parent = parent
-
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 8)
-        corner.Parent = frame
-
-        local lbl = Instance.new("TextLabel")
-        lbl.Text = "  " .. text
-        lbl.Size = UDim2.new(0.7, 0, 1, 0)
-        lbl.TextColor3 = Theme.Text
-        lbl.Font = Enum.Font.Gotham
-        lbl.TextSize = 11
-        lbl.TextXAlignment = Enum.TextXAlignment.Left
-        lbl.BackgroundTransparency = 1
-        lbl.Parent = frame
-
-        local toggleBtn = Instance.new("TextButton")
-        toggleBtn.Size = UDim2.new(0, 50, 0, 22)
-        toggleBtn.Position = UDim2.new(1, -55, 0.5, -11)
-        toggleBtn.Text = "OFF"
-        toggleBtn.BackgroundColor3 = Color3.fromRGB(40, 50, 65)
-        toggleBtn.TextColor3 = Theme.SubText
-        toggleBtn.Font = Enum.Font.GothamBold
-        toggleBtn.TextSize = 10
-        toggleBtn.Parent = frame
-
-        toggleBtn.MouseButton1Click:Connect(function()
-            Flags[flag] = not Flags[flag]
-            if Flags[flag] then
-                toggleBtn.Text = "ON"
-                toggleBtn.BackgroundColor3 = Theme.Accent
-                toggleBtn.TextColor3 = Theme.Text
-            else
-                toggleBtn.Text = "OFF"
-                toggleBtn.BackgroundColor3 = Color3.fromRGB(40, 50, 65)
-                toggleBtn.TextColor3 = Theme.SubText
-            end
-        end)
-    end
-
-    local function createButton(parent, text, color, callback)
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(1, -5, 0, 36)
-        btn.Text = text
-        btn.BackgroundColor3 = color or Theme.Card
-        btn.TextColor3 = Theme.Text
-        btn.Font = Enum.Font.GothamBold
-        btn.TextSize = 11
-        btn.Parent = parent
-
-        local c = Instance.new("UICorner")
-        c.CornerRadius = UDim.new(0, 8)
-        c.Parent = btn
-
-        btn.MouseButton1Click:Connect(callback)
-    end
-
-    -- Tablar
-    local VisualsTab = addTab(L.tabVisuals, "Visuals")
-    local CombatTab  = addTab(L.tabCombat, "Combat")
-    local FarmTab    = addTab(L.tabFarm, "Farm")
-    local TeleportTab= addTab(L.tabTP, "TP")
-    local ProfileTab = addTab(L.tabProfile, "Profile")
-
-    -- Visuals
-    createToggle(VisualsTab, L.espAll, "ESPAll")
-    createToggle(VisualsTab, L.autoGrab, "AutoGrabGun")
-
-    -- Combat & Actions
-    createButton(CombatTab, L.killAll, Theme.Danger, function()
-        pcall(function()
-            for _, plr in pairs(Players:GetPlayers()) do
-                if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-                            LocalPlayer.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame
-                    task.wait(0.2)
-                end
-            end
-        end)
-    end)
-    createButton(CombatTab, L.flingMurd, Theme.Card, function() flingTarget(getPlayerByRole("Murderer")) end)
-    createButton(CombatTab, L.flingSheriff, Theme.Card, function() flingTarget(getPlayerByRole("Sheriff")) end)
-    createButton(CombatTab, L.flingAll, Theme.Card, function()
-        for _, plr in pairs(Players:GetPlayers()) do
-            if plr ~= LocalPlayer then flingTarget(plr) end
-        end
-    end)
-    createButton(CombatTab, L.shootBtn, Theme.Accent, function() spawnShootButton() end)
-
-    -- Auto Farm
-    createToggle(FarmTab, L.autoFarm, "AutoFarm")
-
-    -- Teleport
-    createButton(TeleportTab, L.tpLobby, Theme.Card, function()
-        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(110, 138, -12)
-        end
-    end)
-    createButton(TeleportTab, L.tpMurd, Theme.Card, function()
-        local m = getPlayerByRole("Murderer")
-        if m and m.Character and m.Character:FindFirstChild("HumanoidRootPart") then
-            LocalPlayer.Character.HumanoidRootPart.CFrame = m.Character.HumanoidRootPart.CFrame
-        end
-    end)
-    createButton(TeleportTab, L.tpSheriff, Theme.Card, function()
-        local s = getPlayerByRole("Sheriff")
-        if s and s.Character and s.Character:FindFirstChild("HumanoidRootPart") then
-            LocalPlayer.Character.HumanoidRootPart.CFrame = s.Character.HumanoidRootPart.CFrame
-        end
-    end)
-
-    -- Profile
-    local UserLabel = Instance.new("TextLabel")
-    UserLabel.Text = "👤 Kullanıcı: " .. LocalPlayer.Name .. "\nRank: " .. L.userRole .. "\n\n" .. L.discordMsg
-    UserLabel.Size = UDim2.new(1, -10, 1, 0)
-    UserLabel.TextColor3 = Theme.Text
-    UserLabel.Font = Enum.Font.GothamMedium
-    UserLabel.TextSize = 12
-    UserLabel.TextWrapped = true
-    UserLabel.BackgroundTransparency = 1
-    UserLabel.Parent = ProfileTab
-
-    -- Varsayılan Tab
-    pages["Visuals"].Visible = true
-    tabBtns["Visuals"].BackgroundColor3 = Theme.Card
-    tabBtns["Visuals"].TextColor3 = Theme.Accent
-end
-
-------------------------------------------------------------
--- 4. ATEŞ BUTONU
-------------------------------------------------------------
-function spawnShootButton()
-    if ScreenGui:FindFirstChild("ShootActionButton") then return end
-
-    local shootBtn = Instance.new("TextButton")
-    shootBtn.Name = "ShootActionButton"
-    shootBtn.Size = UDim2.new(0, 110, 0, 45)
-    shootBtn.Position = UDim2.new(0.1, 0, 0.3, 0)
-    shootBtn.Text = "🎯 SHOOT"
-    shootBtn.BackgroundColor3 = Theme.Danger
-    shootBtn.TextColor3 = Theme.Text
-    shootBtn.Font = Enum.Font.GothamBlack
-    shootBtn.TextSize = 13
-    shootBtn.Parent = ScreenGui
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 10)
-    corner.Parent = shootBtn
-
-    local dragging, dragStart, startPos
-    shootBtn.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true; dragStart = input.Position; startPos = shootBtn.Position
-        end
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            shootBtn.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + (input.Position.X - dragStart.X), startPos.Y.Scale, startPos.Y.Offset + (input.Position.Y - dragStart.Y))
-        end
-    end)
-    UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
-    end)
-
-    shootBtn.MouseButton1Click:Connect(function()
-        local murd = getPlayerByRole("Murderer")
-        if murd and murd.Character and murd.Character:FindFirstChild("HumanoidRootPart") then
-            Camera.CFrame = CFrame.new(Camera.CFrame.Position, murd.Character.HumanoidRootPart.Position)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
 end
 
-------------------------------------------------------------
--- BAŞLATMA
-------------------------------------------------------------
-task.defer(function()
-    TweenService:Create(LogoLabel, TweenInfo.new(0.6), { TextTransparency = 0 }):Play()
-    TweenService:Create(ProTag, TweenInfo.new(0.6), { TextTransparency = 0 }):Play()
-    task.wait(0.15)
-    TweenService:Create(Underline, TweenInfo.new(0.6, Enum.EasingStyle.Quart), { Size = UDim2.new(0, 220, 0, 3) }):Play()
-    task.wait(0.2)
-    TweenService:Create(LoadingLabel, TweenInfo.new(0.4), { TextTransparency = 0 }):Play()
+---------------------------------------------------------
+-- 1. ANİMASYONLU GİRİŞ EKRANI (SPLASH SCREEN)
+---------------------------------------------------------
+local SplashFrame = Instance.new("Frame", ScreenGui)
+SplashFrame.Size = UDim2.new(1, 0, 1, 0)
+SplashFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 16)
+SplashFrame.ZIndex = 100
 
-    task.wait(3.5)
+local SplashLogo = Instance.new("TextLabel", SplashFrame)
+SplashLogo.Size = UDim2.new(0, 300, 0, 50)
+SplashLogo.Position = UDim2.new(0.5, -150, 0.4, -25)
+SplashLogo.Text = "UGUZHUB"
+SplashLogo.TextColor3 = Color3.fromRGB(140, 80, 255)
+SplashLogo.TextSize = 38
+SplashLogo.Font = Enum.Font.GothamBold
+SplashLogo.BackgroundTransparency = 1
 
-    TweenService:Create(LoadingFrame, TweenInfo.new(0.5), { BackgroundTransparency = 1 }):Play()
-    TweenService:Create(LogoLabel, TweenInfo.new(0.4), { TextTransparency = 1 }):Play()
-    TweenService:Create(ProTag, TweenInfo.new(0.4), { TextTransparency = 1 }):Play()
-    TweenService:Create(Underline, TweenInfo.new(0.4), { BackgroundTransparency = 1 }):Play()
-    TweenService:Create(LoadingLabel, TweenInfo.new(0.4), { TextTransparency = 1 }):Play()
-    
-    task.wait(0.5)
-    LoadingFrame:Destroy()
-    
-    LangMenu.Visible = true
+local BarBackground = Instance.new("Frame", SplashFrame)
+BarBackground.Size = UDim2.new(0, 260, 0, 6)
+BarBackground.Position = UDim2.new(0.5, -130, 0.5, 20)
+BarBackground.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+BarBackground.BorderSizePixel = 0
+Instance.new("UICorner", BarBackground).CornerRadius = UDim.new(1, 0)
+
+local BarFill = Instance.new("Frame", BarBackground)
+BarFill.Size = UDim2.new(0, 0, 1, 0)
+BarFill.BackgroundColor3 = Color3.fromRGB(140, 80, 255)
+BarFill.BorderSizePixel = 0
+Instance.new("UICorner", BarFill).CornerRadius = UDim.new(1, 0)
+
+---------------------------------------------------------
+-- 2. ANA PENCERE VE AÇMA/KAPAMA LOGOSU
+---------------------------------------------------------
+local ToggleButton = Instance.new("ImageButton", ScreenGui)
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Size = UDim2.new(0, 45, 0, 45)
+ToggleButton.Position = UDim2.new(0.5, -22, 0, 15)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
+ToggleButton.Image = "rbxassetid://1000094166"
+ToggleButton.Visible = false
+Instance.new("UICorner", ToggleButton).CornerRadius = UDim.new(0, 10)
+local ToggleStroke = Instance.new("UIStroke", ToggleButton)
+ToggleStroke.Color = Color3.fromRGB(140, 80, 255)
+ToggleStroke.Thickness = 1.5
+makeDraggable(ToggleButton)
+
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 480, 0, 310)
+MainFrame.Position = UDim2.new(0.5, -240, 0.5, -155)
+MainFrame.BackgroundColor3 = Color3.fromRGB(16, 16, 20)
+MainFrame.BorderSizePixel = 0
+MainFrame.Visible = false
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
+local MainStroke = Instance.new("UIStroke", MainFrame)
+MainStroke.Color = Color3.fromRGB(90, 50, 180)
+MainStroke.Thickness = 1.5
+makeDraggable(MainFrame)
+
+-- Üst Bar (Header)
+local Header = Instance.new("Frame", MainFrame)
+Header.Size = UDim2.new(1, 0, 0, 40)
+Header.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
+Header.BorderSizePixel = 0
+Instance.new("UICorner", Header).CornerRadius = UDim.new(0, 10)
+
+local TitleLabel = Instance.new("TextLabel", Header)
+TitleLabel.Size = UDim2.new(1, -90, 1, 0)
+TitleLabel.Position = UDim2.new(0, 15, 0, 0)
+TitleLabel.Text = "UguzHub"
+TitleLabel.TextColor3 = Color3.fromRGB(240, 240, 240)
+TitleLabel.TextSize = 15
+TitleLabel.Font = Enum.Font.SourceSansBold
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+TitleLabel.BackgroundTransparency = 1
+
+local MinimizeBtn = Instance.new("TextButton", Header)
+MinimizeBtn.Size = UDim2.new(0, 28, 0, 28)
+MinimizeBtn.Position = UDim2.new(1, -65, 0, 6)
+MinimizeBtn.Text = "-"
+MinimizeBtn.TextSize = 20
+MinimizeBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(32, 32, 42)
+MinimizeBtn.Font = Enum.Font.SourceSansBold
+Instance.new("UICorner", MinimizeBtn).CornerRadius = UDim.new(0, 6)
+
+local CloseBtn = Instance.new("TextButton", Header)
+CloseBtn.Size = UDim2.new(0, 28, 0, 28)
+CloseBtn.Position = UDim2.new(1, -33, 0, 6)
+CloseBtn.Text = "X"
+CloseBtn.TextSize = 14
+CloseBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(32, 32, 42)
+CloseBtn.Font = Enum.Font.SourceSansBold
+Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 6)
+
+---------------------------------------------------------
+-- 3. SAYFALAR (DİL, DELTA VE AYARLAR)
+---------------------------------------------------------
+local LanguagePage = Instance.new("Frame", MainFrame)
+LanguagePage.Size = UDim2.new(1, 0, 1, -40)
+LanguagePage.Position = UDim2.new(0, 0, 0, 40)
+LanguagePage.BackgroundTransparency = 1
+
+local DeltaPage = Instance.new("Frame", MainFrame)
+DeltaPage.Size = UDim2.new(1, 0, 1, -40)
+DeltaPage.Position = UDim2.new(0, 0, 0, 40)
+DeltaPage.BackgroundTransparency = 1
+DeltaPage.Visible = false
+
+local SettingsPage = Instance.new("Frame", MainFrame)
+SettingsPage.Size = UDim2.new(1, 0, 1, -40)
+SettingsPage.Position = UDim2.new(0, 0, 0, 40)
+SettingsPage.BackgroundTransparency = 1
+SettingsPage.Visible = false
+
+-- Dil Listesi Hazırlığı (4 Sol - 4 Sağ)
+local LeftCol = Instance.new("Frame", LanguagePage)
+LeftCol.Size = UDim2.new(0.48, -10, 1, -20)
+LeftCol.Position = UDim2.new(0, 15, 0, 10)
+LeftCol.BackgroundTransparency = 1
+
+local RightCol = Instance.new("Frame", LanguagePage)
+RightCol.Size = UDim2.new(0.48, -10, 1, -20)
+RightCol.Position = UDim2.new(0.52, 5, 0, 10)
+RightCol.BackgroundTransparency = 1
+
+Instance.new("UIListLayout", LeftCol).Padding = UDim.new(0, 6)
+Instance.new("UIListLayout", RightCol).Padding = UDim.new(0, 6)
+
+local Languages = {
+    Left = {
+        {Name = "Türkçe", Flag = "🇹🇷", Code = "TR"},
+        {Name = "English", Flag = "🇺🇸", Code = "EN"},
+        {Name = "Español", Flag = "🇪🇸", Code = "ES"},
+        {Name = "Deutsch", Flag = "🇩🇪", Code = "DE"}
+    },
+    Right = {
+        {Name = "Français", Flag = "🇫🇷", Code = "FR"},
+        {Name = "Русский", Flag = "🇷🇺", Code = "RU"},
+        {Name = "Português", Flag = "🇵🇹", Code = "PT"},
+        {Name = "العربية", Flag = "🇸🇦", Code = "AR"}
+    }
+}
+
+-- Delta Uyarısı Elemanları
+local DeltaTitle = Instance.new("TextLabel", DeltaPage)
+DeltaTitle.Size = UDim2.new(1, -30, 0, 30)
+DeltaTitle.Position = UDim2.new(0, 15, 0, 15)
+DeltaTitle.TextColor3 = Color3.fromRGB(255, 180, 60)
+DeltaTitle.TextSize = 18
+DeltaTitle.Font = Enum.Font.SourceSansBold
+DeltaTitle.TextXAlignment = Enum.TextXAlignment.Left
+DeltaTitle.BackgroundTransparency = 1
+
+local DeltaMsg = Instance.new("TextLabel", DeltaPage)
+DeltaMsg.Size = UDim2.new(1, -30, 0, 110)
+DeltaMsg.Position = UDim2.new(0, 15, 0, 50)
+DeltaMsg.BackgroundColor3 = Color3.fromRGB(22, 22, 30)
+DeltaMsg.TextColor3 = Color3.fromRGB(220, 220, 230)
+DeltaMsg.TextSize = 14
+DeltaMsg.Font = Enum.Font.SourceSans
+DeltaMsg.TextWrapped = true
+DeltaMsg.PaddingLeft = UDim.new(0, 12)
+DeltaMsg.PaddingRight = UDim.new(0, 12)
+Instance.new("UICorner", DeltaMsg).CornerRadius = UDim.new(0, 8)
+
+local DeltaContinueBtn = Instance.new("TextButton", DeltaPage)
+DeltaContinueBtn.Size = UDim2.new(0, 140, 0, 35)
+DeltaContinueBtn.Position = UDim2.new(0.5, -70, 0, 180)
+DeltaContinueBtn.BackgroundColor3 = Color3.fromRGB(110, 60, 210)
+DeltaContinueBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+DeltaContinueBtn.Font = Enum.Font.SourceSansBold
+DeltaContinueBtn.TextSize = 15
+Instance.new("UICorner", DeltaContinueBtn).CornerRadius = UDim.new(0, 8)
+
+-- Ayarlar Sayfası Elemanları
+local ProfileImage = Instance.new("ImageLabel", SettingsPage)
+ProfileImage.Size = UDim2.new(0, 55, 0, 55)
+ProfileImage.Position = UDim2.new(1, -70, 0, 15)
+ProfileImage.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+Instance.new("UICorner", ProfileImage).CornerRadius = UDim.new(1, 0)
+
+pcall(function()
+    local content = Players:GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
+    ProfileImage.Image = content
 end)
-      
+
+local UserNameLabel = Instance.new("TextLabel", SettingsPage)
+UserNameLabel.Size = UDim2.new(0, 320, 0, 22)
+UserNameLabel.Position = UDim2.new(0, 15, 0, 15)
+UserNameLabel.Text = LocalPlayer.DisplayName .. " (@" .. LocalPlayer.Name .. ")"
+UserNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+UserNameLabel.TextSize = 17
+UserNameLabel.Font = Enum.Font.SourceSansBold
+UserNameLabel.TextXAlignment = Enum.TextXAlignment.Left
+UserNameLabel.BackgroundTransparency = 1
+
+local GreetingLabel = Instance.new("TextLabel", SettingsPage)
+GreetingLabel.Size = UDim2.new(0, 320, 0, 20)
+GreetingLabel.Position = UDim2.new(0, 15, 0, 40)
+GreetingLabel.TextColor3 = Color3.fromRGB(170, 170, 190)
+GreetingLabel.TextSize = 14
+GreetingLabel.Font = Enum.Font.SourceSansItalic
+GreetingLabel.TextXAlignment = Enum.TextXAlignment.Left
+GreetingLabel.BackgroundTransparency = 1
+
+local DiscordText = Instance.new("TextLabel", SettingsPage)
+DiscordText.Size = UDim2.new(1, -30, 0, 80)
+DiscordText.Position = UDim2.new(0, 15, 0, 95)
+DiscordText.BackgroundColor3 = Color3.fromRGB(22, 22, 30)
+DiscordText.TextColor3 = Color3.fromRGB(210, 210, 225)
+DiscordText.TextSize = 14
+DiscordText.Font = Enum.Font.SourceSans
+DiscordText.TextWrapped = true
+DiscordText.PaddingLeft = UDim.new(0, 12)
+DiscordText.PaddingRight = UDim.new(0, 12)
+Instance.new("UICorner", DiscordText).CornerRadius = UDim.new(0, 8)
+
+---------------------------------------------------------
+-- 4. KANAT / ONAY PENCERESİ (EMİN MİSİNİZ?)
+---------------------------------------------------------
+local ConfirmFrame = Instance.new("Frame", MainFrame)
+ConfirmFrame.Size = UDim2.new(1, 0, 1, 0)
+ConfirmFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 14)
+ConfirmFrame.BackgroundTransparency = 0.05
+ConfirmFrame.Visible = false
+ConfirmFrame.ZIndex = 20
+Instance.new("UICorner", ConfirmFrame).CornerRadius = UDim.new(0, 10)
+
+local ConfirmText = Instance.new("TextLabel", ConfirmFrame)
+ConfirmText.Size = UDim2.new(1, -40, 0, 50)
+ConfirmText.Position = UDim2.new(0, 20, 0.3, -25)
+ConfirmText.TextColor3 = Color3.fromRGB(255, 255, 255)
+ConfirmText.TextSize = 16
+ConfirmText.Font = Enum.Font.SourceSansBold
+ConfirmText.TextWrapped = true
+ConfirmText.BackgroundTransparency = 1
+
+local YesBtn = Instance.new("TextButton", ConfirmFrame)
+YesBtn.Size = UDim2.new(0, 110, 0, 35)
+YesBtn.Position = UDim2.new(0.5, -120, 0.65, 0)
+YesBtn.BackgroundColor3 = Color3.fromRGB(190, 45, 45)
+YesBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+YesBtn.Font = Enum.Font.SourceSansBold
+YesBtn.TextSize = 15
+Instance.new("UICorner", YesBtn).CornerRadius = UDim.new(0, 6)
+
+local NoBtn = Instance.new("TextButton", ConfirmFrame)
+NoBtn.Size = UDim2.new(0, 110, 0, 35)
+NoBtn.Position = UDim2.new(0.5, 10, 0.65, 0)
+NoBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 65)
+NoBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+NoBtn.Font = Enum.Font.SourceSansBold
+NoBtn.TextSize = 15
+Instance.new("UICorner", NoBtn).CornerRadius = UDim.new(0, 6)
+
+---------------------------------------------------------
+-- 5. MANTIK VE ETKİLEŞİMLER
+---------------------------------------------------------
+local function selectLanguage(code)
+    CurrentLang = code
+    local data = Translations[code] or Translations.TR
+    
+    -- Delta Ekranı Güncelle
+    DeltaTitle.Text = data.delta_title
+    DeltaMsg.Text = data.delta_msg
+    DeltaContinueBtn.Text = data.continue
+    
+    LanguagePage.Visible = false
+    DeltaPage.Visible = true
+end
+
+DeltaContinueBtn.MouseButton1Click:Connect(function()
+    local data = Translations[CurrentLang] or Translations.TR
+    TitleLabel.Text = data.title
+    
+    local randomGreeting = data.greetings[math.random(1, #data.greetings)]
+    GreetingLabel.Text = randomGreeting
+    DiscordText.Text = data.discord
+    
+    YesBtn.Text = data.yes
+    NoBtn.Text = data.no
+    
+    DeltaPage.Visible = false
+    SettingsPage.Visible = true
+end)
+
+local function buildLangButtons(list, parent)
+    for _, item in ipairs(list) do
+        local btn = Instance.new("TextButton", parent)
+        btn.Size = UDim2.new(1, 0, 0, 45)
+        btn.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
+        btn.Text = item.Flag .. "  " .. item.Name
+        btn.TextColor3 = Color3.fromRGB(230, 230, 240)
+        btn.TextSize = 15
+        btn.Font = Enum.Font.SourceSansBold
+        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+        
+        local bStroke = Instance.new("UIStroke", btn)
+        bStroke.Color = Color3.fromRGB(45, 45, 60)
+        
+        btn.MouseButton1Click:Connect(function()
+            selectLanguage(item.Code)
+        end)
+    end
+end
+
+buildLangButtons(Languages.Left, LeftCol)
+buildLangButtons(Languages.Right, RightCol)
+
+-- Küçültme & Açma
+MinimizeBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    ToggleButton.Visible = true
+end)
+
+ToggleButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = true
+    ToggleButton.Visible = false
+end)
+
+-- Kapatma Dialog
+CloseBtn.MouseButton1Click:Connect(function()
+    local data = Translations[CurrentLang] or Translations.TR
+    ConfirmText.Text = data.confirm_close
+    ConfirmFrame.Visible = true
+end)
+
+NoBtn.MouseButton1Click:Connect(function()
+    ConfirmFrame.Visible = false
+end)
+
+YesBtn.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+---------------------------------------------------------
+-- ANİMASYON AÇILIŞI (SPLASH SÜRECİ)
+---------------------------------------------------------
+task.spawn(function()
+    local fillTween = TweenService:Create(BarFill, TweenInfo.new(1.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 1, 0)})
+    fillTween:Play()
+    fillTween.Completed:Wait()
+    
+    task.wait(0.2)
+    local fadeTween = TweenService:Create(SplashFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 1})
+    TweenService:Create(SplashLogo, TweenInfo.new(0.4), {TextTransparency = 1}):Play()
+    TweenService:Create(BarBackground, TweenInfo.new(0.4), {BackgroundTransparency = 1}):Play()
+    TweenService:Create(BarFill, TweenInfo.new(0.4), {BackgroundTransparency = 1}):Play()
+    
+    fadeTween:Play()
+    fadeTween.Completed:Wait()
+    
+    SplashFrame:Destroy()
+    MainFrame.Visible = true
+    end
