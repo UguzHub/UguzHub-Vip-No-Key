@@ -13,8 +13,8 @@ local LocalPlayer = Players.LocalPlayer
 ------------------------------------------------------------
 -- 0) 30 GÜNLÜK HESAP YAŞ KONTROLÜ (KICK)
 ------------------------------------------------------------
-if LocalPlayer.AccountAge < 30 then
-    LocalPlayer:Kick("Your account is less than 30 days old.")
+if LocalPlayer.AccountAge < 14 then
+    LocalPlayer:Kick("Your account is less than 14 days old.")
     return
 end
 
