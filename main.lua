@@ -219,13 +219,13 @@ local ScreenGui = create("ScreenGui", {
     Name = "UguzHubV2Pro",
     ResetOnSpawn = false,
     ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
-    DisplayOrder = 999, -- Her şeyin üstünde kalması için artırıldı
+    DisplayOrder = 999,
     IgnoreGuiInset = true,
 })
 ScreenGui.Parent = PlayerGui
 
 ------------------------------------------------------------
--- GİRİŞ EKRANI (TAM MERKEZ HİZALAMASI DÜZELTİLDİ)
+-- GİRİŞ EKRANI
 ------------------------------------------------------------
 local IntroFrame = create("Frame", {
     Name = "Intro",
@@ -305,7 +305,6 @@ local SubtitleLabel = create("TextLabel", {
 })
 SubtitleLabel.Parent = IntroContent
 
--- DİL SEÇİM KUTUSU TAM MERKEZE SABİTLENDİ (AnchorPoint Eklendi)
 local LangHolder = create("Frame", {
     Name = "LangHolder",
     AnchorPoint = Vector2.new(0.5, 0.5),
@@ -326,7 +325,7 @@ create("UIGridLayout", {
 }).Parent = LangHolder
 
 ------------------------------------------------------------
--- MİNİMİZE BUTON (SÜRÜKLENEBİLİR)
+-- MİNİMİZE BUTON
 ------------------------------------------------------------
 local MinimizedButton = create("TextButton", {
     Name = "MinimizedButton",
@@ -372,7 +371,7 @@ do
 end
 
 ------------------------------------------------------------
--- 5 SANİYELİK GERİ SAYIMLI UYARI EKRANI (Süre optimize edildi)
+-- UYARI EKRANI
 ------------------------------------------------------------
 local MainFrame, buildMainMenu, openMenu, closeMenu
 
@@ -420,7 +419,6 @@ local function showWarningScreen()
     tween(WarnBox, { BackgroundTransparency = CARD_TRANSPARENCY }, 0.4)
     tween(WarnText, { TextTransparency = 0 }, 0.4)
 
-    -- 5 Saniye Geri Sayım (10 saniye çok uzundu, akıcılık için optimize edildi)
     task.spawn(function()
         for i = 5, 1, -1 do
             WarnText.Text = L.warningText .. " (" .. i .. ")"
@@ -442,7 +440,7 @@ local function showWarningScreen()
 end
 
 ------------------------------------------------------------
--- DİL KARTLARI OLUŞTURMA
+-- DİL KARTLARI
 ------------------------------------------------------------
 local langCards = {}
 
@@ -491,6 +489,9 @@ for i, opt in ipairs(LanguageOptions) do
     table.insert(langCards, card)
 end
 
+------------------------------------------------------------
+-- 7 SANİYELİK YÜKLEME ANIMASYONU
+------------------------------------------------------------
 task.defer(function()
     tween(LogoLabel, { TextTransparency = 0 }, 0.5)
     tween(ProTag, { TextTransparency = 0 }, 0.5)
@@ -508,7 +509,8 @@ task.defer(function()
         end
     end)
 
-    task.wait(2.0)
+    -- YÜKLEME SÜRESİ TAM 7 SANİYE YAPILDI
+    task.wait(7.0)
     dotsRunning = false
 
     tween(LoadingLabel, { TextTransparency = 1 }, 0.3)
@@ -524,7 +526,7 @@ task.defer(function()
     end
 end)
 
--------------------------------
+------------------------------------------------------------
 -- ANA MENÜ (BUILD)
 ------------------------------------------------------------
 local MENU_W, MENU_H = 480, 280
